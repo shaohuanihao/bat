@@ -46,7 +46,7 @@ goto :eof
 rem Activate
 set softlan=/Activate.bat
 set softwan=/Activate.bat
-set softother=/KMS_VL_ALL_AIO/raw/master/KMS_VL_ALL_AIO.cmd
+set softother=/bat/raw/main/KMS_VL_ALL_AIO.cmd
 call :make
 call :net
 del /f /s /q "%local%\Key\Activate.bat" & curl -# -o "%local%\Key\Activate.bat" -O -L %net% || echo.%error%
