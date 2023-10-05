@@ -1,0 +1,135 @@
+ÿþa
+cls
+echo off
+ver|findstr /i "5\.1\." > nul&&(goto:begin)
+net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+:begin
+echo off
+cls
+disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
+set Name=FixPrint½Å±¾
+set Powered=Powered by ÉÛ»ª 18900559020
+set Version=20231005
+set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
+title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+:start
+reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v forceguest /t REG_DWORD /d 0 /f
+cls
+echo.
+echo.¡¡ÇëÑ¡ÔñËùÐè²Ù×÷µÄ×ÖÄ¸¿ì½Ý¼ü£º&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡U£©¸üÕý¡¡ÃÜÂë£º¡¡½â¾öServer´òÓ¡»úÖ÷»úÒòÁªÈíÏÂ·¢Ç¿ÖÆÐÞ¸ÄÓÃ»§ÃÜÂë²ßÂÔµ¼ÖÂÎÞ·¨´òÓ¡µÄÎÊÌâ£»&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡S£©Ö÷»ú¡¡ÐÞ¸´£º¡¡Server´òÓ¡»ú·þÎñÆ÷£¨Ö±Á¬´òÓ¡»úµÄµçÄÔÖ÷»ú£©£»&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡C£©¿Í»§»úÐÞ¸´£º¡¡Client·ÃÎÊÕßµçÄÔ£¨ÐèÒªÌí¼Ó¹²Ïí´òÓ¡»úµÄÖ÷»ú£©£»&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡F£©½â¾ö¡¡±¨´í£º¡¡½â¾ö´òÓ¡µÄÊ±²¿·Ö¿Õ°×ºÍ±¨0x0000011bºÍ0x00000709µÄÎÊÌâ£»&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡D£©ÈÎÎñ¡¡ÇåÀí£º¡¡É¾³ý±¾»úÒÑ±£´æµÄ´òÓ¡ÈÎÎñ¼ÇÂ¼£»&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡O£©OfficeÐÞ¸´£º¡¡OfficeÄ£°å´íÎóÐÞ¸´£»&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
+choice /C USCFDO /N /M "¡¡[ °´ U ¸üÕýÃÜÂë / °´ S Ö÷»úÐÞ¸´ / °´ C ¿Í»§»úÐÞ¸´ / °´ F ½â¾ö±¨´í / °´ D ÈÎÎñÇåÀí / °´ O OfficeÐÞ¸´ ]"
+if errorlevel 6 goto office
+if errorlevel 5 goto clear
+if errorlevel 4 goto fix
+if errorlevel 3 goto client
+if errorlevel 2 goto server
+if errorlevel 1 goto update
+exit
+:fix
+@wusa /quiet /uninstall /kb:5000802 >nul 2>nul
+@wusa /quiet /uninstall /kb:5000808 >nul 2>nul
+@wusa /quiet /uninstall /kb:5006670 >nul 2>nul
+@wusa /quiet /uninstall /kb:5006667 >nul 2>nul
+@wusa /quiet /uninstall /kb:5006672 >nul 2>nul
+@wusa /quiet /uninstall /kb:5006669 >nul 2>nul
+@wusa /quiet /uninstall /kb:5006675 >nul 2>nul
+@wusa /quiet /uninstall /kb:5005569 >nul 2>nul
+@wusa /quiet /uninstall /kb:5005573 >nul 2>nul
+@wusa /quiet /uninstall /kb:5005568 >nul 2>nul
+@wusa /quiet /uninstall /kb:5005566 >nul 2>nul
+@wusa /quiet /uninstall /kb:5005565 >nul 2>nul
+goto end
+:update
+net user PrintUser Hs123456 >nul 2>nul
+goto end
+:server
+cls&echo.
+echo.¡¡ÎÒ½«ÎªÄú×Ô¶¯»¯ÒÔÏÂ²Ù×÷£º&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡×¢Òâ£ºµ±Ç°Ñ¡ÔñÊÇ¡¾´òÓ¡»úÖ÷»ú¡¿¡£&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡1£©£ºÉ¾³ýÏÖÓÐ printuser ºÍ printeruserÓÃ»§£»
+echo.¡¡¡¡¡¡¡¡¡¡¡¡2£©£ºÐÂ½¨ PrintUser ÓÃ»§£»
+echo.¡¡¡¡¡¡¡¡¡¡¡¡3£©£ºÎª PrintUser ÓÃ»§ÉèÖÃ¡°Hs123456¡±ÃÜÂë£»
+echo.¡¡¡¡¡¡¡¡¡¡¡¡4£©£ºÎª PrintUser ÓÃ»§ÉèÖÃÃÜÂëÓÀ²»¹ýÆÚ£»
+echo.¡¡¡¡¡¡¡¡¡¡¡¡5£©£º½ûÓÃ Guset ÓÃ»§£»
+echo.¡¡¡¡¡¡¡¡¡¡¡¡6£©£ºÉèÖÃ¹²Ïí·ÃÎÊÐÎÊ½ÎªÃÜÂë¹²Ïí£»&echo.&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
+echo.¡¡°´ÈÎÒâ¼ü¼ÌÐø...&pause >nul 2>nul&cls&echo.&echo.¡¡²¿ÊðÖÐ£¬ÇëÉÔºó...&echo.&
+net stop server /y
+net stop spooler /y
+net stop workstation /y
+net user printuser /delete >nul 2>nul
+net user PrintUser /delete >nul 2>nul
+net user PrinterUser /delete >nul 2>nul
+net user PrintUser Hs123456 /add >nul 2>nul
+net localgroup Users PrintUser /add >nul 2>nul
+wmic path win32_useraccount where name='PrintUser' set passwordexpires='false' >nul 2>nul
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" /v "PrintUser" /d "0" /t reg_dword /f >nul 2>nul
+net user guest /active:no>nul 2>nul
+reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v forceguest /t REG_DWORD /d 0 /f
+net start workstation
+net start server
+net start spooler
+net start SSDPSRV
+sc config SSDPSRV start= auto
+cls&echo. &echo. &echo. Çë¼ÇÏÂIPµØÖ·£¬¿Í»§»úÌí¼Ó¹²Ïí´òÓ¡»úÊ±ºò»áÓÃµ½¡£&echo.&FOR /F "tokens=2 delims=:" %%A in ('ipconfig ^| findstr "IPv4"') do echo. ÄúµÄIP¿ÉÄÜÊÇ£º¡¾%%A¡¿&echo.&pause
+cls&echo.
+echo.¡¡²¿ÊðÍê³É...Çë¡¾ÖØÆôµçÄÔºó¡¿£¡ÔÙµ½ÐèÒªÁ¬½Ó¹²Ïí´òÓ¡»úµÄµçÄÔÉÏÔËÐÐ±¾½Å±¾...&echo.&echo.&echo.&echo.&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¾ÛÉ¢ÖÕÓÐÊ±¡¡ÔÙ¼ûÒàÓÐÆÚ&echo.&echo.&echo.&echo.&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
+echo.¡¡Èç¹û»¹ÓÐÎÊÌâ¾Í´òÎÒµç»°°É...&timeout /t 6 >nul&exit
+:client
+cls&echo.
+echo.×ûÇëÊäÈë¶Ô·½µØÖ·&echo.×û²»È·¶¨µÄ»°£¬¾ÍÓÃ¡¾´òÓ¡»úµÄµçÄÔÖ÷»ú¡¿´ò¿ª·ÖÐÐÄÚÍø£¬²é¿´ÍøÒ³¶¥²¿IPµØÖ·¡£&echo.&echo.×ûÆ©Èç£º&echo.×û38.4*.***.***&echo.
+set "input="&set "f="
+set /p input=×ûÇëÊäÈëIP:
+echo;"%input%"|>nul findstr "^\"[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\"$"||(goto client)
+for %%a in (%input:.= %) do (echo;%%a|>nul findstr "^25[0-5]$ ^2[0-4][0-9]$ ^1[0-9][0-9]$ ^[1-9][0-9]$ ^[0-9]$"||(goto client))
+echo.&echo.×û¶Ô·½IPµØÖ·Îª£º×û×û×û¡¾%input%¡¿&set p=&for /f "tokens=3 delims=: " %%p in ('ping -a %input% -w 1 -n 1') do (set /a p+=1&if !p!==1 echo.¡¡¶Ô·½¼ÆËã»úÃûÎª£º×û×û¡¾%%p¡¿&set name=%%p)
+echo.&echo.×û×¢Òâ£º¼ÆËã»úÃûÀíÓ¦Îª×ûMAS-HS********×ûÕâ°ã¸ñÊ½£¬ÈçÉÏ·½Ã»ÓÐ³öÏÖ£¬ÇëÖØÐÂÊäÈë&echo.&echo.&echo.&echo.&echo.
+choice /C:YN /N /M "¡¡[ °´¡®Y¡¯È·ÈÏ / °´¡®N¡¯ÖØÊä ]"
+if errorlevel 2 goto client
+if errorlevel 1 goto cmdkey
+:cmdkey
+cls&echo.&echo.É¾³ýÏÖÓÐ%name%µÄÆ¾Ö¤
+cmdkey /delete:%name%
+echo.&echo.Ìí¼ÓÕýÈ·%name%µÄÆ¾Ö¤
+cmdkey /add:%name% /user:PrintUser /pass:Hs123456
+net use \\%name%\ "Hs123456" /user:"PrintUser"
+cmdkey /add:%input% /user:PrintUser /pass:Hs123456
+net use \\%input%\ "Hs123456" /user:"PrintUser"
+explorer \\%name%\
+goto end
+:clear
+sc config spooler start= disabled
+net stop spooler
+net session /delete /y
+attrib %systemroot%\System32\spool\PRINTERS\*.* -R /s
+del %systemroot%\System32\spool\PRINTERS\*.* /q /s
+sc config spooler start= auto
+net start spooler
+goto end
+:office
+del /a /f /s /q "C:\Documents and Settings\%UserName%\Application Data\Microsoft\Templates\*.*"
+del /a /f /s /q "C:\Documents and Settings\Administrator\Application Data\Microsoft\Templates\*.*"
+regsvr32 /u /s pintlgnt.ime
+del /f /s /q "%userprofile%\local settings\temp\*.*"
+del /f /s /q "%appdata%\microsoft\Templates\*.dot"
+del /f /s /q "%appdata%\microsoft\Word\Startup\*.dot"
+goto end
+:end
+mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+echo.&echo.¡¡²¿ÊðÍê³É...&echo.&echo.&echo.&echo.&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¾ÛÉ¢ÖÕÓÐÊ±¡¡ÔÙ¼ûÒàÓÐÆÚ&echo.&echo.&echo.&echo.&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
+echo.¡¡Èç¹û»¹ÓÐÎÊÌâ¾Í´òÎÒµç»°°É...&timeout /t 6 >nul&exit

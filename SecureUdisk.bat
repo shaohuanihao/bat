@@ -1,0 +1,127 @@
+ÿþa
+cls
+echo off
+ver|findstr /i "5\.1\." > nul&&(goto:begin)
+net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+:begin
+echo off
+cls
+disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
+set Name=SecureUdisk½Å±¾
+set Powered=Powered by ÉÛ»ª 18900559020
+set Version=20231005
+set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
+title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+:start
+rem ÒýÈë±äÁ¿
+set vnn1=
+set vnn2={679F137C-3162-45da-BE3C-2F9C3D093F68}
+set vnn3={679F137C-3162-45da-BE3C-2F9C3D093F69}
+set vcn1=°²È«UÅÌ
+set vcn2=°²È«UÅÌ_V2
+set vcn3=°²È«UÅÌ_V3
+set vpn1=C:\ShaoHua\Soft\FugueExplorer.exe
+set vpn2=C:\ShaoHua\Soft\FugueExplorer_v2.exe
+set vpn3=C:\ShaoHua\Soft\FugueExplorer_v3.exe
+set vpn4=%~dp0\FugueExplorer_v3.exe
+rem ½áÊø½ø³Ì
+taskkill /f /im FugueExplorer.exe
+rem ÅÐ¶Ï°æ±¾
+if exist "C:\ShaoHua\Soft\FugueExplorer.exe" (goto upanver) else (goto menu)
+:upanver
+set EXE='C:\ShaoHua\Soft\FugueExplorer.exe'
+powershell "(Get-Item -path %EXE%).VersionInfo.ProductVersion" > DE_Version_tmp.txt
+for /f "tokens=*" %%i in (DE_Version_tmp.txt) do set vvn=%%i
+del DE_Version_tmp.txt
+if %vvn% EQU 8.7.1.16 ren "C:\ShaoHua\Soft\FugueExplorer.exe" FugueExplorer_v3.exe
+if %vvn% EQU 8.7.1.16 set vcn=%vcn3%
+if %vvn% NEQ 8.7.1.16 ren "C:\ShaoHua\Soft\FugueExplorer.exe" FugueExplorer_v2.exe
+if %vvn% NEQ 8.7.1.16 set vcn=%vcn2%
+rem ÏÔÊ¾¹¦ÄÜ
+:menu
+cls&echo.
+echo.  µ±Ç°ÏµÍ³°²È«UÅÌÎª %vcn% °æ±¾ºÅÎª %vvn%¡£&echo.&echo.
+echo.               ÎÒ½«ÎªÄú×Ô¶¯»¯ÒÔÏÂ²Ù×÷£º&echo.&echo.
+echo.                              a1£©£ºÉ¾³ý  ×ÀÃæ        %vcn1%  ËùÓÐ°æ±¾µÄ  ¿ì½Ý·½Ê½
+echo.                              a2£©£ºÉ¾³ý  ×ÊÔ´¹ÜÀíÆ÷  %vcn1%  ËùÓÐ°æ±¾µÄ  ¿ì½Ý·½Ê½
+echo.                              b1£©£ºÉú³É  ×ÀÃæ        %vcn1%  ×îÐÂ°æ±¾µÄ  ¿ì½Ý·½Ê½
+echo.                              b2£©£ºÉú³É  ×ÊÔ´¹ÜÀíÆ÷  %vcn1%  ×îÐÂ°æ±¾µÄ  ¿ì½Ý·½Ê½
+echo.&echo.&echo.&echo.
+echo.                                                                                                        ÉÛ»ª
+echo.                                                                                                 18900559020&echo.
+echo.  °´ÈÎÒâ¼ü¼ÌÐø...&pause >nul 2>nul&cls&echo.&echo.  ÇåÀíÖÐ£¬ÇëÉÔºó...&echo.
+
+rem clear Secure Udisk V1
+del /f /q "%userprofile%\Desktop\%vcn1%.lnk"
+del /f /q "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Network Shortcuts\%vcn1%.exe"
+del /f /q "%UserProfile%\AppData\Roaming\Microsoft\Windows\Network Shortcuts\%vcn1%.exe"
+
+rem clear Secure Udisk V2
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\%vnn2%" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\%vnn2%" /f
+reg delete "HKCR\CLSID\%vnn2%" /f
+reg delete "HKCU\Software\Classes\CLSID\%vnn2%" /f
+reg delete "HKLM\Software\Classes\CLSID\%vnn2%" /f
+del /f /q "%userprofile%\Desktop\%vcn2%.lnk"
+
+rem clear Secure Udisk V3
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\%vnn3%" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\%vnn3%" /f
+reg delete "HKCR\CLSID\%vnn3%" /f
+reg delete "HKCU\Software\Classes\CLSID\%vnn3%" /f
+reg delete "HKLM\Software\Classes\CLSID\%vnn3%" /f
+del /f /q "%userprofile%\Desktop\%vcn3%.lnk"
+
+rem xuanze
+cls&echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.                                     ÒÑ¾­³É¹¦É¾³ý  ËùÓÐ°æ±¾µÄ  ¿ì½Ý·½Ê½£¡&echo.
+echo.                                     ÊÇ·ñ¼ÌÐøÌí¼Ó  ×îÐÂ°æ±¾µÄ  ¿ì½Ý·½Ê½£¿&echo.&echo.&echo.&echo.&echo.&echo.&echo.
+SET Choice=
+SET /P Choice=¡¡¡¡Ö±½Ó°´»Ø³µ¼üÔò¼ÌÐø£¨ÊäÈëÆäËûÈÎÒâ¼ü»Ø³µÔòÍË³ö£©
+IF "%Choice%" EQU "" GOTO add
+IF "%Choice%" NEQ "" GOTO exit
+exit
+:add
+cls
+rem add Secure Udisk
+set vnn=%vnn3%
+set vcn=%vcn3%
+set vpn=%vpn3%
+
+rem %systemroot%\LVUAAgentlnstBaseRoot\FugueExplorer.exe
+echo f | xcopy /d /y /g /h FugueExplorer_v3.exe %vpn3%
+echo f | xcopy /d /y /g /h %~dp0FugueExplorer_v3.exe %vpn3%
+echo f | xcopy /d /y /g /h D:\LVUAAgentlnstBaseRoot\FugueExplorer.exe %vpn3%
+echo f | xcopy /d /y /g /h %systemroot%\LVUAAgentlnstBaseRoot\FugueExplorer.exe %vpn3%
+if exist "C:\ShaoHua\Soft\FugueExplorer_v3.exe" (echo.) else (goto end)
+if exist "%vpn%" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\%vcn%.lnk""):b.TargetPath=""%vpn%"":b.WorkingDirectory=""C:\ShaoHua\Soft"":b.Save:close") 2>nul
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\%vnn%" /ve /t reg_sz /d "%vcn%" /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\%vnn%" /ve /t reg_sz /d "%vcn%" /f
+reg add "HKCR\CLSID\%vnn%" /ve /t reg_sz /d "%vcn%" /f
+reg add "HKCR\CLSID\%vnn%" /v "InfoTip" /t reg_sz /d "¿ì½Ý²¹¶¡By_ShaoHua" /f
+reg add "HKCR\CLSID\%vnn%" /v "LocalizedString" /t reg_sz /d "%vcn%" /f
+reg add "HKCR\CLSID\%vnn%" /v "System.ItemAuthors" /t reg_sz /d "¿ì½Ý²¹¶¡By_ShaoHua" /f
+reg add "HKCR\CLSID\%vnn%" /v "TileInfo" /t reg_sz /d "prop:System.ItemAuthors" /f
+reg add "HKCR\CLSID\%vnn%\DefaultIcon" /ve /t reg_expand_sz /d "%vpn%" /f
+reg add "HKCR\CLSID\%vnn%\Shell\Open\Command" /ve /t reg_sz /d "%vpn%" /f
+reg add "HKCR\CLSID\%vnn%\Instance" /v "CLSID" /t reg_sz /d "{0AFACED1-E828-11D1-9187-B532F1E9575D}" /f
+reg add "HKCR\CLSID\%vnn%\Instance\InitPropertyBag" /v "Target" /t reg_sz /d "C:\ShaoHua\Soft\\" /f
+reg add "HKCU\Software\Classes\CLSID\%vnn%" /ve /t reg_sz /d "%vcn%" /f
+reg add "HKLM\Software\Classes\CLSID\%vnn%" /ve /t reg_sz /d "%vcn%" /f
+
+:exit
+rem ÅÐ¶Ï°æ±¾
+if exist "C:\ShaoHua\Soft\FugueExplorer_v3.exe" (goto upanf) else (goto end)
+:upanf
+set EXE='C:\ShaoHua\Soft\FugueExplorer_v3.exe'
+powershell "(Get-Item -path %EXE%).VersionInfo.ProductVersion" > DE_Version_tmp.txt
+for /f "tokens=*" %%i in (DE_Version_tmp.txt) do set vvn=%%i
+del DE_Version_tmp.txt
+:end
+cls&echo.
+echo.&echo.  µ±Ç°ÏµÍ³°²È«UÅÌÎª %vcn% °æ±¾ºÅÎª %vvn%¡£&echo.&echo.&echo.&echo.&echo.&echo.
+echo.                                            ¾ÛÉ¢ÖÕÓÐÊ±  ÔÙ¼ûÒàÓÐÆÚ&echo.&echo.&echo.&echo.&echo.&echo.
+echo.                                                                                                        ÉÛ»ª
+echo.                                                                                                 18900559020&echo.
+echo.  Èç¹û»¹ÓÐÎÊÌâ¾Í´òÎÒµç»°°É...&timeout /t 6 >nul&exit
+
+

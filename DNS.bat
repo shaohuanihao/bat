@@ -1,0 +1,98 @@
+ÿþa
+cls
+echo off
+cls
+disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
+set Name=DNS½Å±¾
+set Powered=Powered by ÉÛ»ª 18900559020
+set Version=20231005
+set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
+title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+:menu
+cls
+echo.
+echo.¡¡ÇëÑ¡ÔñÄúµ±Ç°µçÄÔÊÇÄÚÍø»¹ÊÇÍâÍø£¿&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë A Ñ¡ÔñÎª ¡¾×Ô¶¯¡¡ÅÐ¶Ï¡¿£¨10ÃëºóÄ¬ÈÏÖ´ÐÐ£©&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë L Ñ¡ÔñÎª ¡¾HS-LanÄÚÍø¡¿&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë W Ñ¡ÔñÎª ¡¾HS-WanÍâÍø¡¿&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë O Ñ¡ÔñÎª ¡¾PC-OtherÆäËû¡¿&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë Q ½Å±¾½« ¡¾ÍË³ö¡¿&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
+echo.¡¡ÇëÊäÈë£º&choice /T 10 /C ALWOQS /d A /N >nul 2>nul
+mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+if %errorlevel%==1 goto auto
+if %errorlevel%==2 goto HS-Lan
+if %errorlevel%==3 goto HS-Wan
+if %errorlevel%==4 goto PC-Other
+if %errorlevel%==5 exit
+if %errorlevel%==6 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.ÈçÄúÏëÊ¹ÓÃÈ«²¿¹¦ÄÜ£¬ÇëÁªÏµÉÛ»ª18900559020°²×°×îÐÂ²Ù×÷ÏµÍ³¾µÏñ¡£&timeout /t 10)
+:auto
+call :net
+goto %Pc%
+:HS-Lan
+title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+call :const
+set Pc=HS-Lan
+call :del
+call :add
+goto exit
+:HS-Wan
+call :net
+title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+call :const
+set Pc=HS-Wan
+call :del
+call :add
+goto exit
+:PC-Other
+call :net
+title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+call :const
+set Pc=PC-Other
+call :del
+goto exit
+:list
+:net
+set Pc=&arp -a|findstr /i "38.40." >nul && (set Pc=HS-Lan)||(arp -a|findstr /i "38.41." >nul && (set Pc=HS-Lan)||(arp -a|findstr /i "10.198." >nul && (set Pc=HS-Wan)||(set Pc=PC-Other)))
+goto :eof
+:const
+set wangka1=±¾µØÁ¬½Ó&set wangka2=±¾µØÁ¬½Ó 2&set wangka3=ÒÔÌ«Íø&set wangka4=ÒÔÌ«Íø 2&set wangka5=ÒÔÌ«Íø 3
+set HS-Lan1=38.19.64.129&set HS-Lan2=38.16.36.8&set HS-Lan3=38.19.18.10&set HS-Lan4=38.16.68.8&set HS-Lan5=38.19.17.240
+set HS-Wan1=61.132.163.68&set HS-Wan2=218.104.78.2&set HS-Wan3=202.102.192.68&set HS-Wan4=202.102.199.68&set HS-Wan5=58.242.2.2
+set add1=netsh interface ipv4 add dnsservers "
+set add3=" address="
+set add5=" index="
+set add7=" validate=no
+goto :eof
+:del
+netsh interface ipv4 delete dnsservers "%wangka1%" all >nul 2>nul
+netsh interface ipv4 delete dnsservers "%wangka2%" all >nul 2>nul
+netsh interface ipv4 delete dnsservers "%wangka3%" all >nul 2>nul
+netsh interface ipv4 delete dnsservers "%wangka4%" all >nul 2>nul
+goto :eof
+:add
+set Ano=1&set Bno=1
+:SetA
+if "%Ano%"=="6" goto ex
+call set wangka=%%wangka%Ano%%%
+:SetB
+if "%Bno%"=="6" goto SetbBEnd
+call set net=%%%Pc%%Bno%%%
+%add1%%wangka%%add3%%net%%add5%%Bno%%add7%
+set /a Bno=%Bno%+1
+goto SetB
+:SetbBEnd
+set Bno=1
+set /a Ano=%Ano%+1
+goto SetA
+:ex
+goto :eof
+:exit
+ipconfig /flushdns >nul 2>nul
+echo.&echo.¡¡²¿ÊðÍê³É...&echo.&echo.&echo.&echo.&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¾ÛÉ¢ÖÕÓÐÊ±¡¡ÔÙ¼ûÒàÓÐÆÚ&echo.&echo.&echo.&echo.&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
+echo.¡¡Èç¹û»¹ÓÐÎÊÌâ¾Í´òÎÒµç»°°É...&timeout /t 6 >nul&exit

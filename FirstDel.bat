@@ -1,0 +1,29 @@
+ÿþa
+cls
+echo off
+ver|findstr /i "5\.1\." > nul&&(goto:begin)
+net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+:begin
+echo off
+cls
+disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
+set Name=FirstDel½Å±¾
+set Powered=Powered by ÉÛ»ª 18900559020
+set Version=20231005
+set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
+title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+rem É¾³ýËùÓÐ¼Æ»®ÈÎÎñ
+timeout /t 3 >nul
+schtasks /delete /tn * /F
+rem É¾³ý¿ª»ú¶àÓàÆô¶¯Ïî
+@reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /va /f
+@reg delete HKLM\Software\Microsoft\Windows\CurrentVersion\Run /va /f
+reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ctfmon.exe /d C:\WINDOWS\system32\ctfmon.exe
+@reg delete "HKLM\Software\Microsoft\Shared Tools\MSConfig\startupreg" /f
+del "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*.*" /q /f
+del "C:\Users\All Users\Microsoft\Windows\Start Menu\Programs\StartUp\*.*" /q /f
+del "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\*.*" /q /f
+del "C:\Sysprep\*.*" /q /f
+rd "C:\Sysprep\" /s /q /f
+del "%userprofile%\¡¸¿ªÊ¼¡¹²Ëµ¥\³ÌÐò\Æô¶¯\*.*" /q /f 
+exit

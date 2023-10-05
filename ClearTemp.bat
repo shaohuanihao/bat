@@ -1,0 +1,164 @@
+ÿþa
+cls
+echo off
+ver|findstr /i "5\.1\." > nul&&(goto:begin)
+net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+:begin
+echo off
+cls
+disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
+set Name=ClearTemp½Å±¾
+set Powered=Powered by ÉÛ»ª 18900559020
+set Version=20231005
+set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
+title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+:start
+cls&for /f "tokens=2 delims=()" %%i in ('fsutil volume diskfree c:^|find /i "¿ÉÓÃ"') do set myvar=%%i&echo.
+echo.¡¡µ±Ç°CÅÌ¿ÉÓÃÈÝÁ¿Îª%myvar%¡£&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡ÎÒ½«ÎªÄú×Ô¶¯»¯ÒÔÏÂ²Ù×÷£º&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡1£©£ºÇ¿ÖÆ¹Ø±Õ Î¢ÐÅ ³ÌÐò
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡2£©£ºÇ¿ÖÆ¹Ø±Õ Internet Explorer ^& 360 ^& Google Chromeä¯ÀÀÆ÷ ½ø³Ì
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡3£©£ºÇåÀí Î¢ÐÅ×Ô¶¯±£´æµÄÎÄµµ ^& Í¼Æ¬ ^& ÊÓÆµ ^& ÁÄÌì¼ÇÂ¼µÈÒ»ÇÐ ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡4£©£ºÇåÀí ÏµÍ³ Temp ÁÙÊ± ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡5£©£ºÇåÀí ´òÓ¡×Ô¶¯±£´æ¼ÇÂ¼ ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡6£©£ºÇåÀí Internet Explorer ^& 360 ^& Google Chrome ä¯ÀÀÆ÷»º´æ ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡7£©£ºÇåÀí Windows Éý¼¶ÁÙÊ± ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡8£©£ºÇåÀí ÏµÍ³À¬»ø¸ñÊ½¼°¼ÇÂ¼ÎÄ¼þ ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡9£©£ºÆô¶¯ ´ÅÅÌÇåÀí³ÌÐò ×Ô¶¯ÇåÀí
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
+echo.¡¡°´ÈÎÒâ¼ü¿ªÊ¼...&pause >nul 2>nul&cls&echo.&echo.¡¡ÇåÀíÖÐ£¬ÇëÉÔºó...&echo.
+mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+call :l1
+call :l2
+call :l3
+call :l4
+call :l5
+call :l6
+call :l7
+call :l8
+call :l9
+call :exit
+:l1
+cls&echo.
+taskkill /f /t /im WeChat.exe 2>nul
+taskkill /f /t /im WechatBrowser.exe 2>nul
+goto :eof
+:l2
+cls&echo.
+taskkill /f /t /im iexplore.exe 2>nul
+taskkill /f /t /im chrome.exe  2>nul
+taskkill /f /t /im firefox.exe  2>nul
+taskkill /f /t /im 360se.exe 2>nul
+taskkill /f /t /im sesvc.exe 2>nul
+goto :eof
+:l3
+rem Delete WeChat Files directory
+cls&echo.&echo.¡¡ÊÇ·ñÈ·ÈÏÇå³ý¡¡¡¾Î¢ÐÅ×Ô¶¯±£´æµÄÎÄµµ ^& Í¼Æ¬ ^& ÊÓÆµ ^& ÁÄÌì¼ÇÂ¼µÈÒ»ÇÐÎÄ¼þ¡¿¡¡£¿
+call :xuanze
+if %errorlevel%==2 goto :eof
+call :tishi
+for /f "tokens=1,2,*" %%i in ('REG QUERY HKEY_CURRENT_USER\Software\Tencent\WeChat /v FileSavePath') do set "regvalue=%%k"
+del /f /s /q "%userprofile%\Documents\WeChat Files\*.*"
+del /f /s /q "%regvalue%\WeChat Files\*.*"
+goto :eof
+:l4
+rem Clear temp and temp cache directories
+cls&echo.&echo.¡¡ÊÇ·ñÈ·ÈÏÇå³ý¡¡¡¾ÏµÍ³TempÁÙÊ±ÎÄ¼þ¡¿¡¡£¿
+call :xuanze
+if %errorlevel%==2 goto :eof
+call :tishi
+set temp=%temp%
+set tmp=%tmp%
+del /f /s /q %temp%\*.* 
+del /f /s /q %tmp%\*.*
+rd /s /q %temp%
+md %temp%
+rd /s /q %tmp%
+md %tmp%
+goto :eof
+:l5
+rem Delete print task history files
+cls&echo.&echo.¡¡ÊÇ·ñÈ·ÈÏÇå³ý¡¡¡¾´òÓ¡×Ô¶¯±£´æ¼ÇÂ¼ÎÄ¼þ¡¿¡¡£¿
+call :xuanze
+if %errorlevel%==2 goto :eof
+call :tishi
+del /f /s /q "C:\Windows\System32\spool\PRINTERS\*.*"
+goto :eof
+:l6
+rem Delete browser cache files
+cls&echo.&echo.¡¡ÊÇ·ñÈ·ÈÏÇå³ý¡¡¡¾Internet Explorer ^& 360 ^& Google Chrome ä¯ÀÀÆ÷»º´æÎÄ¼þ¡¿¡¡£¿
+call :xuanze
+if %errorlevel%==2 goto :eof
+call :tishi
+del /f /s /q "%userprofile%\AppData\Local\Microsoft\Windows\INetCache\*.*"
+del /f /s /q "%userprofile%\AppData\Local\Google\Chrome\User Data\Default\Cache\*.*"
+del /f /s /q "%userprofile%\AppData\Local\360Chrome\User Data\Default\Cache\*.*"
+del /f /s /q "%userprofile%\AppData\roaming\360se6\User Data\Default\Cache\*.*"
+goto :eof
+:l7
+rem Remove Windows upgrade files
+cls&echo.&echo.¡¡ÊÇ·ñÈ·ÈÏÇå³ý¡¡¡¾WindowsÉý¼¶ÁÙÊ±ÎÄ¼þ¡¿¡¡£¿
+call :xuanze
+if %errorlevel%==2 goto :eof
+call :tishi
+rd /s /q %windir%\SoftwareDistribution\Download
+rd /s /q %windir%$Windows.~BT
+rd /s /q %windir%\servicing\Packages
+goto :eof
+:l8
+rem Delete symptom files
+cls&echo.&echo.¡¡ÊÇ·ñÈ·ÈÏÇå³ý¡¡¡¾ÏµÍ³À¬»ø¸ñÊ½¼°¼ÇÂ¼ÎÄ¼þ¡¿¡¡£¿
+call :xuanze
+if %errorlevel%==2 goto :eof
+call :tishi
+rem ÁÙÊ±ÎÄ¼þ
+del /f /s /q %systemdrive%\*.tmp
+rem ÁÙÊ±ÎÄ¼þ
+del /f /s /q %systemdrive%\*._mp
+rem ÈÕÖ¾ÎÄ¼þ
+del /f /s /q %systemdrive%\*.log
+rem ÁÙÊ±°ïÖúÎÄ¼þ
+del /f /s /q %systemdrive%\*.gid
+rem ´ÅÅÌ¼ì²éÎÄ¼þ
+del /f /s /q %systemdrive%\*.chk
+rem ÁÙÊ±±¸·ÝÎÄ¼þ
+del /f /s /q %systemdrive%\*.old
+rem »ØÊÕÕ¾ÎÄ¼þ
+del /f /s /q %systemdrive%\recycled\*.*
+rem ±¸·ÝÎÄ¼þ
+del /f /s /q %windir%\*.bak
+rem Ô¤¶ÁÎÄ¼þ
+del /f /s /q %windir%\prefetch\*.*
+rem ÁÙÊ±Ä¿Â¼
+del /f /s /q %windir%\temp\*.*
+rem ×î½ü·ÃÎÊÎÄ¼þµÄ¼ÍÂ¼
+del /f /s /q %userprofile%\recent\*.*
+del /f /s /q "%userprofile%\Local Settings\Temporary Internet Files\*.*"
+del /f /s /q "%userprofile%\Local Settings\Temp\*.*"
+goto :eof
+:l9
+rem Run disk cleanup tool by Sageset id 60
+cls&echo.&echo.¡¡ÊÇ·ñÈ·ÈÏÆô¶¯¡¡¡¾´ÅÅÌÇåÀí³ÌÐò¡¿¡¡Íê³É×îºóµÄÊÖ¶¯ÇåÀí£¿
+call :xuanze
+if %errorlevel%==2 goto :eof
+call :tishi
+rem Cleanmgr.exe /sageset:60
+rem Cleanmgr.exe /sagerun:60
+cleanmgr.exe /VERYLOWDISK
+goto :eof
+:xuanze
+echo.&echo.¡¡°´¡¾Y¡¿¼ÌÐø£¬°´¡¾N¡¿Ìø¹ý¡£&echo.&echo.¡¡ÇëÈ·ÈÏ£¡&echo.&echo.¡¡4Ãëºó£¬½«ÊÓÎªY¼ÌÐø¡£
+choice /T 3 /C YN /d Y /N >nul 2>nul
+goto :eof
+:tishi
+cls&echo.&if %errorlevel%==1 echo.¡¡Èç¹û¹â±êÔÚÉÁ¶¯£¬ËµÃ÷³ÌÐòÕýÔÚÔËÐÐ£¬ÇëÄÍÐÄµÈ´ý¡­¡­&echo.
+goto :eof
+:exit
+cls&for /f "tokens=2 delims=()" %%i in ('fsutil volume diskfree c:^|find /i "¿ÉÓÃ"') do set myvar=%%i&echo.
+echo.&echo.¡¡ÇåÀíÍê³É,µ±Ç°CÅÌ¿ÉÓÃÈÝÁ¿Îª%myvar%...&echo.&echo.&echo.&echo.&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¾ÛÉ¢ÖÕÓÐÊ±¡¡ÔÙ¼ûÒàÓÐÆÚ&echo.&echo.&echo.&echo.&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
+echo.¡¡Èç¹û»¹ÓÐÎÊÌâ¾Í´òÎÒµç»°°É...&timeout /t 6 >nul&exit

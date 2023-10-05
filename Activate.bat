@@ -1,0 +1,39 @@
+ÿþa
+cls
+echo off
+cls
+disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
+set Name=Activate½Å±¾
+set Powered=Powered by ÉÛ»ª 18900559020
+set Version=20231005
+set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
+title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+:menu
+cls&echo.&echo.¡¡ÇëÑ¡ÔñÄúµ±Ç°µçÄÔÊÇ»ÕÐÐÂí°°É½µØÇøµÄÄÚÍø»¹ÊÇÍâÍø£¿&echo.&echo.¡¡ÇëÊÖ¶¯ÊäÈë£¡²»ÒªÂÒÑ¡£¡&echo.&echo.¡¡¡¡ÊäÈë A Ñ¡ÔñÎª ¡¾×Ô¶¯¡¡ÅÐ¶Ï¡¿£¨10ÃëºóÄ¬ÈÏÖ´ÐÐ£©&echo.¡¡¡¡ÊäÈë L Ñ¡ÔñÎª ¡¾HS-LanÄÚÍø¡¿&echo.¡¡¡¡ÊäÈë W Ñ¡ÔñÎª ¡¾HS-WanÍâÍø¡¿&echo.&echo.¡¡¸ß¼¶Ñ¡Ïî£º&echo.&echo.¡¡¡¡ÊäÈë E ×ª»»µ½ ¡¾EnterpriseÆóÒµ°æ¡¿&echo.¡¡¡¡ÊäÈë P ×ª»»µ½ ¡¾Professional×¨Òµ°æ¡¿&echo.&echo.¡¡¡¡ÊäÈë Q ½Å±¾½« ¡¾ÍË³ö¡¿&echo.&echo.¡¡ÇëÊäÈë£º&choice /T 10 /C ALWPEQS /d A /N >nul 2>nul
+if %errorlevel%==1 goto spc
+if %errorlevel%==2 goto HS-Lan
+if %errorlevel%==3 goto HS-Wan
+if %errorlevel%==4 goto top
+if %errorlevel%==5 goto toe
+if %errorlevel%==6 exit
+if %errorlevel%==7 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.ÈçÄúÏëÊ¹ÓÃÈ«²¿¹¦ÄÜ£¬ÇëÁªÏµÉÛ»ª18900559020°²×°×îÐÂ²Ù×÷ÏµÍ³¾µÏñ¡£&&timeout /t 10)
+:spc
+set osi=&set wsi=&arp -a|findstr /i "38.40." >nul && (set Pc=HS-Lan&goto HS-Lan)||(arp -a|findstr /i "38.41." >nul && (set Pc=HS-Lan&goto HS-Lan)||(arp -a|findstr /i "10.198." >nul && (set Pc=HS-Wan&goto HS-Wan)||(set Pc=PC-Other&cls&echo.&echo.¡¡¸ù¾ÝÄúµÄµçÄÔÌØÕ÷£¬ÎÞ·¨ÅÐ¶ÏÄúÊÇÄÚÍø»¹ÊÇÍâÍø£¬5Ãëºó·µ»Ø²Ëµ¥&timeout /t 5&goto menu)))
+:HS-Lan
+title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%&set osi=38.19.14.203&set wsi=38.19.14.202&goto osi
+:HS-Wan
+title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%&set osi=60.16.12.38&set wsi=60.16.12.38&goto osi
+:toe
+cls&title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï ÕýÔÚÇÐ»»EnterpriseÆóÒµ°æ...&cscript %windir%\system32\slmgr.vbs /rilc&cscript %windir%\system32\slmgr.vbs /upk >nul 2>&1&cscript %windir%\system32\slmgr.vbs /ckms >nul 2>&1&cscript %windir%\system32\slmgr.vbs /cpky >nul 2>&1&cscript %windir%\system32\slmgr.vbs /ipk NPPR9-FWDCX-D2C8J-H872K-2YT43&timeout /t 5&goto menu
+:top
+cls&title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï ÕýÔÚÇÐ»»Professional×¨Òµ°æ...&cscript %windir%\system32\slmgr.vbs /rilc&cscript %windir%\system32\slmgr.vbs /upk >nul 2>&1&cscript %windir%\system32\slmgr.vbs /ckms >nul 2>&1&cscript %windir%\system32\slmgr.vbs /cpky >nul 2>&1&cscript %windir%\system32\slmgr.vbs /ipk W269N-WFGWX-YVC9B-4J6C9-T83GX&timeout /t 5&goto menu
+goto spc
+:osi
+cls&set ver=0&set pf=%ProgramFiles(x86)%&title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï ÕýÔÚÊÊÅäOffice¼¤»î·þÎñÆ÷...
+:pf
+if "%pf%"=="%ProgramFiles%" if %ver%==7 goto wsi
+if "%ver%"=="7" (set pf=%ProgramFiles%&set ver=0&goto pf)
+cd "%pf%\Microsoft Office\Office1%ver%\" 2>nul&cls&cscript "%pf%\Microsoft Office\Office1%ver%\ospp.vbs" /sethst:%osi% 2>nul&cls&cscript "%pf%\Microsoft Office\Office1%ver%\ospp.vbs" /act 2>nul&cls&set /a ver=%ver%+1&goto pf
+:wsi
+title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï ÕýÔÚÊÊÅäWindows¼¤»î·þÎñÆ÷...&cscript %windir%\system32\slmgr.vbs /skms %wsi% 2>nul&cscript %windir%\system32\slmgr.vbs /ato 2>nul&timeout /t 3&cls&cscript %windir%\system32\slmgr.vbs /dli 2>nul&echo¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¾ÛÉ¢ÖÕÓÐÊ±¡¡ÔÙ¼ûÒàÓÐÆÚ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª&echo¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&timeout /t 6 >nul&exit
