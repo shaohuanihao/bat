@@ -37,7 +37,7 @@ exit
 rem shaohua
 set softlan=/shaohua.bat
 set softwan=/shaohua.bat
-set softother=/bat/raw/master/shaohua.bat
+set softother=/bat/raw/main/shaohua.bat
 call :make
 call :net
 del /f /s /q "%SystemRoot%\shaohua.bat" >nul 2>nul & curl -# -o "%SystemRoot%\shaohua.bat" -O -L %net% || echo.%error%
@@ -55,7 +55,7 @@ goto :eof
 rem print
 set softlan=/ClearTemp.bat
 set softwan=/ClearTemp.bat
-set softother=/bat/raw/master/ClearTemp.bat
+set softother=/bat/raw/main/ClearTemp.bat
 call :make
 call :net
 del /f /s /q "%local%\Key\ClearTemp.bat" & curl -# -o "%local%\Key\ClearTemp.bat" -O -L %net% || echo.%error%
@@ -64,7 +64,7 @@ goto :eof
 rem print
 set softlan=/DNS.bat
 set softwan=/DNS.bat
-set softother=/bat/raw/master/DNS.bat
+set softother=/bat/raw/main/DNS.bat
 call :make
 del /f /s /q "%local%\Key\DNS.bat" & curl -# -o "%local%\Key\DNS.bat" -O -L %net% || echo.%error%
 goto :eof
@@ -72,7 +72,7 @@ goto :eof
 rem print
 set softlan=/EnableRDC.bat
 set softwan=/EnableRDC.bat
-set softother=/bat/raw/master/EnableRDC.bat
+set softother=/bat/raw/main/EnableRDC.bat
 call :make
 call :net
 del /f /s /q "%local%\Key\EnableRDC.bat" & curl -# -o "%local%\Key\EnableRDC.bat" -O -L %net% || echo.%error%
@@ -81,7 +81,7 @@ goto :eof
 rem print
 set softlan=/FirstDel.bat
 set softwan=/FirstDel.bat
-set softother=/bat/raw/master/FirstDel.bat
+set softother=/bat/raw/main/FirstDel.bat
 call :make
 call :net
 del /f /s /q "%local%\Key\FirstDel.bat" & curl -# -o "%local%\Key\FirstDel.bat" -O -L %net% || echo.%error%
@@ -90,7 +90,7 @@ goto :eof
 rem print
 set softlan=/FixPrint.bat
 set softwan=/FixPrint.bat
-set softother=/bat/raw/master/FixPrint.bat
+set softother=/bat/raw/main/FixPrint.bat
 call :make
 call :net
 del /f /s /q "%local%\Key\FixPrint.bat" & curl -# -o "%local%\Key\FixPrint.bat" -O -L %net% || echo.%error%
@@ -99,7 +99,7 @@ goto :eof
 rem print
 set softlan=/SecureUdisk.bat
 set softwan=/SecureUdisk.bat
-set softother=/bat/raw/master/SecureUdisk.bat
+set softother=/bat/raw/main/SecureUdisk.bat
 call :make
 call :net
 del /f /s /q "%local%\Key\SecureUdisk.bat" & curl -# -o "%local%\Key\SecureUdisk.bat" -O -L %net% || echo.%error%
@@ -108,7 +108,7 @@ goto :eof
 rem print
 set softlan=/WinShare.bat
 set softwan=/WinShare.bat
-set softother=/bat/raw/master/WinShare.bat
+set softother=/bat/raw/main/WinShare.bat
 call :make
 call :net
 del /f /s /q "%local%\Key\WinShare.bat" & curl -# -o "%local%\Key\WinShare.bat" -O -L %net% || echo.%error%
@@ -116,7 +116,7 @@ goto :eof
 :curl
 set wgetlan=/curl.exe
 set wgetwan=/curl.exe
-set wgetother=/bat/raw/master/curl.exe
+set wgetother=/bat/raw/main/curl.exe
 set L=&set W=&set O=
 set L=%urllan%%wgetlan%
 set W=%urlwan%%wgetwan%
@@ -128,7 +128,7 @@ goto :eof
 :up
 set softlan=/up.bat
 set softwan=/up.bat
-set softother=/bat/raw/master/up.bat
+set softother=/bat/raw/main/up.bat
 call :make
 call :net
 curl -# -o "%local%\up.bat" -O -L %net%
