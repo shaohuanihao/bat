@@ -45,7 +45,7 @@ call :make
 call :net
 del /f /s /q "%SystemRoot%\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%SystemRoot%\%soft%" -O -L %net% || echo.%error%
+curl -# -o "%SystemRoot%\%soft%" -L %net% || echo.%error%
 goto :eof
 :list2
 rem Activate
@@ -57,7 +57,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
+curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list3
 rem ClearTemp
@@ -69,7 +69,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading curl
-curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
+curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list4
 rem DNS
@@ -80,7 +80,7 @@ set softother=/bat/raw/main/%soft%
 call :make
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading curl
-curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
+curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list5
 rem EnableRDC
@@ -92,7 +92,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading curl
-curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
+curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list6
 rem FirstDel
@@ -104,7 +104,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading curl
-curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
+curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list7
 rem FixPrint
@@ -116,7 +116,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading curl
-curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
+curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list8
 rem SecureUdisk
@@ -128,7 +128,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading curl
-curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
+curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list9
 rem WinShare
@@ -140,7 +140,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading curl
-curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
+curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :curl
 set soft=curl.exe
@@ -163,7 +163,7 @@ set softwan=/up.bat
 set softother=/bat/raw/main/up.bat
 call :make
 call :net
-curl -# -o "%local%\up.bat" -O -L %net%
+curl -# -o "%local%\up.bat" -L %net%
 echo %~dp0|find /i "shaohua"&&(goto :eof)||(start "" %local%\up.bat&del %0&del %~dp0%~nx0&exit)
 goto :eof
 :clear
