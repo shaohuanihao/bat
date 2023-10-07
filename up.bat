@@ -22,9 +22,8 @@ if exist %local%\up.bat call :clear
 :list
 set al=1
 :SetA
-if "%al%"=="9" goto ex
+if "%al%"=="10" goto ex
 call :list%al%
-set soft=
 set /a al=%al%+1
 goto SetA
 :ex
@@ -145,16 +144,16 @@ goto :eof
 :curl
 set soft=curl.exe
 echo. Downloading curl.Just keep waiting no matter how long it takes.
-set wgetlan=/%soft%
-set wgetwan=/%soft%
-set wgetother=/bat/raw/main/%soft%
+set wgetlan=/curl.exe
+set wgetwan=/curl.exe
+set wgetother=/bat/raw/main/curl.exe
 set L=&set W=&set O=
 set L=%urllan%%wgetlan%
 set W=%urlwan%%wgetwan%
 set O=%urlother%%wgetother%
 arp -a|findstr /i "38.40." >nul && (set net=%L%&set Pc=HS-Lan)||(arp -a|findstr /i "38.41." >nul && (set net=%L%&set Pc=HS-Lan)||(arp -a|findstr /i "10.198." >nul && (set net=%W%&set Pc=HS-Wan)||(set net=%O%&set Pc=PC-Other)))
 title Downloading curl.Just keep waiting no matter how long it takes.
-bitsadmin /transfer curl %net% %SystemRoot%\System32\%soft%
+bitsadmin /transfer curl %net% %SystemRoot%\System32\curl.exe
 goto :eof
 :up
 echo. Updating the script. Please be patient, no matter how long it takes.
