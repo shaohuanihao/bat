@@ -9,7 +9,8 @@ set Version=20231005
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
-echo.&set local=C:\ShaoHua >nul 2>nul
+echo.
+set "local=C:\ShaoHua" >nul 2>nul
 md %local%\Key >nul 2>nul
 set error=似乎下载遇到了问题，请检查是否有杀毒软件在拦截？
 set urllan=http://38.40.12.180/sh
@@ -23,6 +24,7 @@ set al=1
 :SetA
 if "%al%"=="9" goto ex
 call :list%al%
+set soft=
 set /a al=%al%+1
 goto SetA
 :ex
@@ -35,96 +37,124 @@ if exist "C:\ShaoHua\Key\ClearTemp.bat" start "" mshta VBScript:Execute("Set a=C
 exit
 :list1
 rem shaohua
-set softlan=/shaohua.bat
-set softwan=/shaohua.bat
-set softother=/bat/raw/main/shaohua.bat
+set soft=shaohua.bat
+set softlan=/%soft%
+set softwan=/%soft%
+set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /s /q "%SystemRoot%\shaohua.bat" >nul 2>nul & curl -# -o "%SystemRoot%\shaohua.bat" -O -L %net% || echo.%error%
+del /f /s /q "%SystemRoot%\%soft%" >nul 2>nul
+echo. Downloading %soft%
+curl -# -o "%SystemRoot%\%soft%" -O -L %net% || echo.%error%
 goto :eof
 :list2
 rem Activate
-set softlan=/Activate.bat
-set softwan=/Activate.bat
+set soft=Activate.bat
+set softlan=/%soft%
+set softwan=/%soft%
 set softother=/bat/raw/main/KMS_VL_ALL_AIO.cmd
 call :make
 call :net
-del /f /s /q "%local%\Key\Activate.bat" & curl -# -o "%local%\Key\Activate.bat" -O -L %net% || echo.%error%
+del /f /s /q "%local%\Key\%soft%" >nul 2>nul
+echo. Downloading %soft%
+curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
 goto :eof
 :list3
-rem print
-set softlan=/ClearTemp.bat
-set softwan=/ClearTemp.bat
-set softother=/bat/raw/main/ClearTemp.bat
+rem ClearTemp
+set soft=ClearTemp.bat
+set softlan=/%soft%
+set softwan=/%soft%
+set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /s /q "%local%\Key\ClearTemp.bat" & curl -# -o "%local%\Key\ClearTemp.bat" -O -L %net% || echo.%error%
+del /f /s /q "%local%\Key\%soft%" >nul 2>nul
+echo. Downloading curl
+curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
 goto :eof
 :list4
-rem print
-set softlan=/DNS.bat
-set softwan=/DNS.bat
-set softother=/bat/raw/main/DNS.bat
+rem DNS
+set soft=DNS.bat
+set softlan=/%soft%
+set softwan=/%soft%
+set softother=/bat/raw/main/%soft%
 call :make
-del /f /s /q "%local%\Key\DNS.bat" & curl -# -o "%local%\Key\DNS.bat" -O -L %net% || echo.%error%
+del /f /s /q "%local%\Key\%soft%" >nul 2>nul
+echo. Downloading curl
+curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
 goto :eof
 :list5
-rem print
-set softlan=/EnableRDC.bat
-set softwan=/EnableRDC.bat
-set softother=/bat/raw/main/EnableRDC.bat
+rem EnableRDC
+set soft=EnableRDC.bat
+set softlan=/%soft%
+set softwan=/%soft%
+set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /s /q "%local%\Key\EnableRDC.bat" & curl -# -o "%local%\Key\EnableRDC.bat" -O -L %net% || echo.%error%
+del /f /s /q "%local%\Key\%soft%" >nul 2>nul
+echo. Downloading curl
+curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
 goto :eof
 :list6
-rem print
-set softlan=/FirstDel.bat
-set softwan=/FirstDel.bat
-set softother=/bat/raw/main/FirstDel.bat
+rem FirstDel
+set soft=FirstDel.bat
+set softlan=/%soft%
+set softwan=/%soft%
+set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /s /q "%local%\Key\FirstDel.bat" & curl -# -o "%local%\Key\FirstDel.bat" -O -L %net% || echo.%error%
+del /f /s /q "%local%\Key\%soft%" >nul 2>nul
+echo. Downloading curl
+curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
 goto :eof
 :list7
-rem print
-set softlan=/FixPrint.bat
-set softwan=/FixPrint.bat
-set softother=/bat/raw/main/FixPrint.bat
+rem FixPrint
+set soft=%soft%
+set softlan=/%soft%
+set softwan=/%soft%
+set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /s /q "%local%\Key\FixPrint.bat" & curl -# -o "%local%\Key\FixPrint.bat" -O -L %net% || echo.%error%
+del /f /s /q "%local%\Key\%soft%" >nul 2>nul
+echo. Downloading curl
+curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
 goto :eof
 :list8
-rem print
-set softlan=/SecureUdisk.bat
-set softwan=/SecureUdisk.bat
-set softother=/bat/raw/main/SecureUdisk.bat
+rem SecureUdisk
+set soft=SecureUdisk.bat
+set softlan=/%soft%
+set softwan=/%soft%
+set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /s /q "%local%\Key\SecureUdisk.bat" & curl -# -o "%local%\Key\SecureUdisk.bat" -O -L %net% || echo.%error%
+del /f /s /q "%local%\Key\%soft%" >nul 2>nul
+echo. Downloading curl
+curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
 goto :eof
 :list9
-rem print
-set softlan=/WinShare.bat
-set softwan=/WinShare.bat
-set softother=/bat/raw/main/WinShare.bat
+rem WinShare
+set soft=WinShare.bat
+set softlan=/%soft%
+set softwan=/%soft%
+set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /s /q "%local%\Key\WinShare.bat" & curl -# -o "%local%\Key\WinShare.bat" -O -L %net% || echo.%error%
+del /f /s /q "%local%\Key\%soft%" >nul 2>nul
+echo. Downloading curl
+curl -# -o "%local%\Key\%soft%" -O -L %net% || echo.%error%
 goto :eof
 :curl
+set soft=curl.exe
 echo. Downloading curl.Just keep waiting no matter how long it takes.
-set wgetlan=/curl.exe
-set wgetwan=/curl.exe
-set wgetother=/bat/raw/main/curl.exe
+set wgetlan=/%soft%
+set wgetwan=/%soft%
+set wgetother=/bat/raw/main/%soft%
 set L=&set W=&set O=
 set L=%urllan%%wgetlan%
 set W=%urlwan%%wgetwan%
 set O=%urlother%%wgetother%
 arp -a|findstr /i "38.40." >nul && (set net=%L%&set Pc=HS-Lan)||(arp -a|findstr /i "38.41." >nul && (set net=%L%&set Pc=HS-Lan)||(arp -a|findstr /i "10.198." >nul && (set net=%W%&set Pc=HS-Wan)||(set net=%O%&set Pc=PC-Other)))
 title Downloading curl.Just keep waiting no matter how long it takes.
-bitsadmin /transfer curl %net% %SystemRoot%\System32\curl.exe
+bitsadmin /transfer curl %net% %SystemRoot%\System32\%soft%
 goto :eof
 :up
 echo. Updating the script. Please be patient, no matter how long it takes.
