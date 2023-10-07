@@ -374,10 +374,13 @@ REM 删除IE的过期ActiveX控件阻止通知中的“更新”按钮
 reg add "HKCU\Software\Microsoft\Internet Explorer\VersionManager" /v UpdateEnabled /t REG_DWORD /d 0 /f
 REM 修改“用户帐户控制：以管理员批准模式运行所有管理员”的注册表设置
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorAdmin" /t REG_DWORD /d 0 /f
-REM 关闭UAC
+REM 关闭UAC - 禁用用户账户控制
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t reg_dword /d 0 /f
+REM 开启管理员令牌过滤
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t reg_dword /d 1 /f
+REM 开启UIA桌面切换
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableUIADesktopToggle" /t reg_dword /d 1 /f
+REM 在安全桌面上不显示UAC提示
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t reg_dword /d 0 /f
 REM 在兼容性视图中显示所有网站
 reg add "HKCU\Software\Microsoft\Internet Explorer\BrowserEmulation" /v "AllSitesCompatibilityMode" /t reg_dword /d 1 /f
@@ -462,6 +465,7 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v "NoLockScr
 REM 关闭「笔迹与键入个人化」设定
 Reg Add "HKLM\SOFTWARE\Microsoft\Personalization\Settings" /v "AcceptedPrivacyPolicy" /t "Reg_Dword" /d "0" /f
 REM 「传递最佳化」设定为〝关闭『允许从其他电脑下载』〞
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\DeliveryOptimization" /v "SystemSettingsDownloadMode" /t REG_DWORD /d 0 /f
 Reg Add "HKU\S-1-5-20\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Settings" /v "DownloadMode" /t "Reg_Dword" /d "0" /f
 REM 关闭〝在档案总管和「执行」对话方块中使用即时自动完成〞设定
 Reg Add "HKCU\SOFTWARE\Microsoft\Internet Explorer\AutoComplete" /v "Append Completion" /t "Reg_Sz" /d "no" /f
@@ -576,7 +580,6 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSyncN
 REM 关闭自动更新地图
 reg add "HKLM\SYSTEM\Maps" /v "AutoUpdateEnabled" /t reg_dword /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Maps" /v "AutoUpdateEnabled" /t REG_DWORD /d 0 /f
-
 REM 关闭资讯和兴趣
 taskkill /f /t /im "StartMenuExperienceHost.exe" >nul 2>nul
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Feeds" /v "ShellFeedsTaskbarViewMode" /t reg_dword /d 2 /f
@@ -620,22 +623,29 @@ reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "OneDrive" /f
 REM 禁用OneDrive的系统服务
 sc config OneSyncSvc start= disabled
 REM 卸载OneDrive
-REM %SystemRoot%\SysWOW64\OneDriveSetup.exe /uninstall 2>nul
-REM RD "%UserProfile%\OneDrive" /Q /S 2>nul
-REM RD "%LocalAppData%\Microsoft\OneDrive" /Q /S 2>nul
-REM RD "%ProgramData%\Microsoft OneDrive" /Q /S 2>nul
-REM RD "C:\OneDriveTemp" /Q /S 2>nul
-REM REG Delete "HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f 2>nul
-REM REG Delete "HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f 2>nul
-REM 关闭在开始菜单显示建议
+taskkill /f /im OneDrive.exe
+%SystemRoot%\SysWOW64\OneDriveSetup.exe /uninstall
+rd "%UserProfile%\OneDrive" /Q /S
+rd "C:\OneDriveTemp" /Q /S
+rd "%LocalAppData%\Microsoft\OneDrive" /Q /S
+rd "%ProgramData%\Microsoft OneDrive" /Q /S
+REM 禁用内容交付管理器的功能管理
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "FeatureManagementEnabled" /t reg_dword /d 0 /f
+REM 禁用内容交付管理器的原始设备制造商预装应用程序
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "OemPreInstalledAppsEnabled" /t reg_dword /d 0 /f
+REM 启用内容交付管理器的旋转锁屏功能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "RotatingLockScreenEnabled" /t reg_dword /d 1 /f
+REM 启用内容交付管理器的旋转锁屏叠加层功能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "RotatingLockScreenOverlayEnabled" /t reg_dword /d 1 /f
+REM 禁用内容交付管理器的预安装应用程序
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "PreInstalledAppsEnabled" /t reg_dword /d 0 /f
+REM 禁用内容交付管理器的静默安装应用程序
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SilentInstalledAppsEnabled" /t reg_dword /d 0 /f
+REM 禁用内容交付管理器的软着陆功能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SoftLandingEnabled" /t reg_dword /d 0 /f
+REM 禁用内容交付管理器的系统面板建议功能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SystemPaneSuggestionsEnabled" /t reg_dword /d 0 /f
+REM 关闭在开始菜单显示建议
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338388Enabled" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338389Enabled" /t reg_dword /d 0 /f
@@ -653,18 +663,22 @@ REM 删除通知和操作中心
 reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v "DisableNotificationCenter" /t reg_dword /d 1 /f
 REM 文件没有关联的打开程序时，禁止从网络上去搜索打开类型
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "NoInternetOpenWith" /t reg_dword /d 1 /f
-REM 关闭Windows商店功能
+REM 禁用 Microsoft Store 后台访问应用程序
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications\Microsoft.WindowsStore_8wekyb3d8bbwe" /v "Disabled" /t reg_dword /d 1 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications\Microsoft.WindowsStore_8wekyb3d8bbwe" /v "DisabledByUser" /t reg_dword /d 1 /f
 REM 关闭打开方式从应用商店选择其它应用
 reg add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v "NoUseStoreOpenWith" /t reg_dword /d 1 /f
-REM 语言栏隐藏到任务拦，取消语言栏上的帮助按钮
-reg add "HKCU\Software\Microsoft\CTF\MSUTB" /v "ShowDeskBand" /t reg_dword /d 1 /f
-reg add "HKCU\Software\Microsoft\CTF\LangBar" /v "ShowStatus" /t reg_dword /d 4 /f
-reg add "HKCU\Software\Microsoft\CTF\LangBar" /v "ExtraIconsOnMinimized" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\CTF\LangBar\ItemState{ED9D5450-EBE6-4255-8289-F8A31E687228}" /v "DemoteLevel" /t reg_dword /d 3 /f
-REM 关闭快速访问不显示常用文件夹和最近使用文件
+REM 将语言栏隐藏到任务栏
+reg add "HKCU\Software\Microsoft\CTF\MSUTB" /v "ShowDeskBand" /t REG_DWORD /d 1 /f
+REM 取消语言栏上的帮助按钮
+reg add "HKCU\Software\Microsoft\CTF\LangBar" /v "ShowStatus" /t REG_DWORD /d 4 /f
+REM 在最小化时不显示语言栏上的额外图标
+reg add "HKCU\Software\Microsoft\CTF\LangBar" /v "ExtraIconsOnMinimized" /t REG_DWORD /d 0 /f
+REM 设置语言栏的降级级别为3
+reg add "HKCU\Software\Microsoft\CTF\LangBar\ItemState{ED9D5450-EBE6-4255-8289-F8A31E687228}" /v "DemoteLevel" /t REG_DWORD /d 3 /f
+REM 关闭快速访问中显示常用文件夹
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowFrequent" /t reg_dword /d 0 /f
+REM 关闭快速访问中显示最近使用的文件
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowRecent" /t reg_dword /d 0 /f
 REM 禁止运行计算机自动维护计划
 reg add "HKLM\Software\Policies\Microsoft\Windows\ScheduledDiagnostics" /v "EnabledExecution" /t reg_dword /d 0 /f
@@ -738,87 +752,89 @@ reg add "HKCU\Software\Policies\Google\Chrome" /v "PrintHeaderFooter" /t REG_DWO
 REM 开启Chrome默认背景图片打印模式
 reg add "HKCU\Software\Policies\Google\Chrome" /v "PrintingBackgroundGraphicsDefault" /t REG_SZ /d "enabled" /f
 REM 添加网址至信任站点
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\hsbank.com.cn\*" /v "http" /t reg_dword /d "2" /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\hsbank.com.cn\*" /v "https" /t reg_dword /d "2" /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\hsbank.cn\*" /v "http" /t reg_dword /d "2" /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\hsbank.cn\*" /v "https" /t reg_dword /d "2" /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\hsbank.cc\*" /v "http" /t reg_dword /d "2" /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\hsbank.cc\*" /v "https" /t reg_dword /d "2" /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\hsbank.com\*" /v "http" /t reg_dword /d "2" /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\hsbank.com\*" /v "https" /t reg_dword /d "2" /f
+SET REGPATH=HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains
+reg add "%REGPATH%\hsbank.com.cn\*" /v "http" /t reg_dword /d "2" /f
+reg add "%REGPATH%\hsbank.com.cn\*" /v "https" /t reg_dword /d "2" /f
+reg add "%REGPATH%\hsbank.cn\*" /v "http" /t reg_dword /d "2" /f
+reg add "%REGPATH%\hsbank.cn\*" /v "https" /t reg_dword /d "2" /f
+reg add "%REGPATH%\hsbank.cc\*" /v "http" /t reg_dword /d "2" /f
+reg add "%REGPATH%\hsbank.cc\*" /v "https" /t reg_dword /d "2" /f
+reg add "%REGPATH%\hsbank.com\*" /v "http" /t reg_dword /d "2" /f
+reg add "%REGPATH%\hsbank.com\*" /v "https" /t reg_dword /d "2" /f
 REM 增加IP到信任站点
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range100" /v ":Range" /d "38.*" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range100" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range100" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range101" /v ":Range" /d "38.*.*.*" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range101" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range101" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range102" /v ":Range" /d "38.10.68.32" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range102" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range102" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range103" /v ":Range" /d "38.10.68.38" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range103" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range103" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range104" /v ":Range" /d "38.19.11.176" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range104" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range104" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range105" /v ":Range" /d "38.19.11.177" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range105" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range105" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range106" /v ":Range" /d "38.19.13.70" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range106" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range106" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range107" /v ":Range" /d "38.19.13.241" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range107" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range107" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range108" /v ":Range" /d "38.19.17.80" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range108" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range108" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range109" /v ":Range" /d "38.19.19.114" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range109" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range109" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range110" /v ":Range" /d "38.19.19.157" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range110" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range110" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range111" /v ":Range" /d "38.19.19.172" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range111" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range111" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range112" /v ":Range" /d "38.19.19.240" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range112" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range112" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range113" /v ":Range" /d "38.19.19.243" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range113" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range113" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range114" /v ":Range" /d "38.19.19.78" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range114" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range114" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range115" /v ":Range" /d "38.19.64.35" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range115" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range115" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range116" /v ":Range" /d "38.19.77.104" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range116" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range116" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range117" /v ":Range" /d "38.19.79.45" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range117" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range117" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range118" /v ":Range" /d "38.19.79.55" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range118" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range118" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range119" /v ":Range" /d "38.40.15.101" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range119" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range119" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range120" /v ":Range" /d "38.19.19.52" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range120" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range120" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range121" /v ":Range" /d "38.19.19.87" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range121" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range121" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range122" /v ":Range" /d "38.19.16.33" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range122" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range122" /v "https" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range123" /v ":Range" /d "38.19.78.59" /t REG_SZ /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range123" /v "http" /d "2" /t REG_DWORD /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges\Range123" /v "https" /d "2" /t REG_DWORD /f
+SET REGPATH=HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges
+reg add "%REGPATH%\Range100" /v ":Range" /d "38.*" /t REG_SZ /f
+reg add "%REGPATH%\Range100" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range100" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range101" /v ":Range" /d "38.*.*.*" /t REG_SZ /f
+reg add "%REGPATH%\Range101" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range101" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range102" /v ":Range" /d "38.10.68.32" /t REG_SZ /f
+reg add "%REGPATH%\Range102" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range102" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range103" /v ":Range" /d "38.10.68.38" /t REG_SZ /f
+reg add "%REGPATH%\Range103" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range103" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range104" /v ":Range" /d "38.19.11.176" /t REG_SZ /f
+reg add "%REGPATH%\Range104" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range104" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range105" /v ":Range" /d "38.19.11.177" /t REG_SZ /f
+reg add "%REGPATH%\Range105" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range105" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range106" /v ":Range" /d "38.19.13.70" /t REG_SZ /f
+reg add "%REGPATH%\Range106" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range106" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range107" /v ":Range" /d "38.19.13.241" /t REG_SZ /f
+reg add "%REGPATH%\Range107" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range107" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range108" /v ":Range" /d "38.19.17.80" /t REG_SZ /f
+reg add "%REGPATH%\Range108" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range108" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range109" /v ":Range" /d "38.19.19.114" /t REG_SZ /f
+reg add "%REGPATH%\Range109" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range109" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range110" /v ":Range" /d "38.19.19.157" /t REG_SZ /f
+reg add "%REGPATH%\Range110" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range110" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range111" /v ":Range" /d "38.19.19.172" /t REG_SZ /f
+reg add "%REGPATH%\Range111" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range111" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range112" /v ":Range" /d "38.19.19.240" /t REG_SZ /f
+reg add "%REGPATH%\Range112" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range112" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range113" /v ":Range" /d "38.19.19.243" /t REG_SZ /f
+reg add "%REGPATH%\Range113" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range113" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range114" /v ":Range" /d "38.19.19.78" /t REG_SZ /f
+reg add "%REGPATH%\Range114" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range114" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range115" /v ":Range" /d "38.19.64.35" /t REG_SZ /f
+reg add "%REGPATH%\Range115" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range115" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range116" /v ":Range" /d "38.19.77.104" /t REG_SZ /f
+reg add "%REGPATH%\Range116" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range116" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range117" /v ":Range" /d "38.19.79.45" /t REG_SZ /f
+reg add "%REGPATH%\Range117" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range117" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range118" /v ":Range" /d "38.19.79.55" /t REG_SZ /f
+reg add "%REGPATH%\Range118" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range118" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range119" /v ":Range" /d "38.40.15.101" /t REG_SZ /f
+reg add "%REGPATH%\Range119" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range119" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range120" /v ":Range" /d "38.19.19.52" /t REG_SZ /f
+reg add "%REGPATH%\Range120" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range120" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range121" /v ":Range" /d "38.19.19.87" /t REG_SZ /f
+reg add "%REGPATH%\Range121" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range121" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range122" /v ":Range" /d "38.19.16.33" /t REG_SZ /f
+reg add "%REGPATH%\Range122" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range122" /v "https" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range123" /v ":Range" /d "38.19.78.59" /t REG_SZ /f
+reg add "%REGPATH%\Range123" /v "http" /d "2" /t REG_DWORD /f
+reg add "%REGPATH%\Range123" /v "https" /d "2" /t REG_DWORD /f
 REM 开启IE打印背景颜色和图像
 REM reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Print_Background" /t reg_sz /d "yes" /f
 REM reg add "HKCU\Software\Microsoft\Internet Explorer\PageSetup" /v "Print_Background" /t reg_sz /d "yes" /f
@@ -840,7 +856,6 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\LanmanWorkstation" /v "AllowIn
 reg add "HKLM\Software\WOW6432Node\Policies\Microsoft\Windows\LanmanWorkstation" /v "AllowInsecureGuestAuth" /d 1 /t reg_dword /f
 REM 网络优化-设置NetBIOS名称解析查询超时时间为3000毫秒。
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" /v "NameSrvQueryTimeout" /d 3000 /t reg_dword /f
-
 REM 网络优化-启用网络文件夹搜索优化，以提高文件夹搜索的性能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "nonetcrawling" /d 1 /t reg_dword /f
 REM 网络优化-设置每个服务器的最大连接数为0，表示没有限制。
@@ -960,16 +975,20 @@ REM 系统自我修复时间
 reg add "HKLM\SYSTEM\ControlSet001\Control\Session Manager" /v "AutoChkTimeout" /d 5 /t reg_dword /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager" /v "AutoChkTimeout" /d 5 /t reg_dword /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoLowDiskSpaceChecks" /d 1 /t reg_dword /f
-REM 解决Win10图片管理器报内存不足
+REM 解决Win10图片管理器报内存不足，方法2为实验产品，开启4G内存
 REM reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\ICM\RegisteredProfiles" /v "sRGB" /t reg_sz /d "RSWOP.icm" /f
+reg add "HKCU\Software\Microsoft\Windows Photo Viewer\Viewer" /f /v MemCacheSize /t REG_DWORD /d 4294967295
 REM 关闭windows传递优化
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\PenWorkspace" /v "PenWorkspaceAppSuggestionsEnabled" /t reg_dword /d 0 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DoSvc" /v "Start" /t REG_DWORD /d "4" /f
 REM 开启搜索始终搜索文件名和内容
 REM reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Search\PrimaryProperties\UnindexedLocations" /v "SearchOnly" /t reg_dword /d 0 /f
 REM 去除WPS云文档
-REM @reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{7AE6DE87-C956-4B40-9C89-3D166C9841D3}" /f
-REM @reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace{D426C8B3-0B26-4F0D-BA74-2EE212EDAC6D}" /f 
+taskkill /f /im wpsoffice.exe
+ping 127.0.0.1 -n 5 > nul
+rd "%UserProfile%\AppData\Roaming\WPS\Office" /Q /S
+rd "%UserProfile%\AppData\Local\Kingsoft\WPS Office" /Q /S rd "%UserProfile%\AppData\LocalLow\Kingsoft\WPS Office" /Q /S
 REM IE禁止加载项性能通知
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Ext" /v "DisableAddonLoadTimePerformanceNotifications" /t reg_dword /d 1 /f
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Ext" /v "DisableAddonLoadTimePerformanceNotifications" /t reg_dword /d 1 /f
@@ -1038,10 +1057,15 @@ ftype mhtmfile=%PF%
 ftype urlfile=%PF%
 ftype httpfile=%PF%
 ftype httpsfile=%PF%
-REM 设置在新窗口或标签页中始终在Internet Explorer中打开链接
-reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v AlwaysOpenIEInNewWindow /t REG_DWORD /d 1 /f
+
+REM 设置默认浏览器的应用名称和路径
+set "browserName=Internet Explorer"
+set "browserPath32=C:\ProgramFiles(x86)\Internet Explorer\iexplore.exe"
+set "browserPath64=C:\Program Files\internet explorer\iexplore.exe"
 REM 禁用Internet Explorer的扩展功能
 REM reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v EnableExtensions /t REG_DWORD /d 0 /f
+REM 设置在新窗口或标签页中始终在Internet Explorer中打开链接
+reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v AlwaysOpenIEInNewWindow /t REG_DWORD /d 1 /f
 REM 禁用Internet Explorer的活动功能
 reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v EnableIEActivities /t REG_DWORD /d 0 /f
 REM 删除http协议的UserChoice键
@@ -1050,30 +1074,34 @@ reg delete "HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\h
 REM 删除https协议的UserChoice键
 reg delete "HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice" /v Progid /f
 reg delete "HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice" /v Hash /f
-REM 还原默认浏览器为32位IE11
-reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice" /v ProgId /d IE.HTTP /f
-reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice" /v ProgId /d IE.HTTPS /f
 REM 禁用Edge浏览器
 reg ADD "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v AllowPrelaunch /t REG_DWORD /d 0 /f
 reg ADD "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v DoNotUpdateToEdgeWithChromium /t REG_DWORD /d 1 /f
 REM 禁用自动跳转到Edge浏览器
 reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice" /v Hash /t REG_SZ /d "" /f
 reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice" /v Hash /t REG_SZ /d "" /f
-REM 设置32位IE11为默认浏览器
-reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\DefaultIcon" /ve /d "C:\ProgramFiles(x86)\Internet Explorer\iexplore.exe,1" /f
-reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\DefaultIcon" /ve /d "C:\ProgramFiles(x86)\Internet Explorer\iexplore.exe,1" /f
-reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\ftp\DefaultIcon" /ve /d "C:\ProgramFiles(x86)\Internet Explorer\iexplore.exe,1" /f
-reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\shell\open\command" /ve /d "\"C:\ProgramFiles(x86)\Internet Explorer\iexplore.exe\" -nohome" /f
-reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\shell\open\command" /ve /d "\"C:\ProgramFiles(x86)\Internet Explorer\iexplore.exe\" -nohome" /f
-reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\ftp\shell\open\command" /ve /d "\"C:\ProgramFiles(x86)\Internet Explorer\iexplore.exe\" -nohome" /f
+REM 设置默认浏览器的应用名称和路径
+reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\DefaultIcon" /ve /d "%browserPath32%,1" /f
+reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\DefaultIcon" /ve /d "%browserPath32%,1" /f
+reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\ftp\DefaultIcon" /ve /d "%browserPath32%,1" /f
+reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\shell\open\command" /ve /d "\"%browserPath32%\" -nohome" /f
+reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\shell\open\command" /ve /d "\"%browserPath32%\" -nohome" /f
+reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\ftp\shell\open\command" /ve /d "\"%browserPath32%\" -nohome" /f
+REM 修改默认浏览器的注册表键值
+reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice" /v ProgId /d %browserName% /f
+reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice" /v ProgId /d %browserName% /f
+rem 恢复默认的 FTP 打开方式为 Windows 资源管理器
+reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\ftp\UserChoice" /v ProgId /d "IE.AssocFile.FTP" /f
+REM 设置默认浏览器的路径
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe" /v Path /t REG_SZ /d %browserPath32% /f
 REM 禁用IE11到Edge的重定向
 reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v IE11DisableEdgeRedirect /t REG_DWORD /d 1 /f
 REM 增强桌面IE
-reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Open\Command" /ve /t reg_sz /d "C:\Program Files (x86)\Internet Explorer\iexplore.exe" /f
+reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Open\Command" /ve /t reg_sz /d "%browserPath32%" /f
 reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Open64" /ve /t reg_sz /d "启动64位IE(&E)" /f
-reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Open64\Command" /ve /t reg_sz /d "C:\Program Files\internet explorer\iexplore.exe" /f
+reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Open64\Command" /ve /t reg_sz /d "%browserPath64%" /f
 reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Alank" /ve /t reg_sz /d "打开空白页(&B)" /f
-reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Alank\Command" /ve /t reg_sz /d "\"C:\Program Files (x86)\Internet Explorer\iexplore.exe\" about:blank" /f
+reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Alank\Command" /ve /t reg_sz /d "\"%browserPath32%\" about:blank" /f
 REM 关闭win10让windows管理默认打印机
 reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\Windows" /v "LegacyDefaultPrinterMode" /t reg_dword /d 1 /f
 REM 关闭程序兼容性助手
