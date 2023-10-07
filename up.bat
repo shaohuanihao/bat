@@ -9,7 +9,7 @@ set Version=20231005
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
-set local=C:\ShaoHua
+echo.&set local=C:\ShaoHua >nul 2>nul
 md %local%\Key >nul 2>nul
 set error=似乎下载遇到了问题，请检查是否有杀毒软件在拦截？
 set urllan=http://38.40.12.180/sh
@@ -114,6 +114,7 @@ call :net
 del /f /s /q "%local%\Key\WinShare.bat" & curl -# -o "%local%\Key\WinShare.bat" -O -L %net% || echo.%error%
 goto :eof
 :curl
+echo. Downloading curl.Just keep waiting no matter how long it takes.
 set wgetlan=/curl.exe
 set wgetwan=/curl.exe
 set wgetother=/bat/raw/main/curl.exe
@@ -122,10 +123,11 @@ set L=%urllan%%wgetlan%
 set W=%urlwan%%wgetwan%
 set O=%urlother%%wgetother%
 arp -a|findstr /i "38.40." >nul && (set net=%L%&set Pc=HS-Lan)||(arp -a|findstr /i "38.41." >nul && (set net=%L%&set Pc=HS-Lan)||(arp -a|findstr /i "10.198." >nul && (set net=%W%&set Pc=HS-Wan)||(set net=%O%&set Pc=PC-Other)))
-title Downloading Wget.Just keep waiting no matter how long it takes.
-bitsadmin /transfer wget %net% %SystemRoot%\wget.exe
+title Downloading curl.Just keep waiting no matter how long it takes.
+bitsadmin /transfer curl %net% %SystemRoot%\System32\curl.exe
 goto :eof
 :up
+echo. Updating the script. Please be patient, no matter how long it takes.
 set softlan=/up.bat
 set softwan=/up.bat
 set softother=/bat/raw/main/up.bat
@@ -135,6 +137,7 @@ curl -# -o "%local%\up.bat" -O -L %net%
 echo %~dp0|find /i "shaohua"&&(goto :eof)||(start "" %local%\up.bat&del %0&del %~dp0%~nx0&exit)
 goto :eof
 :clear
+echo. Cleaning up files that may trigger false-positive virus alerts from antivirus software. Please be patient, no matter how long it takes.
 rd "%systemdrive%\sysprep\" /s /q 2>nul
 rd "%local%\Tools\Key" /s /q 2>nul
 rd "%local%\Tools\DNS" /s /q 2>nul
