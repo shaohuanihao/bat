@@ -67,7 +67,7 @@ set softother=/bat/raw/main/%soft%
 call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading curl
+echo. Downloading %soft%
 curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list4
@@ -78,7 +78,7 @@ set softwan=/%soft%
 set softother=/bat/raw/main/%soft%
 call :make
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading curl
+echo. Downloading %soft%
 curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list5
@@ -90,7 +90,7 @@ set softother=/bat/raw/main/%soft%
 call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading curl
+echo. Downloading %soft%
 curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list6
@@ -102,19 +102,19 @@ set softother=/bat/raw/main/%soft%
 call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading curl
+echo. Downloading %soft%
 curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list7
 rem FixPrint
-set soft=%soft%
+set soft=FixPrint.bat
 set softlan=/%soft%
 set softwan=/%soft%
 set softother=/bat/raw/main/%soft%
 call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading curl
+echo. Downloading %soft%
 curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list8
@@ -126,7 +126,7 @@ set softother=/bat/raw/main/%soft%
 call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading curl
+echo. Downloading %soft%
 curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :list9
@@ -138,7 +138,7 @@ set softother=/bat/raw/main/%soft%
 call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading curl
+echo. Downloading %soft%
 curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
 goto :eof
 :curl
