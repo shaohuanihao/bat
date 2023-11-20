@@ -5,14 +5,14 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=Upgrade脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20231007
+set Version=20231120
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
 echo.
 set "local=C:\ShaoHua" >nul 2>nul
 md %local%\Key >nul 2>nul
-set error=似乎下载遇到了问题，请检查是否有杀毒软件在拦截？
+set error=下载遇到了问题，请检查是否网络不可达或者杀毒软件在拦截？
 set urllan=http://38.40.12.180/sh
 set urlwan=http://10.198.78.78/sh
 set urlother=https://gitee.com/shaohuanihao
@@ -27,6 +27,7 @@ call :list%al%
 set /a al=%al%+1
 goto SetA
 :ex
+del /f /s /q up.txt
 rem 系统激活脚本
 if exist "C:\ShaoHua\Key\Activate.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\系统激活脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\Activate.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
 rem 打印共享脚本
@@ -44,7 +45,7 @@ call :make
 call :net
 del /f /s /q "%SystemRoot%\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%SystemRoot%\%soft%" -L %net% || echo.%error%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%SystemRoot%\%soft%" -L %net%) || (echo.%error%) && del /f /s /q up.txt
 goto :eof
 :list2
 rem Activate
@@ -56,7 +57,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%) && del /f /s /q up.txt
 goto :eof
 :list3
 rem ClearTemp
@@ -68,7 +69,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%) && del /f /s /q up.txt
 goto :eof
 :list4
 rem DNS
@@ -79,7 +80,7 @@ set softother=/bat/raw/main/%soft%
 call :make
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%) && del /f /s /q up.txt
 goto :eof
 :list5
 rem EnableRDC
@@ -91,7 +92,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%) && del /f /s /q up.txt
 goto :eof
 :list6
 rem FirstDel
@@ -103,7 +104,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%) && del /f /s /q up.txt
 goto :eof
 :list7
 rem FixPrint
@@ -115,7 +116,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%) && del /f /s /q up.txt
 goto :eof
 :list8
 rem SecureUdisk
@@ -127,7 +128,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%) && del /f /s /q up.txt
 goto :eof
 :list9
 rem WinShare
@@ -139,7 +140,7 @@ call :make
 call :net
 del /f /s /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
-curl -# -o "%local%\Key\%soft%" -L %net% || echo.%error%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%) && del /f /s /q up.txt
 goto :eof
 :curl
 set soft=curl.exe
@@ -162,7 +163,7 @@ set softwan=/up.bat
 set softother=/bat/raw/main/up.bat
 call :make
 call :net
-curl -# -o "%local%\up.bat" -L %net%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\up.bat" -L %net%) || (echo.%error%) && del /f /s /q up.txt
 echo %~dp0|find /i "shaohua"&&(goto :eof)||(start "" %local%\up.bat&del %0&del %~dp0%~nx0&exit)
 goto :eof
 :clear

@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20231005
+set Version=20231120
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
@@ -43,8 +43,8 @@ if %Pc% EQU HS-Lan goto NPCtime
 if %Pc% EQU HS-Wan goto WPCtime
 if %Pc% EQU PC-Other goto WPCtime
 :NPCtime
-reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\DateTime\Servers" /v 3 /t REG_SZ /d 38.40.254.254 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" /v NtpServer /t REG_SZ /d 38.40.254.254 /f
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\DateTime\Servers" /v 3 /t REG_SZ /d 38.40.254.240 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" /v NtpServer /t REG_SZ /d 38.40.254.240 /f
 w32tm /config /manualpeerlist:"38.40.254.254" /syncfromflags:domhier /reliable:yes /update 2>nul
 goto endtime
 :WPCtime
@@ -56,7 +56,18 @@ goto endtime
 sc config w32time start= auto 2>nul
 net stop w32time >nul 2>nul
 net start w32time >nul 2>nul
+REM 开启自动设置时区
+tzutil /s "Automatic" 2>nul
+REM 开启自动设置时间
+w32tm /config /update /syncfromflags:domhier 2>nul
+REM 开启自动设置时间
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\w32time\TimeProviders\NtpClient" /v Enabled /t REG_DWORD /d 1 /f
+REM 开启自动设置时区
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_QWORD /d 1 /f
+REM 立即同步时间
 w32tm /resync 2>nul
+REM 立即同步时区
+tzutil /s 2>nul
 :upanset
 REM 安全U盘_v1_V2_V3_DEL
 del /f /q "%userprofile%\Desktop\安全U盘.lnk" 2>nul
@@ -91,11 +102,13 @@ reg add "HKLM\Software\Classes\CLSID\{679F137C-3162-45da-BE3C-2F9C3D093F69}" /ve
 mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
 REM 关闭所有浏览器
 taskkill /f /t /im iexplore.exe 2>nul
+taskkill /f /t /im MicrosoftEdge.exe 2>nul
 taskkill /f /t /im chrome.exe  2>nul
 taskkill /f /t /im firefox.exe  2>nul
 taskkill /f /t /im WeChat.exe 2>nul
 taskkill /f /t /im WechatBrowser.exe 2>nul
 taskkill /f /t /im 360se.exe 2>nul
+taskkill /f /t /im 360chrome.exe 2>nul
 taskkill /f /t /im sesvc.exe 2>nul
 REM 最大化提高系统自带电源管理性能
 echo 切换电源方案为【高性能】
@@ -178,11 +191,13 @@ reg add "HKCU\Control Panel\Desktop" /v "ScreenSaverIsSecure" /t reg_sz /d "1" /
 reg add "HKCU\Control Panel\Desktop" /v "ScreenSaveTimeOut" /t reg_sz /d "180" /f
 REM 设置IE
 taskkill /f /t /im iexplore.exe 2>nul
+taskkill /f /t /im MicrosoftEdge.exe 2>nul
 taskkill /f /t /im chrome.exe  2>nul
 taskkill /f /t /im firefox.exe  2>nul
 taskkill /f /t /im WeChat.exe 2>nul
 taskkill /f /t /im WechatBrowser.exe 2>nul
 taskkill /f /t /im 360se.exe 2>nul
+taskkill /f /t /im 360chrome.exe 2>nul
 taskkill /f /t /im sesvc.exe 2>nul
 REM 取消关闭浏览器自动清理记录
 reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\Privacy" /v "ClearBrowsingHistoryOnExit" /d "0" /t reg_dword /f
@@ -584,7 +599,6 @@ REM 关闭资讯和兴趣
 taskkill /f /t /im "StartMenuExperienceHost.exe" >nul 2>nul
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Feeds" /v "ShellFeedsTaskbarViewMode" /t reg_dword /d 2 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /v "EnableFeeds" /t reg_dword /d 0 /f
-taskkill /f /t /im "StartMenuExperienceHost.exe" >nul 2>nul
 REM 关闭小娜
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v "AllowCortana" /t REG_DWORD /d 0 /f
 REM 关闭win10快速用户切换功能
@@ -616,19 +630,17 @@ REM 禁用Windows Defender 安全中心服务
 reg add "HKLM\SYSTEM\ControlSet001\Services\SecurityHealthService" /v "Start" /t reg_dword /d 4 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t reg_dword /d 4 /f
 sc config WinDefend start= disabled
-REM 卸载并删除OneDrive
-taskkill /f /t /im OneDrive.exe
 REM 删除OneDrive的启动项
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "OneDrive" /f
 REM 禁用OneDrive的系统服务
 sc config OneSyncSvc start= disabled
 REM 卸载OneDrive
-taskkill /f /im OneDrive.exe
-%SystemRoot%\SysWOW64\OneDriveSetup.exe /uninstall
-rd "%UserProfile%\OneDrive" /Q /S
-rd "C:\OneDriveTemp" /Q /S
-rd "%LocalAppData%\Microsoft\OneDrive" /Q /S
-rd "%ProgramData%\Microsoft OneDrive" /Q /S
+taskkill /f /im OneDrive.exe >nul 2>nul
+%SystemRoot%\SysWOW64\OneDriveSetup.exe /uninstall >nul 2>nul
+rd "%UserProfile%\OneDrive" /Q /S >nul 2>nul
+rd "C:\OneDriveTemp" /Q /S >nul 2>nul
+rd "%LocalAppData%\Microsoft\OneDrive" /Q /S >nul 2>nul
+rd "%ProgramData%\Microsoft OneDrive" /Q /S >nul 2>nul
 REM 禁用内容交付管理器的功能管理
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "FeatureManagementEnabled" /t reg_dword /d 0 /f
 REM 禁用内容交付管理器的原始设备制造商预装应用程序
@@ -985,8 +997,8 @@ REM 开启搜索始终搜索文件名和内容
 REM reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Search\PrimaryProperties\UnindexedLocations" /v "SearchOnly" /t reg_dword /d 0 /f
 REM 去除WPS云文档
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace{D426C8B3-0B26-4F0D-BA74-2EE212EDAC6D}" /f 
-taskkill /f /im wpsoffice.exe
-ping 127.0.0.1 -n 5 > nul
+taskkill /f /im wpsoffice.exe >nul 2>nul
+ping 127.0.0.1 -n 2 > nul
 rd "%UserProfile%\AppData\Roaming\WPS\Office" /Q /S
 rd "%UserProfile%\AppData\Local\Kingsoft\WPS Office" /Q /S rd "%UserProfile%\AppData\LocalLow\Kingsoft\WPS Office" /Q /S
 REM IE禁止加载项性能通知
@@ -1057,11 +1069,10 @@ ftype mhtmfile=%PF%
 ftype urlfile=%PF%
 ftype httpfile=%PF%
 ftype httpsfile=%PF%
-
 REM 设置默认浏览器的应用名称和路径
 set "browserName=Internet Explorer"
-set "browserPath32=C:\ProgramFiles(x86)\Internet Explorer\iexplore.exe"
-set "browserPath64=C:\Program Files\internet explorer\iexplore.exe"
+set "browserPath32=%ProgramFiles(x86)%\Internet Explorer\iexplore.exe"
+set "browserPath64=%ProgramFiles%\internet explorer\iexplore.exe"
 REM 禁用Internet Explorer的扩展功能
 REM reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v EnableExtensions /t REG_DWORD /d 0 /f
 REM 设置在新窗口或标签页中始终在Internet Explorer中打开链接
@@ -1088,12 +1099,12 @@ reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http
 reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\shell\open\command" /ve /d "\"%browserPath32%\" -nohome" /f
 reg ADD "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\ftp\shell\open\command" /ve /d "\"%browserPath32%\" -nohome" /f
 REM 修改默认浏览器的注册表键值
-reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice" /v ProgId /d %browserName% /f
-reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice" /v ProgId /d %browserName% /f
+reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice" /v ProgId /d "%browserName%" /f
+reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice" /v ProgId /d "%browserName%" /f
 rem 恢复默认的 FTP 打开方式为 Windows 资源管理器
 reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\ftp\UserChoice" /v ProgId /d "IE.AssocFile.FTP" /f
 REM 设置默认浏览器的路径
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe" /v Path /t REG_SZ /d %browserPath32% /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe" /ve /t REG_SZ /d "%browserPath32%" /f
 REM 禁用IE11到Edge的重定向
 reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v IE11DisableEdgeRedirect /t REG_DWORD /d 1 /f
 REM 增强桌面IE
@@ -1102,6 +1113,16 @@ reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Open64" /ve /t 
 reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Open64\Command" /ve /t reg_sz /d "%browserPath64%" /f
 reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Alank" /ve /t reg_sz /d "打开空白页(&B)" /f
 reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\Shell\Alank\Command" /ve /t reg_sz /d "\"%browserPath32%\" about:blank" /f
+REM 显示"我的电脑"图标
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" /t REG_DWORD /d 0 /f
+REM 显示"我的文档"图标
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{450D8FBA-AD25-11D0-98A8-0800361B1103}" /t REG_DWORD /d 0 /f
+REM 显示"网络邻居"图标
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{208D2C60-3AEA-1069-A2D7-08002B30309D}" /t REG_DWORD /d 0 /f
+REM 显示"Internet Explorer"图标
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{871C5380-42A0-1069-A2EA-08002B30309D}" /t REG_DWORD /d 0 /f
+REM 显示"回收站"图标
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{645FF040-5081-101B-9F08-00AA002F954E}" /t REG_DWORD /d 0 /f
 REM 关闭win10让windows管理默认打印机
 reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\Windows" /v "LegacyDefaultPrinterMode" /t reg_dword /d 1 /f
 REM 关闭程序兼容性助手
@@ -1188,10 +1209,10 @@ REM 判断是否是固态硬盘
 REM powershell get-physicaldisk|Findstr /l /c:"SSD" 1>nul 2>nul&&goto ssd ||goto exit
 :ssd
 REM 关闭超级预读 Superfetch
-net stop "SysMain" 2>nul
-sc config "SysMain" start= disabled 2>nul
+sc config SysMain start= disabled
+sc stop SysMain
 REM 关闭系统预读 Prefetch
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v "EnablePrefetcher" /t reg_dword /d 0 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v EnablePrefetcher /t REG_DWORD /d 0 /f
 REM 禁止疑难解答和系统诊断服务
 sc stop WdiSystemHost
 sc stop WdiServiceHost
@@ -1222,6 +1243,22 @@ del "C:\shaohua\soft\ThunderSpeed.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Key\*.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Office修复工具\Office启动一键修复.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Office修复工具\打印任务一键清除.exe" /q /f 2>nul
+set "local=C:\ShaoHua" >nul 2>nul
+rd "%systemdrive%\sysprep\" /s /q 2>nul
+rd "%local%\Tools\Key" /s /q 2>nul
+rd "%local%\Tools\DNS" /s /q 2>nul
+rd "%local%\Tools\局域网共享" /s /q 2>nul
+rd "%local%\Tools\Key" /s /q 2>nul
+del /f /s /q "%local%\*一键*" 2>nul
+del /f /s /q "%local%\*共享*" 2>nul
+del /f /s /q "%local%\*KMS_VL*" 2>nul
+del /f /s /q "%local%\*oem7*" 2>nul
+del /f /s /q "%local%\*office2007*" 2>nul
+del /f /s /q "%local%\tools\*dns*" 2>nul
+del /f /s /q "%local%\tools\*Share*" 2>nul
+del /f /s /q "%systemdrive%\sysprep\*" 2>nul
+del "C:\ShaoHua\Drv\Drvceo\*.*" /f /s /q 2>nul
+rd "C:\ShaoHua\Drv\Drvceo\" /s /q 2>nul
 goto tips
 :waipc
 REM 禁用Windows10自动更新
@@ -1287,7 +1324,7 @@ del "C:\windows\Hsbank\*.*" /f /s /q 2>nul
 rd "C:\shaohua\Hsbank\" /s /q 2>nul
 goto tips
 :tips
-REM 清理IE缓存
+REM 清理IE缓存，勿用！他妈的版本陷阱，官网都不承认数值的解释
 REM start "" cleanmgr
 REM		1：临时Internet文件
 REM		2：Cookies
@@ -1305,11 +1342,10 @@ REM		4096：删除个人设置
 REM		8192：删除所有
 REM		16384：Windows更新清除历史
 REM RunDll32.exe InetCpl.cpl,ClearMyTracksByProcess 4
+REM RunDll32.exe InetCpl.cpl,ClearMyTracksByProcess 271
 del /f /s /q "%USERPROFILE%\AppData\Local\Microsoft\Windows\INetCache\*"
 del /f /s /q "%USERPROFILE%\AppData\Local\Microsoft\Windows\Temporary Internet Files\*"
 del /f /s /q "%TEMP%\*"
-REM 临时Internet文件：1Cookies：2历史记录：4表单数据：8预读缓存（离线缓存）：256将这些数字加起来，得到271。
-RunDll32.exe InetCpl.cpl,ClearMyTracksByProcess 271
 cleanmgr.exe /VERYLOWDISK
 REM 刷新桌面
 taskkill /f /im explorer.exe 2>nul
@@ -1323,6 +1359,6 @@ REM start mshta vbscript:msgbox("System："^&vbCrLf^&"%ProductName%"^&vbCrLf^&"%p
 REM 开启远程
 REM Rundll32.exe shell32.dll,Control_RunDLL Sysdm.cpl,,5
 start "" rundll32 shell32,ShellAbout Script  ：邵华 - 18900559020                   Date：%Version% System：%ProductName% - %processor_architecture% - %CurrentBuildNumber%
-if exist "C:\ShaoHua\Tools\info.exe" start "" "C:\ShaoHua\Tools\info.exe"
+REM if exist "C:\ShaoHua\Tools\info.exe" start "" "C:\ShaoHua\Tools\info.exe"
 echo %~dp0|find /i "windows" >nul||del %0
 exit
