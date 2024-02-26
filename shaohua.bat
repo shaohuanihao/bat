@@ -853,8 +853,8 @@ REM 软件-浏览器-IE-界面-去除IE右边的笑脸
 reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Restrictions" /v "NoHelpItemSendFeedback" /t reg_dword /d "1" /f
 REM 软件-浏览器-IE-界面-去除IE标题栏上的额外文字
 reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Window Title" /t REG_SZ /d "" /f
-REM 软件-浏览器-IE-界面-去除IE工具栏背景
-reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Display Inline Images" /t REG_SZ /d "no" /f
+REM 软件-浏览器-IE-界面-显示图片
+reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Display Inline Images" /t REG_SZ /d "yes" /f
 REM 软件-浏览器-IE-界面-开启在独一行显示标签页
 reg add "HKCU\Software\Microsoft\Internet Explorer\TabbedBrowsing" /v TabProcGrowth /t REG_DWORD /d 0 /f
 REM 软件-浏览器-IE-界面-遇到弹出窗口时始终在新选项卡中打开弹出窗口
