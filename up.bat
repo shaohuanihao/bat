@@ -5,7 +5,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=Upgrade脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240224
+set Version=20240229
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -16,9 +16,9 @@ set error=下载遇到了问题，请检查是否网络不可达或者杀毒软件在拦截？
 set urllan=http://38.40.12.180/sh
 set urlwan=http://10.198.78.78/sh
 set urlother=https://gitee.com/shaohuanihao
+cls
 if not exist %SystemRoot%\System32\curl.exe call :curl
 if exist %SystemRoot%\System32\curl.exe call :up
-if exist %local%\up.bat call :clear
 :list
 set al=1
 :SetA
@@ -34,6 +34,7 @@ rem 打印共享脚本
 if exist "C:\ShaoHua\Key\FixPrint.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\打印共享脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\FixPrint.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
 rem 垃圾清理脚本
 if exist "C:\ShaoHua\Key\ClearTemp.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\垃圾清理脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\ClearTemp.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
+if exist %local%\up.bat call :clear
 exit
 :list1
 rem shaohua
@@ -168,21 +169,20 @@ echo %~dp0|find /i "shaohua"&&(goto :eof)||(start "" %local%\up.bat&del %0&del %
 goto :eof
 :clear
 echo. Cleaning up files that may trigger false-positive virus alerts from antivirus software. Please be patient, no matter how long it takes.
-rd "%systemdrive%\sysprep\" /s /q 2>nul
-rd "%local%\Tools\Key" /s /q 2>nul
-rd "%local%\Tools\DNS" /s /q 2>nul
-rd "%local%\Tools\局域网共享" /s /q 2>nul
-rd "%local%\Tools\Key" /s /q 2>nul
-del /f /s /q "%local%\*一键*" 2>nul
-del /f /s /q "%local%\*共享*" 2>nul
-del /f /s /q "%local%\*KMS_VL*" 2>nul
-del /f /s /q "%local%\*oem7*" 2>nul
-del /f /s /q "%local%\*office2007*" 2>nul
-del /f /s /q "%local%\tools\*dns*" 2>nul
-del /f /s /q "%local%\tools\*Share*" 2>nul
-del /f /s /q "%systemdrive%\sysprep\*" 2>nul
-del "C:\ShaoHua\Drv\Drvceo\*.*" /f /s /q 2>nul
-rd "C:\ShaoHua\Drv\Drvceo\" /s /q 2>nul
+rd "%systemdrive%\sysprep\" /s /q
+rd "%local%\Tools\Key\" /s /q
+rd "%local%\Tools\DNS\" /s /q
+rd "%local%\Tools\局域网共享\" /s /q
+rd "%local%\Tools\Key\" /s /q
+del /f /s /q "%local%\*一键*"
+del /f /s /q "%local%\*共享*"
+del /f /s /q "%local%\*KMS_VL*"
+del /f /s /q "%local%\*oem7*"
+del /f /s /q "%local%\*office2007*"
+del /f /s /q "%local%\tools\*dns*"
+del /f /s /q "%local%\tools\*Share*"
+del /f /s /q "%systemdrive%\sysprep\*"
+rd "C:\ShaoHua\Drv\Drvceo\" /s /q
 goto :eof
 :make
 set L=&set W=&set O=
