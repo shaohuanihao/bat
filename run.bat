@@ -9,20 +9,16 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=FirstRun脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20231005
+set Version=20240303
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
-rem 开启cmd-admin
-reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %windir%\system32\cmd.exe /t reg_sz /d RUNASADMIN /f
-reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %windir%\system32\cmd.exe /t reg_sz /d RUNASADMIN /f
-reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %windir%\SysWOW64\cmd.exe /t reg_sz /d RUNASADMIN /f
-reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %windir%\SysWOW64\cmd.exe /t reg_sz /d RUNASADMIN /f
-reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %windir%\system32\conhost.exe /t reg_sz /d RUNASADMIN /f
-reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %windir%\system32\conhost.exe /t reg_sz /d RUNASADMIN /f
-reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %windir%\System32\WindowsPowerShell\v1.0\powershell.exe /t reg_sz /d RUNASADMIN /f
-reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %windir%\System32\WindowsPowerShell\v1.0\powershell.exe /t reg_sz /d RUNASADMIN /f
-reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe /t reg_sz /d RUNASADMIN /f
-reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe /t reg_sz /d RUNASADMIN /f
+rem 删除多余的广告文件
+rd /s /q C:\Users\Administrator\AppData\Local\360Chrome
+rd /s /q C:\Users\Administrator\AppData\Local\360ChromeX
+rd /s /q C:\Users\Administrator\AppData\Local\google
+rd /s /q C:\Users\Administrator\AppData\Local\Microsoft\Edge
+rd /s /q C:\Users\Administrator\AppData\Local\Sogou\SogouExplorer
+rd /s /q C:\Users\Administrator\AppData\Local\Tencent\QQBrowser
 rem verdate
 REG QUERY "HKLM\SYSTEM\Setup" /v Type 2>nul|findstr /i "Type">nul &&(reg add "HKLM\SYSTEM\Setup" /v "Type" /t reg_sz /d "%date%" /f)||(echo.)
 rem LNK

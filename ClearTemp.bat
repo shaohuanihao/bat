@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=ClearTemp脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20231005
+set Version=20240303
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
@@ -114,23 +114,23 @@ call :xuanze
 if %errorlevel%==2 goto :eof
 call :tishi
 rem 临时文件
-del /f /s /q %systemdrive%\*.tmp
+rem del /f /s /q %systemdrive%\*.tmp
 rem 临时文件
-del /f /s /q %systemdrive%\*._mp
+rem del /f /s /q %systemdrive%\*._mp
 rem 日志文件
-del /f /s /q %systemdrive%\*.log
+rem del /f /s /q %systemdrive%\*.log
 rem 临时帮助文件
-del /f /s /q %systemdrive%\*.gid
+rem del /f /s /q %systemdrive%\*.gid
 rem 磁盘检查文件
-del /f /s /q %systemdrive%\*.chk
+rem del /f /s /q %systemdrive%\*.chk
 rem 临时备份文件
-del /f /s /q %systemdrive%\*.old
+rem del /f /s /q %systemdrive%\*.old
 rem 回收站文件
 del /f /s /q %systemdrive%\recycled\*.*
 rem 备份文件
-del /f /s /q %windir%\*.bak
+rem del /f /s /q %windir%\*.bak
 rem 预读文件
-del /f /s /q %windir%\prefetch\*.*
+rem del /f /s /q %windir%\prefetch\*.*
 rem 临时目录
 del /f /s /q %windir%\temp\*.*
 rem 最近访问文件的纪录

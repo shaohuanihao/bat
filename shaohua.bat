@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240229
+set Version=20240303
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 call :capslk
@@ -787,6 +787,9 @@ REM 界面-桌面-快捷方式不添加快捷方式的文字
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v link /t REG_BINARY /d 00000000 /f
 REM 界面-桌面-桌面壁纸质量调整为
 reg add "HKCU\Control Panel\Desktop" /v "JPEGImportQuality" /t reg_dword /d 256 /f
+REM 界面-桌面-"我的电脑"增加设备管理器
+reg add "HKCR\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\shell\DeviceManager" /ve /d "设备管理器" /f
+reg add "HKCR\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\shell\DeviceManager\command" /ve /d "devmgmt.msc" /f
 
 REM 界面-右键菜单-将“右键菜单”调整为Windows 7模式（by Silence）
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\FlightedFeatures" /v "ImmersiveContextMenu" /t reg_dword /d 0 /f
@@ -1582,12 +1585,17 @@ del "C:\ShaoHua\Drv\Drvceo\*.*" /f /s /q 2>nul
 rd "C:\ShaoHua\Drv\Drvceo\" /s /q 2>nul
 goto :eof
 :finish_hsw
+call :finish_hso
+call :upan
 REM 显示此电脑种的打印机文件夹
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{2227A280-3AEA-1069-A2DE-08002B30309D}" /ve /f
-call :upan
-call :finish_hso
 goto :eof
 :finish_hso
+REM 删除此电脑种的打印机文件夹
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{2227A280-3AEA-1069-A2DE-08002B30309D}" /f
+REM 删除此电脑种的安全U盘_V3文件夹
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{679F137C-3162-45da-BE3C-2F9C3D093F69}" /f
+reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{679F137C-3162-45da-BE3C-2F9C3D093F69}" /f
 REM 禁用新建的“联系人”右键菜单：
 reg delete "HKCR\.contact" /f 2>nul
 REM 禁用发送到的“传真接收人”扩展菜单：
