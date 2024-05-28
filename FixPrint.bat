@@ -9,10 +9,11 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=FixPrint脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20231005
+set Version=20240528
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
+call :CapsLK
 reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v forceguest /t REG_DWORD /d 0 /f
 cls
 echo.
@@ -23,9 +24,9 @@ echo.　　　　　　C）客户机修复：　Client访问者电脑（需要添加共享打印机的主机）；
 echo.　　　　　　F）解决　报错：　解决打印的时部分空白和报0x0000011b和0x00000709的问题；&echo.
 echo.　　　　　　D）任务　清理：　删除本机已保存的打印任务记录；&echo.
 echo.　　　　　　O）Office修复：　Office模板错误修复；&echo.
-echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 邵华
-echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　18900559020&echo.
-choice /C USCFDO /N /M "　[ 按 U 更正密码 / 按 S 主机修复 / 按 C 客户机修复 / 按 F 解决报错 / 按 D 任务清理 / 按 O Office修复 ]"
+echo.
+echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　%Version%　邵华　18900559020&echo.
+choice /C USCFDO /N /M "　[ 按 U 更正密码 / 按 S 主机修复 / 按 C 客户机修复 / 按 F 解决报错 / 按 D 任务清理 / 按 O Office修复 ]："
 if errorlevel 6 goto office
 if errorlevel 5 goto clear
 if errorlevel 4 goto fix
@@ -33,7 +34,11 @@ if errorlevel 3 goto client
 if errorlevel 2 goto server
 if errorlevel 1 goto update
 exit
+:CapsLK
+for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i"=="False" mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+goto :eof
 :fix
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print" /v "RpcAuthnLevelPrivacyEnabled" /d "0" /t reg_dword /f >nul 2>nul
 @wusa /quiet /uninstall /kb:5000802 >nul 2>nul
 @wusa /quiet /uninstall /kb:5000808 >nul 2>nul
 @wusa /quiet /uninstall /kb:5006670 >nul 2>nul
@@ -75,6 +80,7 @@ wmic path win32_useraccount where name='PrintUser' set passwordexpires='false' >
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" /v "PrintUser" /d "0" /t reg_dword /f >nul 2>nul
 net user guest /active:no>nul 2>nul
 reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v forceguest /t REG_DWORD /d 0 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print" /v "RpcAuthnLevelPrivacyEnabled" /d "0" /t reg_dword /f >nul 2>nul
 net start workstation
 net start server
 net start spooler
@@ -127,7 +133,6 @@ del /f /s /q "%appdata%\microsoft\Templates\*.dot"
 del /f /s /q "%appdata%\microsoft\Word\Startup\*.dot"
 goto end
 :end
-mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
 echo.&echo.　部署完成...&echo.&echo.&echo.&echo.&echo.&echo.
 echo.　　　　　　　　　　　　　　　　　　　　　　　聚散终有时　再见亦有期&echo.&echo.&echo.&echo.&echo.&echo.
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 邵华

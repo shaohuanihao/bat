@@ -12,8 +12,8 @@ set Powered=Powered by 邵华 18900559020
 set Version=20240303
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
-mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
 :start
+call :CapsLK
 cls&for /f "tokens=2 delims=()" %%i in ('fsutil volume diskfree c:^|find /i "可用"') do set myvar=%%i&echo.
 echo.　当前C盘可用容量为%myvar%。&echo.&echo.
 echo.　　　　　　我将为您自动化以下操作：&echo.
@@ -29,7 +29,6 @@ echo.　　　　　　　　　　　9）：启动 磁盘清理程序 自动清理
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 邵华
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　18900559020&echo.
 echo.　按任意键开始...&pause >nul 2>nul&cls&echo.&echo.　清理中，请稍后...&echo.
-mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
 call :l1
 call :l2
 call :l3
@@ -40,6 +39,9 @@ call :l7
 call :l8
 call :l9
 call :exit
+:CapsLK
+for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i"=="False" mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+goto :eof
 :l1
 cls&echo.
 taskkill /f /t /im WeChat.exe 2>nul

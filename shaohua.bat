@@ -9,12 +9,13 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240303
+set Version=20240528
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
-call :capslk
+call :CapsLK
 :passwd
-cls&echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.&set /p pwd=　　　　　　　　　　　　　　　　　　Password:
+cls&echo.&echo.
+echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　Ver%Version%&echo.&echo.&echo.&echo.&echo.&echo.&set /p pwd=　　　　　　　　　　　　　　　　　　　　　Password:
 if /i "%pwd%" neq "shaohua" goto :passwd
 call :patch
 title %Pc% ★ %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
@@ -32,8 +33,8 @@ call :better_wl
 call :finish
 exit
 
-:capslk
-mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+:CapsLK
+for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i"=="False" mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
 goto :eof
 
 :patch
@@ -48,7 +49,6 @@ if %errorlevel%==4 set Pc=PC-Sysprep&set hs=_hsf&&goto :eof
 if %errorlevel%==3 set Pc=PC-Other&set hs=_hso&&goto :eof
 if %errorlevel%==2 set Pc=HS-Lan&set hs=_hsl&&goto :eof
 if %errorlevel%==1 set Pc=HS-Wan&set hs=_hsw&&goto :eof
-call :capslk
 REM 根据ARP设置电脑电脑所属
 arp -a|findstr /i "38.40." >nul && (set Pc=HS-Lan&set hs=_hsl)||(arp -a|findstr /i "38.41." >nul && (set Pc=HS-Lan&set hs=_hsl)||(arp -a|findstr /i "10.198." >nul && (set Pc=HS-Wan&set hs=_hsw)||(set Pc=PC-Other&cls&echo. &echo.　暂无法判断您的环境&echo.&echo.　本脚本专供于徽商银行马鞍山地区网络环境使用&echo.　如您有定制需求请于我司联系&echo. &echo.　马鞍山创锐电子科技有限公司 - 邵华 - 7x24H - 18900559020&timeout /t 6 >nul&exit)))
 goto :eof
@@ -262,7 +262,9 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" 
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" /v "NOC_GLOBAL_SETTING_ALLOW_CRITICAL_TOASTS_ABOVE_LOCK" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" /v "NOC_GLOBAL_SETTING_ALLOW_TOASTS_ABOVE_LOCK" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" /v "NOC_GLOBAL_SETTING_BADGE_ENABLED" /t reg_dword /d 0 /f
-REM 隐藏安全和维护中的健康报告
+REM 系统-通知-禁用 Windows To Go 保持插入 USB 驱动器的提示
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\PortableOperatingSystem" /v ShutdownBehavior /t REG_DWORD /d 0 /f
+REM 系统-通知-隐藏安全和维护中的健康报告
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "HideSCAHealth" /t reg_dword /d 1 /f
 REM 系统-通知-禁用启动器的轻扫功能
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell\Launcher" /v "DisableLightDismiss" /t reg_dword /d 1 /f
@@ -290,10 +292,15 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\W
 REM 系统-通知-禁用动态锁出现问题时的通知
 reg add "HKLM\SOFTWARE\Microsoft\Windows Security Health\Health Advisor" /v DynamicLockNotificationDisabled /t REG_DWORD /d 1 /f
 
+REM 系统-广告-关闭广告标识符
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t REG_DWORD /d 0 /f
+REM 系统-广告-禁用遥测
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d 0 /f
 REM 系统-广告-关闭客户体验改善计划
 reg add "HKLM\SOFTWARE\Policies\Microsoft\SQMClient\Windows" /v "CEIPEnable" /d 0 /t REG_DWORD /f
-REM 系统-广告-限制 Windows 在个性化识别服务中收集手写和打字数据
+REM 系统-广告-禁止向 Microsoft 发送墨迹和打字数据
 Reg Add "HKCU\SOFTWARE\Microsoft\InputPersonalization" /v "RestrictImplicitInkCollection" /t "Reg_Dword" /d "1" /f
+REM 系统-广告-禁止向 Microsoft 发送关于我如何书写的信息，以帮助我们改进将来的打字和写作
 Reg Add "HKCU\SOFTWARE\Microsoft\InputPersonalization" /v "RestrictImplicitTextCollection" /t "Reg_Dword" /d "1" /f
 REM 系统-广告-禁止 Windows 收集联系人数据
 Reg Add "HKCU\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" /v "HarvestContacts" /t "Reg_Dword" /d "0" /f
@@ -515,6 +522,8 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurePipeServers\winreg" /v "Rem
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurePipeServers\winreg" /v "RemoteRegAccess" /t reg_dword /d 0 /f
 REM 系统-远程-不将远程桌面会话中的客户端打印机设置为默认打印机
 reg add "HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services" /v "fForceClientLptDef" /t reg_dword /d 1 /f
+REM 系统-远程-禁用RPC的隐私级别认证
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print" /v "RpcAuthnLevelPrivacyEnabled" /t reg_dword /d 0 /f
 REM 系统-远程-禁用客户端打印机重定向
 reg add "HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services" /v "fDisableCpm" /t reg_dword /d 1 /f
 REM 系统-远程-设置远程桌面连接优先使用TCP连接
@@ -538,6 +547,8 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "TargetRelea
 REM 系统-系统更新-禁止 Windows 更新提示
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v DisableOSUpgrade /t REG_DWORD /d 1 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v DisableWindowsUpdateAccess /t REG_DWORD /d 1 /f
+REM 系统-系统更新-Windows 7 不再提示升级到 Windows 10
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\OSUpgrade" /v ReservationsAllowed /t REG_DWORD /d 0 /f
 REM 系统-系统更新-停止Windows Update服务
 sc stop wuauserv
 sc config wuauserv start= disabled

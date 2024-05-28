@@ -1,33 +1,37 @@
 ÿþa
 cls
-echo off
+@echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=DNS½Å±¾
 set Powered=Powered by ÉÛ»ª 18900559020
-set Version=20231005
+set Version=20240528
 set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
+for /f "tokens=2 delims==" %%i in ('wmic computersystem get name /value') do set PCName=%%i
 title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
-mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
 :menu
+call :CapsLK
 cls
 echo.
-echo.¡¡ÇëÑ¡ÔñÄúµ±Ç°µçÄÔÊÇÄÚÍø»¹ÊÇÍâÍø£¿&echo.&echo.
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë A Ñ¡ÔñÎª ¡¾×Ô¶¯¡¡ÅÐ¶Ï¡¿£¨10ÃëºóÄ¬ÈÏÖ´ÐÐ£©&echo.
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë L Ñ¡ÔñÎª ¡¾HS-LanÄÚÍø¡¿&echo.
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë W Ñ¡ÔñÎª ¡¾HS-WanÍâÍø¡¿&echo.
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë O Ñ¡ÔñÎª ¡¾PC-OtherÆäËû¡¿&echo.
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë Q ½Å±¾½« ¡¾ÍË³ö¡¿&echo.
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
-echo.¡¡ÇëÊäÈë£º&choice /T 10 /C ALWOQS /d A /N >nul 2>nul
-mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+echo.¡¡ÇëÑ¡ÔñÄúµ±Ç°µçÄÔ¡¡¡¾%PCName%¡¿¡¡ÊÇ¡¡ÄÚÍø¡¡»¹ÊÇ¡¡ÍâÍø¡¡£¿&echo.&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë¡¡A¡¡Ñ¡ÔñÎª¡¡¡¾×Ô¶¯¡¡ÅÐ¶Ï¡¿¡¡£¨10ÃëºóÄ¬ÈÏÖ´ÐÐ£©&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë¡¡L¡¡Ñ¡ÔñÎª¡¡¡¾HS-LanÄÚÍø¡¿&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë¡¡W¡¡Ñ¡ÔñÎª¡¡¡¾HS-WanÍâÍø¡¿&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë¡¡O¡¡Ñ¡ÔñÎª¡¡¡¾PC-OtherÆäËû¡¿&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÊäÈë¡¡Q¡¡½Å±¾½«¡¡¡¾ÍË³ö¡¿&echo.
+echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡%Version%¡¡ÉÛ»ª¡¡18900559020&echo.
+echo.¡¡ÇëÊäÈë£º
+choice /T 10 /C ALWOQS /d A /N >nul 2>nul
 if %errorlevel%==1 goto auto
 if %errorlevel%==2 goto HS-Lan
 if %errorlevel%==3 goto HS-Wan
 if %errorlevel%==4 goto PC-Other
 if %errorlevel%==5 exit
 if %errorlevel%==6 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.ÈçÄúÏëÊ¹ÓÃÈ«²¿¹¦ÄÜ£¬ÇëÁªÏµÉÛ»ª18900559020°²×°×îÐÂ²Ù×÷ÏµÍ³¾µÏñ¡£&timeout /t 10)
+:CapsLK
+for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i"=="False" mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+goto :eof
 :auto
 call :net
 goto %Pc%
@@ -64,13 +68,13 @@ set HS-Wan1=61.132.163.68&set HS-Wan2=218.104.78.2&set HS-Wan3=202.102.192.68&se
 set add1=netsh interface ipv4 add dnsservers "
 set add3=" address="
 set add5=" index="
-set add7=" validate=no
+set add7=" validate=no 2>nul
 goto :eof
 :del
-netsh interface ipv4 delete dnsservers "%wangka1%" all >nul 2>nul
-netsh interface ipv4 delete dnsservers "%wangka2%" all >nul 2>nul
-netsh interface ipv4 delete dnsservers "%wangka3%" all >nul 2>nul
-netsh interface ipv4 delete dnsservers "%wangka4%" all >nul 2>nul
+netsh interface ipv4 delete dnsservers "%wangka1%" all 2>nul
+netsh interface ipv4 delete dnsservers "%wangka2%" all 2>nul
+netsh interface ipv4 delete dnsservers "%wangka3%" all 2>nul
+netsh interface ipv4 delete dnsservers "%wangka4%" all 2>nul
 goto :eof
 :add
 set Ano=1&set Bno=1
@@ -93,6 +97,6 @@ goto :eof
 ipconfig /flushdns >nul 2>nul
 echo.&echo.¡¡²¿ÊðÍê³É...&echo.&echo.&echo.&echo.&echo.&echo.
 echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¾ÛÉ¢ÖÕÓÐÊ±¡¡ÔÙ¼ûÒàÓÐÆÚ&echo.&echo.&echo.&echo.&echo.&echo.
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
+echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡%Version%¡¡ÉÛ»ª¡¡18900559020&echo.
 echo.¡¡Èç¹û»¹ÓÐÎÊÌâ¾Í´òÎÒµç»°°É...&timeout /t 6 >nul&exit
