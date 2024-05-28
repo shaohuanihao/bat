@@ -1,6 +1,6 @@
 ÿþa
 cls
-echo on
+echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=Upgrade½Å±¾
