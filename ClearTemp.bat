@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=ClearTemp脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240303
+set Version=20240601
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -57,28 +57,25 @@ taskkill /f /t /im sesvc.exe 2>nul
 goto :eof
 :l3
 rem Delete WeChat Files directory
-cls&echo.&echo.　是否确认清除　【微信自动保存的文档 ^& 图片 ^& 视频 ^& 聊天记录等一切文件】　？
+cls&echo.&echo.　是否确认清除 【微信自动保存的文档 ^& 图片 ^& 视频 ^& 聊天记录等一切文件】？
 call :xuanze
 if %errorlevel%==2 goto :eof
 call :tishi
 for /f "tokens=1,2,*" %%i in ('REG QUERY HKEY_CURRENT_USER\Software\Tencent\WeChat /v FileSavePath') do set "regvalue=%%k"
-del /f /s /q "%userprofile%\Documents\WeChat Files\*.*"
-del /f /s /q "%regvalue%\WeChat Files\*.*"
+if defined regvalue (
+    del /f /s /q "%regvalue%\WeChat Files\*.*"
+)
+del /f /s /q "%userprofile%\Documents\WeChat Files\*.*" 2>nul
 goto :eof
 :l4
 rem Clear temp and temp cache directories
-cls&echo.&echo.　是否确认清除　【系统Temp临时文件】　？
+cls
+echo.&echo.　是否确认清除 【系统 Temp 临时文件】？
 call :xuanze
 if %errorlevel%==2 goto :eof
 call :tishi
-set temp=%temp%
-set tmp=%tmp%
-del /f /s /q %temp%\*.* 
-del /f /s /q %tmp%\*.*
-rd /s /q %temp%
-md %temp%
-rd /s /q %tmp%
-md %tmp%
+del /f /s /q "%temp%\*.tmp" 2>nul
+del /f /s /q "%tmp%\*.tmp" 2>nul
 goto :eof
 :l5
 rem Delete print task history files
@@ -152,7 +149,7 @@ cleanmgr.exe /VERYLOWDISK
 goto :eof
 :xuanze
 echo.&echo.　按【Y】继续，按【N】跳过。&echo.&echo.　请确认！&echo.&echo.　4秒后，将视为Y继续。
-choice /T 3 /C YN /d Y /N >nul 2>nul
+choice /T 4 /C YN /d Y /N >nul 2>nul
 goto :eof
 :tishi
 cls&echo.&if %errorlevel%==1 echo.　如果光标在闪动，说明程序正在运行，请耐心等待……&echo.

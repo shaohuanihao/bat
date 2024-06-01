@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=FixPrint脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240528
+set Version=20240601
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -81,10 +81,13 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccou
 net user guest /active:no>nul 2>nul
 reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v forceguest /t REG_DWORD /d 0 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print" /v "RpcAuthnLevelPrivacyEnabled" /d "0" /t reg_dword /f >nul 2>nul
-net start workstation
+net start rpcss
 net start server
+dism /online /enable-feature /featurename:Printing-Foundation-LPDPrintService /NoRestart 2>nul
+net start lpdsvc
 net start spooler
 net start SSDPSRV
+net start workstation
 sc config SSDPSRV start= auto
 cls&echo. &echo. &echo. 请记下IP地址，客户机添加共享打印机时候会用到。&echo.&FOR /F "tokens=2 delims=:" %%A in ('ipconfig ^| findstr "IPv4"') do echo. 您的IP可能是：【%%A】&echo.&pause
 cls&echo.
@@ -121,6 +124,8 @@ net stop spooler
 net session /delete /y
 attrib %systemroot%\System32\spool\PRINTERS\*.* -R /s
 del %systemroot%\System32\spool\PRINTERS\*.* /q /s
+dism /online /enable-feature /featurename:Printing-Foundation-LPDPrintService /NoRestart 2>nul
+net start lpdsvc
 sc config spooler start= auto
 net start spooler
 goto end
@@ -138,3 +143,4 @@ echo.　　　　　　　　　　　　　　　　　　　　　　　聚散终有时　再见亦有期&echo.&
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 邵华
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　18900559020&echo.
 echo.　如果还有问题就打我电话吧...&timeout /t 6 >nul&exit
+
