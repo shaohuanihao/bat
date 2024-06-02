@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240528
+set Version=20240602
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 call :CapsLK
@@ -211,7 +211,7 @@ del c:\hiberfil.sys /f /q 2>nul
 REM 硬件-驱动-win10禁止更新驱动
 reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "ExcludeWUDriversInQualityUpdate" /t reg_dword /d 1 /f
 REM 硬件-驱动-禁用启动时的完整性检查
-bcdedit.exe /set nointegritychecks on
+bcdedit /set nointegritychecks on
 REM 硬件-驱动-禁用数据执行保护（DEP）
 bcdedit /set nx AlwaysOff
 REM 硬件-驱动-禁用启动时的完整性检查
@@ -291,11 +291,17 @@ REM 系统-通知-禁用所有的“安全和维护”通知
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance" /v Enabled /t REG_DWORD /d 0 /f
 REM 系统-通知-禁用动态锁出现问题时的通知
 reg add "HKLM\SOFTWARE\Microsoft\Windows Security Health\Health Advisor" /v DynamicLockNotificationDisabled /t REG_DWORD /d 1 /f
+REM 系统-通知-禁用不满足系统要求的水印
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform" /v NoGenTicket /t REG_DWORD /d 1 /f
 
 REM 系统-广告-关闭广告标识符
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t REG_DWORD /d 0 /f
 REM 系统-广告-禁用遥测
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d 0 /f
+REM 系统-广告-禁用传递优化内容
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DODownloadMode /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DODownloadModeBackground /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DODownloadModeForeground /t REG_DWORD /d 0 /f
 REM 系统-广告-关闭客户体验改善计划
 reg add "HKLM\SOFTWARE\Policies\Microsoft\SQMClient\Windows" /v "CEIPEnable" /d 0 /t REG_DWORD /f
 REM 系统-广告-禁止向 Microsoft 发送墨迹和打字数据
@@ -503,6 +509,24 @@ sc config HomeGroupProvider start=disabled
 REM 系统-服务-手动NTFS链接跟踪服务
 net stop TrkWks
 sc config TrkWks start=demand
+REM 系统-服务-禁用防火墙服务
+net stop MpsSvc
+sc config MpsSvc start=disabled
+REM 系统-服务-禁用备份服务
+net stop SDRSVC
+sc config SDRSVC start=disabled
+REM 系统-服务-禁用AppReadiness
+net stop AppReadiness
+sc config AppReadiness start=disabled
+REM 系统-服务-禁用RemoteRegistry
+net stop RemoteRegistry
+sc config RemoteRegistry start=disabled
+REM 系统-服务-禁用Windows To Go
+net stop WTGService
+sc config WTGService start= disabled
+REM 系统-服务-开启LPD打印服务
+net start lpd
+sc config lpd start= auto
 
 REM 系统-格式关联-删除FTP的注册表项
 Reg Delete "HKCR\ftp\shell\open\command" /f
@@ -548,7 +572,7 @@ REM 系统-系统更新-禁止 Windows 更新提示
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v DisableOSUpgrade /t REG_DWORD /d 1 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v DisableWindowsUpdateAccess /t REG_DWORD /d 1 /f
 REM 系统-系统更新-Windows 7 不再提示升级到 Windows 10
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\OSUpgrade" /v ReservationsAllowed /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\OSUpgrade" /v ReservationsAllowed /t REG_DWORD /d 0 /f
 REM 系统-系统更新-停止Windows Update服务
 sc stop wuauserv
 sc config wuauserv start= disabled
@@ -581,15 +605,23 @@ REM 系统-安全设置-关闭自动更新地图
 reg add "HKLM\SYSTEM\Maps" /v "AutoUpdateEnabled" /t reg_dword /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Maps" /v "AutoUpdateEnabled" /t REG_DWORD /d 0 /f
 REM 系统-安全设置-禁止要求按下 Ctrl+Alt+Del 键登录
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v DisableCAD /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v DisableCAD /t REG_DWORD /d 1 /f
+REM 系统-安全设置-未登录可关机
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ShutdownWithoutLogon" /t REG_DWORD /d 1 /f
+REM 系统-安全设置-禁用关闭原因
+reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v "EnableReasonUI" /t REG_DWORD /d 0 /f
+
+REM 系统-安全设置-禁用复杂密码策略
+net accounts /maxpwage:unlimited /minpwlen:0 /minpwage:0 /uniquepw:0
 REM 系统-安全设置-将用户密码的最大有效期设置为永不过期
 net accounts /maxpwage:unlimited
+wmic UserAccount where Name='administrator' set PasswordExpires=False
 REM 系统-安全设置-在本地计算机上设置允许不安全的访客身份验证（64位系统）
 reg add "HKLM\Software\Policies\Microsoft\Windows\LanmanWorkstation" /v "AllowInsecureGuestAuth" /d 1 /t reg_dword /f
 REM 系统-安全设置-在本地计算机上设置允许不安全的访客身份验证（32位系统）
 reg add "HKLM\Software\WOW6432Node\Policies\Microsoft\Windows\LanmanWorkstation" /v "AllowInsecureGuestAuth" /d 1 /t reg_dword /f
 REM 系统-安全设置-允许从其他计算机下载的文件在打开时不被阻止
-REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "SaveZoneInformation" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "SaveZoneInformation" /t REG_DWORD /d 0 /f
 REM 系统-安全设置-禁止运行计算机自动维护计划
 reg add "HKLM\Software\Policies\Microsoft\Windows\ScheduledDiagnostics" /v "EnabledExecution" /t reg_dword /d 0 /f
 REM 系统-安全设置-允许直接运行来自网络的exebat
@@ -671,6 +703,8 @@ REM 界面-开始菜单-删除所有磁贴，用户退出时清除所有磁贴
 reg add "HKCU\Software\Policies\Microsoft\Windows" /v "ClearTilesOnExit" /t reg_dword /d 1 /f
 REM 界面-开始菜单-关闭“突出显示新安装的程序”
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_NotifyNewApps" /t reg_dword /d 0 /f
+REM 界面-开始菜单-清理推荐项目里的入门图标
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AppKey\10" /v ShellExecute /t REG_SZ /d "control.exe" /f
 
 REM 界面-主题与背景-禁用窗口动态效果
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v DisablePreviewDesktop /t REG_DWORD /d 1 /f
@@ -725,9 +759,11 @@ REM 界面-主题与背景-调整鼠标悬停时间为100毫秒，以使界面元素快速响应鼠标操作
 reg add "HKCU\Control Panel\Mouse" /v "MouseHoverTime" /d 100 /t REG_SZ /f
 REM 界面-主题与背景-显示设置缩放为100%(124%值为119,100%值为96)
 reg add "HKCU\Control Panel\Desktop" /v "LogPixels" /t reg_dword /d 96 /f
+
 REM 界面-资源管理器-减少窗口最大化和最小化的动画时间
 reg add "HKCU\Control Panel\Desktop" /v "AnimateWindows" /t REG_SZ /d "0" /f
-
+REM 界面-资源管理器-隐藏“以前的版本”标签
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v ShowPreviousVersions /t REG_DWORD /d 0 /f
 REM 界面-资源管理器-删除“此电脑”右侧系统盘符上方的文件夹视频
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{f86fa3ab-70d2-4fc7-9c99-fcbf05467f3a}" /f
 REM 界面-资源管理器-删除“此电脑”右侧系统盘符上方的文件夹音乐
@@ -862,6 +898,14 @@ REM 软件-浏览器-IE-控件-自动激活IE新安装的加载项
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Ext" /v "IgnoreFrameApprovalCheck" /t reg_dword /d 1 /f
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Ext" /v "IgnoreFrameApprovalCheck" /t reg_dword /d 1 /f
 
+REM 软件-浏览器-IE-界面-显示菜单栏
+reg add "HKCU\Software\Microsoft\Internet Explorer\Toolbar" /v ITBarLayout /t REG_SZ /d "1" /f
+REM 软件-浏览器-IE-界面-显示收藏夹栏
+reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v Show_Favoritesbar /t REG_DWORD /d 1 /f
+REM 软件-浏览器-IE-界面-显示状态栏
+reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v StatusBarWeb /t REG_DWORD /d 1 /f
+REM 软件-浏览器-IE-界面-单独一行显示标签
+reg add "HKCU\Software\Microsoft\Internet Explorer\TabbedBrowsing" /v TabProcGrowth /t REG_DWORD /d 0 /f
 REM 软件-浏览器-IE-界面-去除IE右边的笑脸
 reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Restrictions" /v "NoHelpItemSendFeedback" /t reg_dword /d "1" /f
 REM 软件-浏览器-IE-界面-去除IE标题栏上的额外文字
@@ -938,7 +982,7 @@ reg add "HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Internet Setting
 reg add "HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v "MaxConnectionsPer1_0Server" /d 10 /t reg_dword /f
 REM 软件-浏览器-IE-功能-关闭IE启动自动崩溃恢复
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Recovery" /v "AutoRecover" /t reg_dword /d 0 /f
-REM 软件-浏览器-IE-功能-关闭IE在后台加载站点和内容以优化性能
+REM 软件-浏览器-IE-功能-开启IE在后台加载站点和内容以优化性能
 reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "UseSWRender" /t REG_DWORD /d 1 /f
 REM 软件-浏览器-IE-功能-禁用IE的预取和预渲染功能
 reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\PrefetchPrerender" /v "Enabled" /t REG_DWORD /d 0 /f
@@ -1404,6 +1448,34 @@ reg add "HKCU\Software\Microsoft\Notepad" /v "fWrap" /t reg_dword /d 1 /f
 REM 软件-记事本-始终显示状态栏
 reg add "HKCU\Software\Microsoft\Notepad" /v "StatusBar" /t reg_dword /d 1 /f
 
+REM 软件-Windows 照片查看器-启用Windows 图片查看器并关联
+reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".jpg" /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".jpeg" /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".png" /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".bmp" /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".gif" /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".tif" /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".tiff" /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".ico" /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".jfif" /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKCR\PhotoViewer.FileAssoc.Jpeg" /ve /d "jpegfile" /f
+reg add "HKCR\PhotoViewer.FileAssoc.Png" /ve /d "pngfile" /f
+reg add "HKCR\PhotoViewer.FileAssoc.Bmp" /ve /d "bmpfile" /f
+reg add "HKCR\PhotoViewer.FileAssoc.Gif" /ve /d "giffile" /f
+reg add "HKCR\PhotoViewer.FileAssoc.Tif" /ve /d "tifffile" /f
+reg add "HKCR\PhotoViewer.FileAssoc.Tiff" /ve /d "tifffile" /f
+reg add "HKCR\PhotoViewer.FileAssoc.Ico" /ve /d "icofile" /f
+reg add "HKCR\PhotoViewer.FileAssoc.Jfif" /ve /d "jfiffile" /f
+ftype PhotoViewer.Image="%SystemRoot%\System32\rundll32.exe" "%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll", ImageView_Fullscreen %1
+for %%i in (".bmp" ".dib" ".rle" ".gif" ".jpg" ".jpeg" ".jpe" ".jfif" ".png" ".tif" ".tiff" ".ico") do assoc %%i=PhotoViewer.FileAssoc.Tiff
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bmp\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpeg\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.png\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.gif\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tif\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tiff\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ico\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
 REM 软件-Windows 照片查看器-解决Win10报内存不足，方法2为实验产品，开启1G缓存
 REM reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\ICM\RegisteredProfiles" /v "sRGB" /t reg_sz /d "RSWOP.icm" /f
 reg add "HKCU\Software\Microsoft\Windows Photo Viewer\Viewer" /f /v MemCacheSize /t REG_DWORD /d 1073741824
@@ -1419,36 +1491,36 @@ sc config WPSUpdateService start= disabled
 REM 软件-WPS-去除WPS云文档
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace{D426C8B3-0B26-4F0D-BA74-2EE212EDAC6D}" /f 
 REM 软件-WPS-禁用WPS Office的启动画面
-reg add "HKEY_CURRENT_USER\Software\Kingsoft\WPS\kui" /v "Startup" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Kingsoft\WPS\kui" /v "Startup" /t REG_DWORD /d 0 /f
 REM 软件-WPS-设置WPS Office的界面语言为英文
-reg add "HKEY_CURRENT_USER\Software\Kingsoft\WPS\kui" /v "Lang" /t REG_DWORD /d 2052 /f
+reg add "HKCU\Software\Kingsoft\WPS\kui" /v "Lang" /t REG_DWORD /d 2052 /f
 REM 软件-WPS-设置WPS Office的默认保存格式为docx
-reg add "HKEY_CURRENT_USER\Software\Kingsoft\WPS\kxe" /v "SaveType" /t REG_SZ /d "docx" /f
+reg add "HKCU\Software\Kingsoft\WPS\kxe" /v "SaveType" /t REG_SZ /d "docx" /f
 REM 软件-WPS-禁用WPS Office的广告推送
-reg add "HKEY_CURRENT_USER\Software\Kingsoft\WPS\kui" /v "AdPush" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Kingsoft\WPS\kui" /v "AdPush" /t REG_DWORD /d 0 /f
 REM 软件-WPS-设置WPS Office的图标大小为中等
-reg add "HKEY_CURRENT_USER\Software\Kingsoft\WPS\kui" /v "IconSize" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Kingsoft\WPS\kui" /v "IconSize" /t REG_DWORD /d 1 /f
 REM 软件-WPS-禁用WPS Office的实时拼写检查
-reg add "HKEY_CURRENT_USER\Software\Kingsoft\WPS\kxe" /v "AutoCheck" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Kingsoft\WPS\kxe" /v "AutoCheck" /t REG_DWORD /d 0 /f
 REM 软件-WPS-设置WPS Office的默认字体为Arial
-reg add "HKEY_CURRENT_USER\Software\Kingsoft\WPS\kui" /v "FontName" /t REG_SZ /d "Arial" /f
+reg add "HKCU\Software\Kingsoft\WPS\kui" /v "FontName" /t REG_SZ /d "Arial" /f
 REM 软件-WPS-设置WPS Office的默认字体大小为12
-reg add "HKEY_CURRENT_USER\Software\Kingsoft\WPS\kui" /v "FontSize" /t REG_DWORD /d 12 /f
+reg add "HKCU\Software\Kingsoft\WPS\kui" /v "FontSize" /t REG_DWORD /d 12 /f
 
 REM 软件-Office-禁用Office 16 Excel的动画
-reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Excel\options" /v "EnableAnimations" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Office\16.0\Excel\options" /v "EnableAnimations" /t REG_DWORD /d 0 /f
 REM 软件-Office-禁用Office 13 Excel的动画
-reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\15.0\Excel\options" /v "EnableAnimations" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Office\15.0\Excel\options" /v "EnableAnimations" /t REG_DWORD /d 0 /f
 REM 软件-Office-禁用Office文件上传通知
-reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common\FileIO" /v "DisablePausedUploadNotification" /t REG_DWORD /d 1 /f
-reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common\FileIO" /v "DisableUploadFailureNotification" /t REG_DWORD /d 1 /f
-reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common\FileIO" /v "DisableNotificationIcon" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Office\16.0\Common\FileIO" /v "DisablePausedUploadNotification" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Office\16.0\Common\FileIO" /v "DisableUploadFailureNotification" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Office\16.0\Common\FileIO" /v "DisableNotificationIcon" /t REG_DWORD /d 1 /f
 REM 软件-Office-设置Office 16的默认保存格式为.docx
-reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common\General" /v "DefaultFormat" /t REG_SZ /d "docx" /f
+reg add "HKCU\Software\Microsoft\Office\16.0\Common\General" /v "DefaultFormat" /t REG_SZ /d "docx" /f
 REM 软件-Office-禁用Office 16的欢迎屏幕
-reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common" /v "ShownFirstRunOptin" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Office\16.0\Common" /v "ShownFirstRunOptin" /t REG_DWORD /d 1 /f
 REM 软件-Office-禁用Office 16的动画效果
-reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common\Graphics" /v "DisableAnimations" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Office\16.0\Common\Graphics" /v "DisableAnimations" /t REG_DWORD /d 1 /f
 
 REM 软件-福昕阅读器-删除垃圾广告软件
 del "C:\ProgramData\CPPackages\*.EXE" /q /f 2>nul
@@ -1456,19 +1528,19 @@ REM 软件-福昕阅读器-关闭福昕阅读器的自动更新服务
 sc stop FoxitReaderUpdateService
 sc config FoxitReaderUpdateService start= disabled
 REM 软件-福昕阅读器-禁用福昕阅读器的启动画面
-reg add "HKEY_CURRENT_USER\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "ShowStartPage" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "ShowStartPage" /t REG_DWORD /d 0 /f
 REM 软件-福昕阅读器-设置福昕阅读器的界面语言为英文
-reg add "HKEY_CURRENT_USER\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "Language" /t REG_DWORD /d 2052 /f
+reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "Language" /t REG_DWORD /d 2052 /f
 REM 软件-福昕阅读器-设置福昕阅读器的默认打开方式为单页连续模式
-reg add "HKEY_CURRENT_USER\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "PageDisplayMode" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "PageDisplayMode" /t REG_DWORD /d 0 /f
 REM 软件-福昕阅读器-禁用福昕阅读器的广告推送
-reg add "HKEY_CURRENT_USER\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "ShowAdvertisement" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "ShowAdvertisement" /t REG_DWORD /d 0 /f
 REM 软件-福昕阅读器-设置福昕阅读器的默认字体为Arial
-reg add "HKEY_CURRENT_USER\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "DefaultFontName" /t REG_SZ /d "Arial" /f
+reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "DefaultFontName" /t REG_SZ /d "Arial" /f
 REM 软件-福昕阅读器-设置福昕阅读器的默认字体大小为12
-reg add "HKEY_CURRENT_USER\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "DefaultFontSize" /t REG_DWORD /d 12 /f
+reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "DefaultFontSize" /t REG_DWORD /d 12 /f
 REM 软件-福昕阅读器-设置福昕阅读器的图标大小为中等
-reg add "HKEY_CURRENT_USER\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "ToolbarIconSize" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "ToolbarIconSize" /t REG_DWORD /d 1 /f
 
 REM 软件-软件启动项-禁用 OneDrive 同步客户端
 reg add "HKLM\Software\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSyncNGSC" /t reg_dword /d 1 /f
@@ -1479,6 +1551,10 @@ sc config OneSyncSvc start= disabled
 goto :eof
 
 :better_wl
+REM 网络-禁用 TCP 半开连接的限制
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v EnableConnectionRateLimiting /t REG_DWORD /d 0 /f
+REM 网络-禁止弹出新网络位置设置
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoNetConnectDisconnect /t REG_DWORD /d 1 /f
 REM 网络-设置NetBIOS名称解析查询超时时间为3000毫秒。
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" /v "NameSrvQueryTimeout" /d 3000 /t reg_dword /f
 REM 网络-启用网络文件夹搜索优化，以提高文件夹搜索的性能
@@ -1602,6 +1678,8 @@ REM 显示此电脑种的打印机文件夹
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{2227A280-3AEA-1069-A2DE-08002B30309D}" /ve /f
 goto :eof
 :finish_hso
+REM 永久暂停Windows自动更新
+reg add "HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" /v FlightSettingsMaxPauseDays /t reg_dword /d 9999 /f
 REM 删除此电脑种的打印机文件夹
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{2227A280-3AEA-1069-A2DE-08002B30309D}" /f
 REM 删除此电脑种的安全U盘_V3文件夹
