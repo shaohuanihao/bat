@@ -8,8 +8,8 @@ set Powered=Powered by 邵华 18900559020
 set Version=20240620
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
-call :CapsLK
 :start
+for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i"=="False" mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
 choice /T 1 /C SH /d H /N >nul 2>nul
 if %errorlevel%==1 echo on
 set "local=C:\ShaoHua" >nul 2>nul
@@ -21,9 +21,6 @@ set urlother=https://gitee.com/shaohuanihao
 cls
 if not exist %SystemRoot%\System32\curl.exe call :curl
 if exist %SystemRoot%\System32\curl.exe call :up
-:CapsLK
-for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i"=="False" mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
-goto :eof
 :list
 set al=1
 :SetA
@@ -170,7 +167,7 @@ set softother=/bat/raw/main/up.bat
 call :make
 call :net
 curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\up.bat" -L %net%) || (echo.%error%)
-echo %~dp0|find /i "shaohua"&&(goto :eof)||(start "" %local%\up.bat&del %0&del %~dp0%~nx0&exit)
+echo %~dp0|findstr /c:"shaohua" >nul&&(goto :eof)||(start "" %local%\up.bat&del %0&del %~dp0%~nx0&exit)
 goto :eof
 :clear
 echo. Cleaning up files that may trigger false-positive virus alerts from antivirus software. Please be patient, no matter how long it takes.
