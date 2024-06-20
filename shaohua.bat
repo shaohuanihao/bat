@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240602
+set Version=20240620
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 call :CapsLK
@@ -59,21 +59,37 @@ goto :eof
 set bit=32&set arch=X86&set IE_Path64=&set IE_Path32=C:\Program Files\Internet Explorer\iexplore.exe
 goto :eof
 :cmd_admin
-REM 禁用“用户帐户控制：以管理员批准模式运行所有管理员”
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f
-REM 将管理员同意提示行为设置为不显示管理员提示
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorAdmin" /t REG_DWORD /d 0 /f
 REM 开启cmd-admin
-reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\cmd.exe" /t reg_sz /d RUNASADMIN /f
+reg add "HKCR\cmdfile\shell\runas\command" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
+reg add "HKCR\ConsoleHost\command\runas" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\cmd.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\cmd.exe" /t reg_sz /d RUNASADMIN /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\cmd.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\conhost.exe" /t reg_sz /d RUNASADMIN /f
+reg add "HKCR\ConsoleHost\command\runas" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\conhost.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
+reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t REG_SZ /d "PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File \"%1\"" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
+REM 开始配置用户账户控制(UAC)策略
+echo 设置用户账户控制策略...
+REM 禁用内置管理员的UAC提示
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v ConsentPromptBehaviorAdmin /t REG_DWORD /d 0 /f
+REM 启用内置管理员帐户的管理员批准模式
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v FilterAdministratorToken /t REG_DWORD /d 1 /f
+REM 禁用“用户帐户控制：以管理员批准模式运行所有管理员”
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f
+REM 在安全桌面上提示同意
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v PromptOnSecureDesktop /t REG_DWORD /d 1 /f
+REM 启用应用程序安装检测并提示提升
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableInstallerDetection /t REG_DWORD /d 1 /f
+REM 配置提升权限时不提示
+secedit /export /cfg C:\Windows\Temp\export.inf
+(findstr /v "ConsentPromptBehaviorAdmin" C:\Windows\Temp\export.inf) > C:\Windows\Temp\export_without.inf
+echo ConsentPromptBehaviorAdmin = 0 >> C:\Windows\Temp\export_without.inf
+secedit /configure /cfg C:\Windows\Temp\export_without.inf /db C:\Windows\Temp\export.sdb
+REM 清理临时文件
+del C:\Windows\Temp\export.inf
+del C:\Windows\Temp\export_without.inf
+del C:\Windows\Temp\export.sdb
 goto :eof
 
 :pctime
@@ -496,10 +512,10 @@ net stop DPS
 sc config DPS start=disabled
 REM 系统-服务-开启IPv6转换服务
 net start iphlpsvc
-sc config iphlpsvc start=enable
+sc config iphlpsvc start= auto
 REM 系统-服务-开启Windows Search
 net start WSearch
-sc config WSearch start=enable
+sc config WSearch start= auto
 REM 系统-服务-禁用错误报告
 net stop WerSvc
 sc config WerSvc start=disabled
@@ -525,8 +541,8 @@ REM 系统-服务-禁用Windows To Go
 net stop WTGService
 sc config WTGService start= disabled
 REM 系统-服务-开启LPD打印服务
-net start lpd
-sc config lpd start= auto
+net start lpdsvc
+sc config lpdsvc start= auto
 
 REM 系统-格式关联-删除FTP的注册表项
 Reg Delete "HKCR\ftp\shell\open\command" /f
@@ -1320,6 +1336,8 @@ goto :eof
 REM 软件-浏览器-IE-hsbank-兼容性视图中添加网站
 reg add "HKCU\Software\Microsoft\Internet Explorer\BrowserEmulation\ClearableListData" /v "UserFilter" /d "411f00005308adba1b0000003c040000010000001b0000000c00000004f493222487d601010000000c00330039002e00310039002e00310031002e003100370037000c000000fd9c074d2487d601010000000a0068007300620061006e006b002e0063006f006d000c0000000054236e2487d601010000000c00330038002e00310039002e00310031002e003100370036000c00000072f633952487d601010000000c00330038002e00310039002e00310039002e003100310034000c000000f3fb70bc2487d601010000000c00330038002e00310039002e00310039002e003200340030000c00000089614bc92487d6010100000003002a002e002a000c0000005b847eabfcbed601010000000c00330038002e00310039002e00310039002e003100350037000c0000008cfd718833ced601010000000b00330038002e00310039002e00310037002e00380030000c00000070381f9433ced601010000000b00330038002e00310039002e00310033002e00370030000c000000b8e4df9c33ced601010000000b00330038002e00310039002e00360034002e00330035000c00000050ba78a333ced601010000000c00330038002e00340030002e00310035002e003100300031000c000000960235af33ced6010100000007006800730062002e00620069007a000c0000001366e42c34ced601010000000b00330038002e00310039002e00370039002e00350035000c000000917dab825729d701010000000b00330038002e00310039002e00370039002e00340035000c0000001197e8875729d701010000000c00330038002e00310039002e00310039002e003100370032000c0000003998c8720d4dd701010000000c00330038002e00310039002e00310033002e003200340031000c00000097a5e72f6154d701010000000c00330038002e00310039002e00310039002e003200340033000c000000459afabc195cd701010000000b00330038002e00310039002e00310039002e00370038000c00000091ee0d178f5ed701010000000c00330038002e00310039002e00370037002e003100300034000c000000ce2a8ae6b7b2d70101000000090068007300620061006e006b002e00630063000c000000b6b5c1eeb7b2d701010000000b00330038002e00310030002e00360038002e00330032000c00000085dc69f3b7b2d701010000000b00330038002e00310030002e00360038002e00330038000c000000d223a28509a3d801010000000b00330038002e00310039002e00310039002e00350032000c0000005a097aa609a3d801010000000b00330038002e00310039002e00310039002e00380037000c0000009129ce0a46a5d801010000000b00330038002e00310039002e00310036002e00330033000c0000008a48ee2846a5d801010000000c00330038002e00310039002e00310031002e003100370037000c000000d1f89b9446a5d801010000000b00330038002e00310039002e00370038002e0035003900" /t reg_binary /f
 REM 软件-浏览器-IE-hsbank-添加网址至信任站点
+reg add "%IE_Domains%\*" /v "http" /t reg_dword /d "2" /f
+reg add "%IE_Domains%\*" /v "https" /t reg_dword /d "2" /f
 reg add "%IE_Domains%\hsbank.com.cn\*" /v "http" /t reg_dword /d "2" /f
 reg add "%IE_Domains%\hsbank.com.cn\*" /v "https" /t reg_dword /d "2" /f
 reg add "%IE_Domains%\hsbank.cn\*" /v "http" /t reg_dword /d "2" /f
@@ -1329,6 +1347,7 @@ reg add "%IE_Domains%\hsbank.cc\*" /v "https" /t reg_dword /d "2" /f
 reg add "%IE_Domains%\hsbank.com\*" /v "http" /t reg_dword /d "2" /f
 reg add "%IE_Domains%\hsbank.com\*" /v "https" /t reg_dword /d "2" /f
 REM 软件-浏览器-IE-hsbank-增加IP到信任站点
+reg add "%IE_Ranges%\Range99" /v ":Range" /d "*" /t REG_SZ /f
 reg add "%IE_Ranges%\Range100" /v ":Range" /d "38.*" /t REG_SZ /f
 reg add "%IE_Ranges%\Range100" /v "http" /d "2" /t REG_DWORD /f
 reg add "%IE_Ranges%\Range100" /v "https" /d "2" /t REG_DWORD /f
@@ -1448,34 +1467,28 @@ reg add "HKCU\Software\Microsoft\Notepad" /v "fWrap" /t reg_dword /d 1 /f
 REM 软件-记事本-始终显示状态栏
 reg add "HKCU\Software\Microsoft\Notepad" /v "StatusBar" /t reg_dword /d 1 /f
 
-REM 软件-Windows 照片查看器-启用Windows 图片查看器并关联
-reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".jpg" /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".jpeg" /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".png" /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".bmp" /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".gif" /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".tif" /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".tiff" /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".ico" /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".jfif" /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKCR\PhotoViewer.FileAssoc.Jpeg" /ve /d "jpegfile" /f
-reg add "HKCR\PhotoViewer.FileAssoc.Png" /ve /d "pngfile" /f
-reg add "HKCR\PhotoViewer.FileAssoc.Bmp" /ve /d "bmpfile" /f
-reg add "HKCR\PhotoViewer.FileAssoc.Gif" /ve /d "giffile" /f
-reg add "HKCR\PhotoViewer.FileAssoc.Tif" /ve /d "tifffile" /f
-reg add "HKCR\PhotoViewer.FileAssoc.Tiff" /ve /d "tifffile" /f
-reg add "HKCR\PhotoViewer.FileAssoc.Ico" /ve /d "icofile" /f
-reg add "HKCR\PhotoViewer.FileAssoc.Jfif" /ve /d "jfiffile" /f
-ftype PhotoViewer.Image="%SystemRoot%\System32\rundll32.exe" "%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll", ImageView_Fullscreen %1
-for %%i in (".bmp" ".dib" ".rle" ".gif" ".jpg" ".jpeg" ".jpe" ".jfif" ".png" ".tif" ".tiff" ".ico") do assoc %%i=PhotoViewer.FileAssoc.Tiff
-REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bmp\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
-REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpeg\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
-REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
-REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.png\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
-REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.gif\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
-REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tif\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
-REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tiff\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
-REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ico\UserChoice" /v ProgId /d PhotoViewer.FileAssoc.Tiff /f
+REM 软件-Windows 照片查看器-设置 Windows Photo Viewer 为默认打开方式
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithProgids" /f
+REM 软件-Windows 照片查看器-保留系统默认的 Windows Photo Viewer
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "MRUList" /t REG_SZ /d "a" /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "a" /t REG_SZ /d "Windows.PhotoViewer.FileAssoc.Tiff" /f
+REM 软件-Windows 照片查看器-设置 PhotoViewer.FileAssoc.Tiff 的关联
+icacls "HKCR\.tiff" /grant Administrators:F
+icacls "HKCR\PhotoViewer.FileAssoc.Tiff" /grant Administrators:F
+ftype PhotoViewer.FileAssoc.Tiff="C:\Program Files\Windows Photo Viewer\PhotoViewer.dll" "%1"
+REM 软件-Windows 照片查看器-设置 Windows Photo Viewer 为建议的应用
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\UserChoice" /v "Progid" /t REG_SZ /d "Windows.PhotoViewer.FileAssoc.Tiff" /f
+REM 软件-Windows 照片查看器-设置图片格式关联为 Windows Photo Viewer
+assoc .jpg=PhotoViewer.FileAssoc.Tiff
+assoc .jpeg=PhotoViewer.FileAssoc.Tiff
+assoc .png=PhotoViewer.FileAssoc.Tiff
+assoc .bmp=PhotoViewer.FileAssoc.Tiff
+assoc .gif=PhotoViewer.FileAssoc.Tiff
+assoc .tif=PhotoViewer.FileAssoc.Tiff
+assoc .tiff=PhotoViewer.FileAssoc.Tiff
+assoc .ico=PhotoViewer.FileAssoc.Tiff
+assoc .jfif=PhotoViewer.FileAssoc.Tiff
 REM 软件-Windows 照片查看器-解决Win10报内存不足，方法2为实验产品，开启1G缓存
 REM reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\ICM\RegisteredProfiles" /v "sRGB" /t reg_sz /d "RSWOP.icm" /f
 reg add "HKCU\Software\Microsoft\Windows Photo Viewer\Viewer" /f /v MemCacheSize /t REG_DWORD /d 1073741824
@@ -1698,6 +1711,9 @@ del "C:\Windows\System32\UCli.exe" /f /s /q 2>nul
 del "C:\Windows\System32\config.ini" /f /s /q 2>nul
 del "C:\windows\Hsbank\*.*" /f /s /q 2>nul
 rd "C:\shaohua\Hsbank\" /s /q 2>nul
+del "%USERPROFILE%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
+del "%PUBLIC%%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
+rd "%ProgramFiles%\360\360ent" /s /q 2>nul
 goto :eof
 :finish_hsf
 call :finish_hso
