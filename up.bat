@@ -167,8 +167,7 @@ set softother=/bat/raw/main/up.bat
 call :make
 call :net
 curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\up.bat" -L %net%) || (echo.%error%)
-echo %~dp0|find /i "shaohua"&&(goto :eof)||(start "" %local%\up.bat&del %0&del %~dp0%~nx0&exit)
-cls&echo.
+echo %~dp0|find /i "shaohua"&&(goto :eof)||(cls&echo.&start "" %local%\up.bat&del %0&del %~dp0%~nx0&exit)
 goto :eof
 :clear
 echo. Cleaning up files that may trigger false-positive virus alerts from antivirus software. Please be patient, no matter how long it takes.
