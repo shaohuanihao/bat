@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240623
+set Version=20240624
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 call :CapsLK
@@ -1669,6 +1669,7 @@ for /f "tokens=2* delims=[]" %%i in ('ver') do set v=%%i
 for /f "tokens=2* delims= " %%i in ("%v%") do set CurrentBuildNumber=%%i
 REM start mshta vbscript:msgbox("System："^&vbCrLf^&"%ProductName%"^&vbCrLf^&"%processor_architecture%"^&vbCrLf^&"%ReleaseId% - %CurrentBuildNumber%"^&vbCrLf^&""^&vbCrLf^&"Script："^&vbCrLf^&"ShaoHua - 7x24H - 18900559020"^&vbCrLf^&"Version："^&vbCrLf^&"%Version%",64,"Tips - %date%")(window.close)
 start "" rundll32 shell32,ShellAbout Script  ：邵华 - 18900559020                   Date：%Version% System：%ProductName% - %processor_architecture% - %CurrentBuildNumber%
+reg add "HKCR\.shaohua\patch" /v "%date%-%time%" /d "%Version%" /t REG_SZ /f
 echo %~dp0|findstr /i "windows" >nul && exit || (del "%~f0" & exit)
 exit
 :finish_hsl
