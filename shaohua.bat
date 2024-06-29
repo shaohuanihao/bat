@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240624
+set Version=20240628
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 call :CapsLK
@@ -211,14 +211,33 @@ echo 播放视频时，优化视频质量
 powercfg -setdcvalueindex 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 9596fb26-9850-41fd-ac3e-f7c3c00afd4b 34c7b99f-9a6d-4b3c-8dc7-b6693b78cef4 0
 powercfg -setacvalueindex 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 9596fb26-9850-41fd-ac3e-f7c3c00afd4b 34c7b99f-9a6d-4b3c-8dc7-b6693b78cef4 0
 echo 开启【卓越性能】
-REM 如果找到“卓越性能”电源计划，选择该计划；否则创建并选择该计划
-for /f "tokens=2 delims=:(" %%a in ('powercfg /list ^| findstr "卓越性能"') do (set GUID=%%a)
-if defined GUID (set GUID=!GUID: =!)
-if not "!GUID!"=="" (powercfg -setactive !GUID!) else (
-    powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61
-    for /f "tokens=2 delims=:(" %%a in ('powercfg /list ^| findstr "卓越性能"') do (set GUID=%%a)
-    set GUID=!GUID: =!
-    powercfg -setactive !GUID!)
+REM 定义卓越性能电源计划的GUID
+set "EXCELLENT_PERFORMANCE_GUID=e9a42b02-d5df-448d-aa00-03f14749eb61"
+REM 搜索已存在的卓越性能电源计划
+for /f "tokens=2 delims=:(" %%a in ('powercfg /list ^| findstr /i "卓越性能"') do (
+    set "GUID=%%a"
+    set "GUID=!GUID: =!"
+)
+REM 如果找到已有的卓越性能计划，激活它
+if defined GUID (
+    powercfg -setactive !GUID!
+) else (
+    REM 复制卓越性能计划
+    powercfg -duplicatescheme %EXCELLENT_PERFORMANCE_GUID%
+    REM 再次搜索已创建的卓越性能电源计划
+    for /f "tokens=2 delims=:(" %%a in ('powercfg /list ^| findstr /i "卓越性能"') do (
+        set "GUID=%%a"
+        set "GUID=!GUID: =!"
+    )
+    REM 如果成功找到，激活之
+    if defined GUID (
+        powercfg -setactive !GUID!
+    ) else (
+        echo 无法找到或创建卓越性能
+    )
+)
+echo 卓越性能已成功启用
+
 REM 硬件-电源性能优化-禁用系统休眠
 powercfg -h off
 powercfg -change -standby-timeout-ac 0
@@ -345,8 +364,6 @@ REM 系统-广告-关闭windows传递优化服务
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DoSvc" /v "Start" /t REG_DWORD /d "4" /f
 REM 系统-广告-禁用登录时启动隐私设置体验
 reg add "HKLM\Software\Policies\Microsoft\Windows\OOBE" /v "DisablePrivacyExperience" /t reg_dword /d 1 /f
-REM 系统-广告-关闭锁屏上显示的内容和其他系统推荐和建议
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338388Enabled" /t reg_dword /d 0 /f
 REM 系统-广告-关闭在开始菜单中显示的建议内容
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t reg_dword /d 0 /f
 REM 系统-广告-禁用内容交付管理器的原始设备制造商预装应用程序
@@ -672,6 +689,12 @@ reg add "HKLM\SOFTWARE\Microsoft\TabletTip\1.7" /v "DisableNewKeyboardExperience
 REM 界面-锁屏界面-关闭首次登录动画
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v "EnableFirstLogonAnimation" /t reg_dword /d 0 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableFirstLogonAnimation" /t reg_dword /d 0 /f
+REM 界面-锁屏界面-禁用锁屏界面，使系统在启动或唤醒时直接显示密码输入界面
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoLockScreen /t REG_DWORD /d 1 /f
+REM 界面-锁屏界面-锁屏模糊效果
+REG add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v "DisableLockScreenBlur" /t REG_DWORD /d 1 /f
+REM 界面-锁屏界面-禁用登录界面的Acrylic背景效果
+REG add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v "DisableAcrylicBackgroundOnLogon" /t REG_DWORD /d 1 /f
 
 REM 界面-任务栏-当任务栏被占满时被占满时合并
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarGlomLevel" /t reg_dword /d 1 /f
@@ -733,6 +756,10 @@ REM 界面-开始菜单-关闭“突出显示新安装的程序”
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_NotifyNewApps" /t reg_dword /d 0 /f
 REM 界面-开始菜单-清理推荐项目里的入门图标
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AppKey\10" /v ShellExecute /t REG_SZ /d "control.exe" /f
+REM 界面-开始菜单-禁用开始菜单的邻近追踪功能
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProximity /t REG_DWORD /d 0 /f
+REM 界面-开始菜单-禁用开始菜单的应用推荐磁贴
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338388Enabled" /t REG_DWORD /d 0 /f
 
 REM 界面-主题与背景-禁用窗口动态效果
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v DisablePreviewDesktop /t REG_DWORD /d 1 /f
@@ -749,7 +776,7 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "
 reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "ColorPrevalence" /t reg_dword /d 1 /f
 REM 界面-主题与背景-开启开始菜单、任务栏、操作中心透明
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_ShowGlass /t REG_DWORD /d 1 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProximity /t REG_DWORD /d 0 /f
+REM 界面-主题与背景-启用系统透明效果
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t reg_dword /d 1 /f
 REM 界面-主题与背景-鼠标悬停在UI元素上的延迟时间设置为0
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ExtendedUIHoverTime" /d 0 /t reg_dword /f
@@ -1486,6 +1513,39 @@ reg add "HKCU\Software\Microsoft\Notepad" /v "StatusBar" /t reg_dword /d 1 /f
 REM 软件-Windows 照片查看器-设置 Windows Photo Viewer 为默认打开方式
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /f
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithProgids" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpeg\OpenWithList" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpeg\OpenWithProgids" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.png\OpenWithList" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.png\OpenWithProgids" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bmp\OpenWithList" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bmp\OpenWithProgids" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.gif\OpenWithList" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.gif\OpenWithProgids" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tif\OpenWithList" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tif\OpenWithProgids" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tiff\OpenWithList" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tiff\OpenWithProgids" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ico\OpenWithList" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ico\OpenWithProgids" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jfif\OpenWithList" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jfif\OpenWithProgids" /f
+REM 添加Windows照片查看器到所有这些文件类型的“建议的应用”
+REM 定义一个变量，包含所有需要处理的文件扩展名
+set FILETYPES=.jpg .jpeg .png .bmp .gif .tif .tiff .ico .jfif
+
+REM 删除所有文件类型的现有关联设置
+for %%t in (%FILETYPES%) do (
+    reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /f
+    reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithProgids" /f
+    reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\UserChoice" /f
+)
+
+REM 添加Windows照片查看器到所有这些文件类型的“建议的应用”
+for %%t in (%FILETYPES%) do (
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "MRUList" /t REG_SZ /d "a" /f
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "a" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\UserChoice" /v "Progid" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
+)
 REM 软件-Windows 照片查看器-保留系统默认的 Windows Photo Viewer
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "MRUList" /t REG_SZ /d "a" /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "a" /t REG_SZ /d "Windows.PhotoViewer.FileAssoc.Tiff" /f
