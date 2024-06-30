@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240628
+set Version=20240630
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 call :CapsLK
@@ -390,7 +390,10 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" 
 REM 系统-广告-
 REM 禁用内容交付管理器的功能管理
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "FeatureManagementEnabled" /t reg_dword /d 0 /f
-REM 系统-广告-启用锁屏时的Windows 聚焦推广
+
+REM 系统-广告-启用 Content Delivery Manager（内容交付管理器）以允许 Windows 聚焦功能
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "ContentDeliveryAllowed" /t REG_DWORD /d 1 /f
+REM 系统-广告-启用旋转锁屏功能，允许Windows聚焦图片在锁屏界面上旋转显示
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "RotatingLockScreenEnabled" /t reg_dword /d 1 /f
 REM 系统-广告-启用内容交付管理器的旋转锁屏叠加层功能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "RotatingLockScreenOverlayEnabled" /t reg_dword /d 1 /f
@@ -488,8 +491,6 @@ REM 系统-设置-关闭“当我玩游戏时在后台录制”
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "HistoricalCaptureEnabled" /t reg_dword /d 0 /f
 REM 系统-设置-关闭程序兼容性助手
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /d 1 /t REG_DWORD /f
-REM 系统-设置-登陆无需滑动，对触摸屏更友好
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v "NoLockScreen" /t REG_DWORD /d 1 /f
 
 REM 系统-性能-关闭win10快速用户切换功能
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "HideFastUserSwitching" /t reg_dword /d 1 /f
@@ -689,8 +690,6 @@ reg add "HKLM\SOFTWARE\Microsoft\TabletTip\1.7" /v "DisableNewKeyboardExperience
 REM 界面-锁屏界面-关闭首次登录动画
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v "EnableFirstLogonAnimation" /t reg_dword /d 0 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableFirstLogonAnimation" /t reg_dword /d 0 /f
-REM 界面-锁屏界面-禁用锁屏界面，使系统在启动或唤醒时直接显示密码输入界面
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoLockScreen /t REG_DWORD /d 1 /f
 REM 界面-锁屏界面-锁屏模糊效果
 REG add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v "DisableLockScreenBlur" /t REG_DWORD /d 1 /f
 REM 界面-锁屏界面-禁用登录界面的Acrylic背景效果
