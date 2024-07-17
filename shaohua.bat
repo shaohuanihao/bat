@@ -1,6 +1,6 @@
 ÿþa
 cls
-echo off
+@echo off
 ver|findstr /i "5\.1\." > nul&&(goto:begin)
 net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
 :begin
@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=×ÛºÏ½Å±¾
 set Powered=Powered by ÉÛ»ª 18900559020
-set Version=20240630
+set Version=20240717
 set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
 title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
 call :CapsLK
@@ -77,9 +77,9 @@ REM ÆôÓÃÄÚÖÃ¹ÜÀíÔ±ÕÊ»§µÄ¹ÜÀíÔ±Åú×¼Ä£Ê½
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v FilterAdministratorToken /t REG_DWORD /d 1 /f
 REM ½ûÓÃ¡°ÓÃ»§ÕÊ»§¿ØÖÆ£ºÒÔ¹ÜÀíÔ±Åú×¼Ä£Ê½ÔËÐÐËùÓÐ¹ÜÀíÔ±¡±
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f
-REM ½ûÓÃÔÚ°²È«×ÀÃæÌáÊ¾ (PromptOnSecureDesktop)
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v PromptOnSecureDesktop /t REG_DWORD /d 0 /f
-
+REM luafv·þÎñÉèÖÃÎª×Ô¶¯
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\luafv" /v Start /t REG_DWORD /d 4 /f
+reg add "HKLM\SYSTEM\ControlSet001\Services\luafv" /v Start /t REG_DWORD /d 4 /f
 REM ÆôÓÃÓ¦ÓÃ³ÌÐò°²×°¼ì²â²¢ÌáÊ¾ÌáÉý
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableInstallerDetection /t REG_DWORD /d 1 /f
 REM ÅäÖÃÌáÉýÈ¨ÏÞÊ±²»ÌáÊ¾
@@ -127,8 +127,8 @@ goto :eof
 REM ¹Ø±ÕËùÓÐä¯ÀÀÆ÷¼°À¬»øÈí¼þ
 taskkill /f /t /im iexplore.exe 2>nul
 taskkill /f /t /im MicrosoftEdge.exe 2>nul
-taskkill /f /t /im chrome.exe  2>nul
-taskkill /f /t /im firefox.exe  2>nul
+taskkill /f /t /im chrome.exe 2>nul
+taskkill /f /t /im firefox.exe 2>nul
 taskkill /f /t /im WeChat.exe 2>nul
 taskkill /f /t /im WechatBrowser.exe 2>nul
 taskkill /f /t /im 360se.exe 2>nul
@@ -252,6 +252,10 @@ REM Ó²¼þ-Çý¶¯-½ûÓÃÊý¾ÝÖ´ÐÐ±£»¤£¨DEP£©
 bcdedit /set nx AlwaysOff
 REM Ó²¼þ-Çý¶¯-½ûÓÃÆô¶¯Ê±µÄÍêÕûÐÔ¼ì²é
 bcdedit -set loadoptions DISABLE_INTEGRITY_CHECKS
+REM ½ûÓÃ¶¯Ì¬Ê±ÖÓµ÷Õû¹¦ÄÜ
+bcdedit /set disabledynamictick yes
+REM ÆôÓÃÆ½Ì¨¶¨Ê±Æ÷¹¦ÄÜ
+bcdedit /set useplatformtick yes
 REM ¹Ø±ÕÏµÍ³²âÊÔÄ£Ê½
 REM bcdedit /set testsigning off
 REM ¿ªÆôµ÷ÊÔ¹¦ÄÜ
@@ -293,13 +297,21 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\W
 REM ÏµÍ³-Í¨Öª-¹Ø±ÕWindowsµÄÍ¨Öª
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\PushNotifications" /v "LockScreenToastEnabled" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\PushNotifications" /v "ToastEnabled" /t reg_dword /d 0 /f
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\PushNotifications" /v "ToastEnabled" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate" /v "TrayIconStatus" /t reg_dword /d 9 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" /v "NOC_GLOBAL_SETTING_ALLOW_NOTIFICATION_SOUND" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" /v "NOC_GLOBAL_SETTING_ALLOW_CRITICAL_TOASTS_ABOVE_LOCK" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" /v "NOC_GLOBAL_SETTING_ALLOW_TOASTS_ABOVE_LOCK" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" /v "NOC_GLOBAL_SETTING_BADGE_ENABLED" /t reg_dword /d 0 /f
+REM ÏµÍ³-Í¨Öª-ÉèÖÃÈ«¾ÖÌáÊ¾Í¨ÖªÆôÓÃ×´Ì¬Îª
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings" /v NOC_GLOBAL_SETTING_TOASTS_ENABLED /t REG_DWORD /d 0 /f
+REM ÏµÍ³-Í¨Öª-ÉèÖÃÓ¦ÓÃ³ÌÐòÍ¨Öª½ûÓÃ
+reg add "HKCU\Software\Policies\Microsoft\Windows\CurrentVersion\PushNotifications" /v NoToastApplicationNotification /t REG_DWORD /d 1 /f
+reg add "HKLM\Software\Policies\Microsoft\Windows\CurrentVersion\PushNotifications" /v NoToastApplicationNotification /t REG_DWORD /d 1 /f
 REM ÏµÍ³-Í¨Öª-½ûÓÃ Windows To Go ±£³Ö²åÈë USB Çý¶¯Æ÷µÄÌáÊ¾
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\PortableOperatingSystem" /v ShutdownBehavior /t REG_DWORD /d 0 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v PortableOperatingSystem /t REG_DWORD /d 0 /f
+reg add "HKLM\SYSTEM\ControlSet001\Control" /v PortableOperatingSystem /t REG_DWORD /d 0 /f
 REM ÏµÍ³-Í¨Öª-Òþ²Ø°²È«ºÍÎ¬»¤ÖÐµÄ½¡¿µ±¨¸æ
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "HideSCAHealth" /t reg_dword /d 1 /f
 REM ÏµÍ³-Í¨Öª-½ûÓÃÍ¨ÖªÖÐµÄÉÁ¹âÐ§¹û
@@ -310,6 +322,7 @@ REM ÏµÍ³-Í¨Öª-½ûÓÃÆô¶¯Æ÷µÄÇáÉ¨¹¦ÄÜ
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell\Launcher" /v "DisableLightDismiss" /t reg_dword /d 1 /f
 REM ÏµÍ³-Í¨Öª-½ûÓÃÍ¨ÖªÖÐÐÄ
 reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v "DisableNotificationCenter" /t reg_dword /d 1 /f
+reg add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v "DisableNotificationCenter" /t reg_dword /d 1 /f
 REM ÏµÍ³-Í¨Öª-¹Ø±Õ¡°Í¬Òâ¸öÈËÊý¾Ý¿ç¾³´«Êä¡±
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\CloudContent" /v DisableCrossDeviceDataTransfer /t REG_DWORD /d 1 /f
 REM ÏµÍ³-Í¨Öª-¹Øµôµ÷ÊÔÆ÷Dr.Watson
@@ -319,6 +332,7 @@ reg add "HKLM\SOFTWARE\Microsoft\PCHealth\ErrorReporting" /v "DoReport" /t reg_d
 reg add "HKLM\SOFTWARE\Microsoft\PCHealth\ErrorReporting" /v "ShowUI" /t reg_dword /d 0 /f
 REM ÏµÍ³-Í¨Öª-½ûÓÃWindows Defender Security CenterµÄÍ¨Öª
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Notifications" /v DisableNotifications /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows Defender Security Center\Notifications" /v DisableNotifications /t REG_DWORD /d 1 /f
 REM ÏµÍ³-Í¨Öª-¹Ø±ÕÓò·À»ðÇ½×èÖ¹ÐÂÓ¦ÓÃÊ±Í¨Öª£º
 reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsFirewall\DomainProfile" /v DisableNotifications /t REG_DWORD /d 1 /f
 REM ÏµÍ³-Í¨Öª-¹Ø±Õ¹«¹²·À»ðÇ½×èÖ¹ÐÂÓ¦ÓÃÊ±Í¨Öª£º
@@ -329,6 +343,7 @@ REM ÏµÍ³-Í¨Öª-ÉèÖÃ½ûÓÃÍ¨Öªµ¯´°
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" /v NocToastEnabled /t REG_DWORD /d 0 /f
 REM ÏµÍ³-Í¨Öª-½ûÓÃËùÓÐµÄ¡°°²È«ºÍÎ¬»¤¡±Í¨Öª
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance" /v Enabled /t REG_DWORD /d 0 /f
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance" /v Enabled /t REG_DWORD /d 0 /f
 REM ÏµÍ³-Í¨Öª-½ûÓÃ¶¯Ì¬Ëø³öÏÖÎÊÌâÊ±µÄÍ¨Öª
 reg add "HKLM\SOFTWARE\Microsoft\Windows Security Health\Health Advisor" /v DynamicLockNotificationDisabled /t REG_DWORD /d 1 /f
 REM ÏµÍ³-Í¨Öª-½ûÓÃ²»Âú×ãÏµÍ³ÒªÇóµÄË®Ó¡
@@ -455,9 +470,16 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Langu
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Language" /v "SettingsVersion" /d 3 /t REG_DWORD /f
 REM ÏµÍ³-ÉèÖÃ-¹Ø±ÕÊÂ¼þ¸ú×Ù³ÌÐò
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Reliability" /v "ShutdownReasonOn" /d 0 /t REG_DWORD /f
+REM ÏµÍ³-ÉèÖÃ-½ûÓÃ×Ô¶¯¸üÐÂÉÌµêÓ¦ÓÃ
+reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsStore" /v AutoDownload /t REG_DWORD /d 2 /f
 REM ÏµÍ³-ÉèÖÃ-½ûÓÃ Microsoft Store ºóÌ¨·ÃÎÊÓ¦ÓÃ³ÌÐò
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications\Microsoft.WindowsStore_8wekyb3d8bbwe" /v "Disabled" /t reg_dword /d 1 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications\Microsoft.WindowsStore_8wekyb3d8bbwe" /v "DisabledByUser" /t reg_dword /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" /v GlobalUserDisabled /t REG_DWORD /d 1 /f
+REM ÏµÍ³-ÉèÖÃ-½ûÓÃ Windows ËÑË÷ÖÐµÄ±³¾°Ó¦ÓÃÈ«¾ÖÇÐ»»¹¦ÄÜ
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v BackgroundAppGlobalToggle /t REG_DWORD /d 0 /f
+REM ÏµÍ³-ÉèÖÃ-ÉèÖÃ embeddedmode ·þÎñµÄÆô¶¯ÀàÐÍÎª×Ô¶¯
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\embeddedmode" /v Start /t REG_DWORD /d 4 /f
 REM ÏµÍ³-ÉèÖÃ-½ûÓÃ´æ´¢¸ÐÖª¹¦ÄÜ
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense" /v StorageSense /t REG_DWORD /d 0 /f
 REM ÏµÍ³-ÉèÖÃ-½ûÓÃ´æ´¢¸ÐÖª°ïÖú
@@ -485,13 +507,34 @@ reg add "HKCU\SOFTWARE\Microsoft\Input\TIPC" /v "Enabled" /t "Reg_Dword" /d "0" 
 REM ÏµÍ³-ÉèÖÃ-¹Ø±Õ¡¸±Ê¼£Óë¼üÈë¸öÈË»¯¡¹Éè¶¨
 reg add "HKLM\SOFTWARE\Microsoft\Personalization\Settings" /v "AcceptedPrivacyPolicy" /t "Reg_Dword" /d "0" /f
 REM ÏµÍ³-ÉèÖÃ-½ûÓÃÓÎÏ·Â¼ÖÆ¹¤¾ß
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "AppCaptureEnabled" /t reg_dword /d 0 /f
 reg add "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /t reg_dword /d 0 /f
 REM ÏµÍ³-ÉèÖÃ-¹Ø±Õ¡°µ±ÎÒÍæÓÎÏ·Ê±ÔÚºóÌ¨Â¼ÖÆ¡±
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "HistoricalCaptureEnabled" /t reg_dword /d 0 /f
+REM ÏµÍ³-ÉèÖÃ-ÐÞ¸Ä×Ô¶¯ÓÎÏ·Ä£Ê½ÆôÓÃÉèÖÃÎª½ûÓÃ
+reg add "HKCU\SOFTWARE\Microsoft\GameBar" /v AutoGameModeEnabled /t REG_DWORD /d 0 /f
+REM ÏµÍ³-ÉèÖÃ-ÐÞ¸ÄÓÎÏ·Ãæ°åÆô¶¯ÌáÊ¾Ë÷ÒýÎª 3
+reg add "HKCU\SOFTWARE\Microsoft\GameBar" /v GamePanelStartupTipIndex /t REG_DWORD /d 3 /f
+REM ÏµÍ³-ÉèÖÃ-ÐÞ¸ÄÏÔÊ¾Æô¶¯Ãæ°åÉèÖÃÎª½ûÓÃ
+reg add "HKCU\SOFTWARE\Microsoft\GameBar" /v ShowStartupPanel /t REG_DWORD /d 0 /f
+REM ÏµÍ³-ÉèÖÃ-ÐÞ¸ÄÊ¹ÓÃ Nexus ×÷ÎªÓÎÏ·À¸ÆôÓÃÉèÖÃÎª½ûÓÃ
+reg add "HKCU\SOFTWARE\Microsoft\GameBar" /v UseNexusForGameBarEnabled /t REG_DWORD /d 0 /f
+REM ÏµÍ³-ÉèÖÃ-ÐÞ¸ÄÔÊÐí×Ô¶¯ÓÎÏ·Ä£Ê½ÉèÖÃÎª½ûÓÃ
+reg add "HKCU\SOFTWARE\Microsoft\GameBar" /v AllowAutoGameMode /t REG_DWORD /d 0 /f
+REM ÏµÍ³-ÉèÖÃ-ÐÞ¸ÄÓ¦ÓÃ³ÌÐò²¶×½ÆôÓÃÉèÖÃÎª½ûÓÃ
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR" /v AppCaptureEnabled /t REG_DWORD /d 0 /f
+REM ÏµÍ³-ÉèÖÃ-ÐÞ¸ÄÔÊÐíÓÎÏ· DVR ÉèÖÃÎªÆôÓÃ
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR" /v AllowGameDVR /t REG_DWORD /d 1 /f
+REM ÏµÍ³-ÉèÖÃ-ÐÞ¸ÄÄ¬ÈÏÓ¦ÓÃ³ÌÐò¹ÜÀíµÄÔÊÐíÓÎÏ· DVR ÉèÖÃÎª½ûÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR" /v value /t REG_DWORD /d 0 /f
 REM ÏµÍ³-ÉèÖÃ-¹Ø±Õ³ÌÐò¼æÈÝÐÔÖúÊÖ
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /d 1 /t REG_DWORD /f
 
+REM ÏµÍ³-ÐÔÄÜ-ÆôÓÃ StickyKeys ¹¦ÄÜ£¬Ê¹ÓÃ»§¿ÉÒÔÇáËÉ°´ÏÂ¶à¸ö¼ü
+reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v Flags /t REG_SZ /d 506 /f
+REM ÏµÍ³-ÐÔÄÜ-µ÷Õû¼üÅÌÏìÓ¦ËÙ¶ÈºÍÆµÂÊ£¬ÒÔÌáÉýÓÃ»§µÄ¼üÅÌÊäÈëÌåÑé
+reg add "HKCU\Control Panel\Accessibility\Keyboard Response" /v Flags /t REG_SZ /d 122 /f
+REM ÏµÍ³-ÐÔÄÜ-ÆôÓÃ ToggleKeys ¹¦ÄÜ£¬ÔÚÓÃ»§Îó°´ÌØ¶¨¼üÊ±Ìá¹©ÉùÒôÌáÊ¾£¬°ïÖúÓÃ»§¾ÀÕý°´¼ü´íÎó
+reg add "HKCU\Control Panel\Accessibility\ToggleKeys" /v Flags /t REG_SZ /d 58 /f
 REM ÏµÍ³-ÐÔÄÜ-¹Ø±Õwin10¿ìËÙÓÃ»§ÇÐ»»¹¦ÄÜ
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "HideFastUserSwitching" /t reg_dword /d 1 /f
 REM ÏµÍ³-ÐÔÄÜ-µÇÂ¼windows¿ªÆôÊý×Ö¼ü
@@ -500,6 +543,8 @@ reg add "HKU\.DEFAULT\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t 
 REM ÏµÍ³-ÐÔÄÜ-NTFSÎÄ¼þÓÅ»¯
 reg add "HKLM\SYSTEM\ControlSet001\Control\Session Manager" /v "NtfsDisableLastAccessUpdate" /d 1 /t reg_dword /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager" /v "NtfsDisableLastAccessUpdate" /d 1 /t reg_dword /f
+REM ÏµÍ³-ÐÔÄÜ-½ûÓÃNTFS8.3 ¸ñÊ½µÄÎÄ¼þÃû
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v NtfsDisable8dot3NameCreation /t REG_DWORD /d 1 /f
 REM ÏµÍ³-ÐÔÄÜ-ÏµÍ³×ÔÎÒÐÞ¸´Ê±¼ä
 reg add "HKLM\SYSTEM\ControlSet001\Control\Session Manager" /v "AutoChkTimeout" /d 5 /t reg_dword /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager" /v "AutoChkTimeout" /d 5 /t reg_dword /f
@@ -543,9 +588,9 @@ sc config DPS start=disabled
 REM ÏµÍ³-·þÎñ-¿ªÆôIPv6×ª»»·þÎñ
 net start iphlpsvc
 sc config iphlpsvc start= auto
-REM ÏµÍ³-·þÎñ-¿ªÆôWindows Search
-net start WSearch
-sc config WSearch start= auto
+REM ÏµÍ³-·þÎñ-¹Ø±ÕWindows Search
+net stop WSearch
+sc config WSearch start= disabled
 REM ÏµÍ³-·þÎñ-½ûÓÃ´íÎó±¨¸æ
 net stop WerSvc
 sc config WerSvc start=disabled
@@ -634,8 +679,6 @@ sc config WaaSMedicSvc start= disabled 2>nul
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\UsoSvc " /v "start" /t reg_dword /d "4" /f
 REM ÏµÍ³-ÏµÍ³¸üÐÂ-Òþ²ØWindows 10Éý¼¶ÖúÊÖGWX
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Gwx" /v "DisableGwx" /t reg_dword /d 1 /f
-REM ÏµÍ³-ÏµÍ³¸üÐÂ-Windows To Go±ê¼Ç(¹Ø±ÕÒÔÔÊÐí´ó°æ±¾¸üÐÂ)
-reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v "PortableOperatingSystem" /t reg_dword /d 1 /f
 REM ÏµÍ³-ÏµÍ³¸üÐÂ-Windows¸üÐÂ²»°üÀ¨¶ñÒâÈí¼þÉ¾³ý¹¤¾ß
 reg add "HKLM\SOFTWARE\Policies\Microsoft\MRT" /v "DontOfferThroughWUAU" /t reg_dword /d 1 /f
 REM ÏµÍ³-ÏµÍ³¸üÐÂ-½«Windows Update×Ô¶¯¸üÐÂµ÷ÕûÎª´Ó²»¼ì²é
@@ -742,8 +785,12 @@ reg add "HKCU\Software\Microsoft\CTF\LangBar" /v "ExtraIconsOnMinimized" /t REG_
 REM ½çÃæ-ÈÎÎñÀ¸-ÓïÑÔÀ¸-ÉèÖÃÓïÑÔÀ¸µÄ½µ¼¶¼¶±ðÎª3
 reg add "HKCU\Software\Microsoft\CTF\LangBar\ItemState{ED9D5450-EBE6-4255-8289-F8A31E687228}" /v "DemoteLevel" /t REG_DWORD /d 3 /f
 
-REM ½çÃæ-¿ªÊ¼²Ëµ¥-½ûÓÃ¿ªÊ¼²Ëµ¥ÖÐµÄ×î½üÊ¹ÓÃµÄ³ÌÐòÁÐ±í
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_TrackProgs" /t REG_DWORD /d 0 /f
+REM ½çÃæ-¿ªÊ¼²Ëµ¥-É¾³ýÏÖÓÐËùÓÐ´ÅÌù...
+del /q /s /f %localappdata%\Microsoft\Windows\RoamingTiles
+REM ½çÃæ-¿ªÊ¼²Ëµ¥-¹Ø±Õ´ÅÌù¹¦ÄÜ¼°ÏÔÊ¾...
+reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v DisableLiveTile /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_LargeTiles /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProgs /t REG_DWORD /d 0 /f
 REM ½çÃæ-¿ªÊ¼²Ëµ¥-¹Ø±Õ¿ªÊ¼ÆÁÄ»×Ô¶¯ÏÔÊ¾"Ó¦ÓÃ"ÊÓÍ¼
 reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v ShowAppsViewOnStart /d 0 /t REG_DWORD /f
 REM ½çÃæ-¿ªÊ¼²Ëµ¥-¿ªÆô´ÅÌùÈ¡Ïû¹Ì¶¨µÄÑ¡Ïî
@@ -791,10 +838,10 @@ REM ½çÃæ-Ö÷ÌâÓë±³¾°-ÉèÖÃÊÓ¾õÐ§¹ûÉèÖÃÎª¼«ËÙÄ£Ê½
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /d 3 /t REG_DWORD /f
 REM ½çÃæ-Ö÷ÌâÓë±³¾°-½ûÓÃÍÏ¶¯´°¿ÚÊ±È«ÆÁÏÔÊ¾
 reg add "HKCU\Control Panel\Desktop" /v "DragFullWindows" /d 0 /t REG_SZ /f
-REM ½çÃæ-Ö÷ÌâÓë±³¾°-ÅäÖÃµ±Ç°ÓÃ»§×ÀÃæÓÃ»§Ê×Ñ¡ÏîÑÚÂëÎª 9c32038012000000
-reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9c32038012000000" /t REG_BINARY /f
-REM ½çÃæ-Ö÷ÌâÓë±³¾°-ÉèÖÃµ±Ç°ÓÃ»§µÄ×ÊÔ´¹ÜÀíÆ÷ÓÃ»§Ê×Ñ¡ÏîÑÚÂëÎª 9c32038012000000
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9c32038012000000" /t REG_BINARY /f
+REM ½çÃæ-Ö÷ÌâÓë±³¾°-ÅäÖÃµ±Ç°ÓÃ»§×ÀÃæÓÃ»§Ê×Ñ¡ÏîÑÚÂëÎª 9012038010000000
+reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9012038010000000" /t REG_BINARY /f
+REM ½çÃæ-Ö÷ÌâÓë±³¾°-ÉèÖÃµ±Ç°ÓÃ»§µÄ×ÊÔ´¹ÜÀíÆ÷ÓÃ»§Ê×Ñ¡ÏîÑÚÂëÎª 9012038010000000
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9012038010000000" /t REG_BINARY /f
 REM ½çÃæ-Ö÷ÌâÓë±³¾°-½çÃæ-Ö÷ÌâÓë±³¾°-ÉèÖÃ×ÖÌåÆ½»¬¶È
 reg add "HKCU\Control Panel\Desktop" /v "FontSmoothing" /d 2 /t REG_SZ /f
 REM ½çÃæ-Ö÷ÌâÓë±³¾°-½ûÓÃ´°¿Ú×îÐ¡»¯ºÍ×î´ó»¯Ê±µÄ¶¯»­Ð§¹û
@@ -817,7 +864,17 @@ REM ½çÃæ-Ö÷ÌâÓë±³¾°-ÏÔÊ¾ÉèÖÃËõ·ÅÎª100%(124%ÖµÎª119,100%ÖµÎª96)
 reg add "HKCU\Control Panel\Desktop" /v "LogPixels" /t reg_dword /d 96 /f
 REM ½çÃæ-Ö÷ÌâÓë±³¾°-½ûÓÃ×ÀÃæÍ¼±ê×Ô¶¯ÅÅÁÐ¹¦ÄÜ¡¢×Ô¶¯¶ÔÆëÍøÂç¡¢°´Ãû³ÆÅÅÐò
 reg add "HKCU\Software\Microsoft\Windows\Shell\Bags\1\Desktop" /v "FFlags" /t REG_DWORD /d 1075839524 /f
+REM ½çÃæ-Ö÷ÌâÓë±³¾°-ÐÞ¸Ä×ÊÔ´¹ÜÀíÆ÷²¼¾ÖµÄÊÓÍ¼Ä£Ê½´°¸ñ×´Ì¬¡¢ÎÄ¼þ¼ÐÉèÖÃµÄÅÅÐòºÍÅÅÁÐË³ÐòÅÅÐòºÍÅÅÁÐË³Ðò¡¢×éÉèÖÃºÍ´°¿ÚÎ»ÖÃºÍ´óÐ¡µÄÉÏ´Î´ò¿ªÎ»ÖÃ¡¢´°¿Ú×î´ó»¯¡¢×îÐ¡»¯¼°Î»ÖÃ
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v ShellState /t REG_BINARY /d 240000003EA8000000000000000000000000000001000000130000000000000073000000 /f
 
+REM ½çÃæ-×ÊÔ´¹ÜÀíÆ÷-½«Æô¶¯ÑÓ³ÙÊ±¼äÉèÖÃÎª 0 ºÁÃë£¬ÒÔ¼Ó¿ì Windows Explorer µÄÆô¶¯ËÙ¶È
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v StartupDelayInMSec /t REG_DWORD /d 0 /f
+REM ½çÃæ-×ÊÔ´¹ÜÀíÆ÷-½«µÈ´ý¿ÕÏÐ×´Ì¬ÉèÖÃÎª 0£¬ÒÔÔÚÆô¶¯ Windows Explorer Ê±²»µÈ´ý¿ÕÏÐ×´Ì¬
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v WaitforIdleState /t REG_DWORD /d 0 /f
+REM ½çÃæ-×ÊÔ´¹ÜÀíÆ÷-Êó±êËÙ¶È¼ÓËÙÓÅ»¯
+reg add "HKCU\Control Panel\Mouse" /v MouseSpeed /t REG_SZ /d 0 /f
+reg add "HKCU\Control Panel\Mouse" /v MouseThreshold1 /t REG_DWORD /d 0 /f
+reg add "HKCU\Control Panel\Mouse" /v MouseThreshold2 /t REG_DWORD /d 0 /f
 REM ½çÃæ-×ÊÔ´¹ÜÀíÆ÷-¼õÉÙ´°¿Ú×î´ó»¯ºÍ×îÐ¡»¯µÄ¶¯»­Ê±¼ä
 reg add "HKCU\Control Panel\Desktop" /v "AnimateWindows" /t REG_SZ /d "0" /f
 REM ½çÃæ-×ÊÔ´¹ÜÀíÆ÷-Òþ²Ø¡°ÒÔÇ°µÄ°æ±¾¡±±êÇ©
@@ -904,6 +961,22 @@ REM ½çÃæ-ÓÒ¼ü²Ëµ¥-½ûÓÃÓÒ¼ü²Ëµ¥µÄ¶¯»­Ð§¹û
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\MenuAnimation" /v "DefaultApplied" /d 0 /t reg_dword /f
 REM ½çÃæ-ÓÒ¼ü²Ëµ¥-½ûÓÃWin11¼ÓÈëµÄÐÂÓÒ¼ü²Ëµ¥£¬Ä¬ÈÏÏÔÊ¾¸ü¶àÑ¡Ïî
 reg add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /v "ThreadingModel" /t REG_SZ /d "" /f
+REM ½çÃæ-ÓÒ¼ü²Ëµ¥-ÔÚ¡°´ËµçÄÔ¡±ÉÏÓÒ¼üµã»÷Ìí¼Ó¡°Éè±¸¹ÜÀíÆ÷¡±Ñ¡Ïî
+reg add "HKCR\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\shell\DeviceManager" /f /ve /d "Éè±¸¹ÜÀíÆ÷"
+reg add "HKCR\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\shell\DeviceManager" /v "HasLUAShield" /d "" /f
+reg add "HKCR\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\shell\DeviceManager\command" /f /ve /d "mmc devmgmt.msc"
+REM ½çÃæ-ÓÒ¼ü²Ëµ¥-ÔÚÎÄ¼þÉÏÓÒ¼üµã»÷Ìí¼Ó¡°¹ÜÀíÔ±È¡µÃËùÓÐÈ¨ÏÞ¡±Ñ¡Ïî
+reg add HKCR\*\shell\TakeOwnerShip /f /ve /d "¹ÜÀíÔ±È¡µÃËùÓÐÈ¨ÏÞ"
+reg add HKCR\*\shell\TakeOwnerShip /v HasLUAShield /t REG_SZ /d "" /f
+reg add HKCR\*\shell\TakeOwnerShip /v NoWorkingDirectory /t REG_SZ /d "" /f
+reg add HKCR\*\shell\TakeOwnerShip\Command /f /ve /d "cmd.exe /c takeown /f \"%%1\" /r /d y ^&^& icacls \"%%1\" /grant administrators:F /t"
+REM ½çÃæ-ÓÒ¼ü²Ëµ¥-ÔÚÎÄ¼þ¼ÐÉÏÓÒ¼üµã»÷Ìí¼Ó¡°¹ÜÀíÔ±È¡µÃËùÓÐÈ¨ÏÞ¡±Ñ¡Ïî
+reg add HKCR\Directory\shell\TakeOwnerShip /f /ve /d "¹ÜÀíÔ±È¡µÃËùÓÐÈ¨ÏÞ"
+reg add HKCR\Directory\shell\TakeOwnerShip /v HasLUAShield /t REG_SZ /d "" /f
+reg add HKCR\Directory\shell\TakeOwnerShip /v NoWorkingDirectory /t REG_SZ /d "" /f
+reg add HKCR\Directory\shell\TakeOwnerShip\Command /f /ve /d "cmd.exe /c takeown /f \"%%1\" /r /d y ^&^& icacls \"%%1\" /grant administrators:F /t"
+
+
 goto :eof
 
 :better_llq
@@ -1144,6 +1217,10 @@ REM Èí¼þ-ä¯ÀÀÆ÷-Edge-¹Ø±ÕAdobe Flash¼´µã¼´ÓÃ
 reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\Security" /v "FlashClickToRunMode" /t reg_dword /d 0 /f
 REM Èí¼þ-ä¯ÀÀÆ÷-Edge-½ûÓÃMicrosoft EdgeµÄV9°æ±¾µöÓãÍøÕ¾¹ýÂËÆ÷
 reg add "HKCU\Software\Microsoft\MicrosoftEdge\PhishingFilter" /v "EnabledV9" /t REG_DWORD /d 0 /f
+REM Èí¼þ-ä¯ÀÀÆ÷-Edge-½ûÓÃÆô¶¯¼ÓËÙ¹¦ÄÜµÄ²ßÂÔ
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v StartupBoostEnabled /t REG_DWORD /d 0 /f
+REM Èí¼þ-ä¯ÀÀÆ÷-Edge-½ûÓÃºóÌ¨Ä£Ê½ÆôÓÃ
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v BackgroundModeEnabled /t REG_DWORD /d 0 /f
 
 REM Èí¼þ-ä¯ÀÀÆ÷-Chrome-Ê¹chromeÖ§³Öflash
 reg add "HKCU\SOFTWARE\Policies\Chromium" /v "AllowOutdatedPlugins" /t reg_dword /d 1 /f
@@ -1348,7 +1425,7 @@ REM ÆäËû£ºÊ¹ÓÃµöÓãÍøÕ¾É¸Ñ¡Æ÷
 reg add "%IE_Zones%" /v "2301" /d "3" /t reg_dword /f
 REM .NET Framework£ºXAML ä¯ÀÀÆ÷Ó¦ÓÃ³ÌÐò
 reg add "%IE_Zones%" /v "2400" /d "0" /t reg_dword /f
-REM  .NET Framework£ºXPS ÎÄµµ
+REM .NET Framework£ºXPS ÎÄµµ
 reg add "%IE_Zones%" /v "2401" /d "0" /t reg_dword /f
 REM .NET Framework£ºËÉÉ¢ XAML
 reg add "%IE_Zones%" /v "2402" /d "0" /t reg_dword /f
@@ -1482,23 +1559,23 @@ goto :eof
 :better_rj
 REM ÉèÖÃ¿ª»úÊ±ÊäÈë·¨Ä¬ÈÏÎªÓ¢ÎÄ£¨×¢ÒâÊÇ·ñÕýÈ·£©
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "DefaultMode" /t REG_SZ /d "0" /f
-REM Èí¼þ-ÊäÈë·¨-Ä¬ÈÏÓïÑÔ  0 ÖÐÎÄ£¬1 Ó¢ÎÄ
+REM Èí¼þ-ÊäÈë·¨-Ä¬ÈÏÓïÑÔ 0 ÖÐÎÄ£¬1 Ó¢ÎÄ
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
-REM Èí¼þ-ÊäÈë·¨-ÖÇÄÜÄ£ºýÆ´Òô  0 ½ûÓÃ£¬1 ÆôÓÃ
+REM Èí¼þ-ÊäÈë·¨-ÖÇÄÜÄ£ºýÆ´Òô 0 ½ûÓÃ£¬1 ÆôÓÃ
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableSmartFuzzyPinyin" /t reg_dword /d 1 /f
-REM Èí¼þ-ÊäÈë·¨-Ä£ºýÆ´Òô  0 ½ûÓÃ£¬1 ÆôÓÃ
+REM Èí¼þ-ÊäÈë·¨-Ä£ºýÆ´Òô 0 ½ûÓÃ£¬1 ÆôÓÃ
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable Fuzzy Input" /t reg_dword /d 1 /f
-REM Èí¼þ-ÊäÈë·¨-×ÔÑ§Ï°  0 Îª½ûÓÃ£¬1 ÎªÆôÓÃ
+REM Èí¼þ-ÊäÈë·¨-×ÔÑ§Ï° 0 Îª½ûÓÃ£¬1 ÎªÆôÓÃ
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable self-learning" /t reg_dword /d 1 /f
-REM Èí¼þ-ÊäÈë·¨-ÖÇÄÜ×ÔÑ§Ï°  0 Îª½ûÓÃ£¬1 ÎªÆôÓÃ
+REM Èí¼þ-ÊäÈë·¨-ÖÇÄÜ×ÔÑ§Ï° 0 Îª½ûÓÃ£¬1 ÎªÆôÓÃ
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableSmartSelfLearning" /t reg_dword /d 1 /f
-REM Èí¼þ-ÊäÈë·¨-ÔÆ¼ÆËã  0 Îª½ûÓÃ£¬1 ÎªÆôÓÃ
+REM Èí¼þ-ÊäÈë·¨-ÔÆ¼ÆËã 0 Îª½ûÓÃ£¬1 ÎªÆôÓÃ
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable Cloud Candidate" /t reg_dword /d 0 /f
 REM Èí¼þ-ÊäÈë·¨-ÖÐÓ¢ÎÄÇÐ»»¿ì½Ý¼ü£¨Ä¬ÈÏ ctrl + ¿Õ¸ñ£¬»¹¿ÉÊ¹ÓÃ£©0 Ä¬ÈÏÎª shift£¬1 Îª ctrl£¬2 Îª ÎÞ
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "English Switch Key" /t reg_dword /d 0 /f
-REM Èí¼þ-ÊäÈë·¨-ÏÔÊ¾ÐÂ´ÊÈÈ´Ê  0 Îª½ûÓÃ£¬1 ÎªÆôÓÃ
+REM Èí¼þ-ÊäÈë·¨-ÏÔÊ¾ÐÂ´ÊÈÈ´Ê 0 Îª½ûÓÃ£¬1 ÎªÆôÓÃ
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableHap" /t reg_dword /d 0 /f
-REM Èí¼þ-ÊäÈë·¨-ÏÔÊ¾ÐÂ´ÊÈÈ´ÊËÑË÷µÄÌáÊ¾  0 Îª½ûÓÃ£¬1 ÎªÆôÓÃ
+REM Èí¼þ-ÊäÈë·¨-ÏÔÊ¾ÐÂ´ÊÈÈ´ÊËÑË÷µÄÌáÊ¾ 0 Îª½ûÓÃ£¬1 ÎªÆôÓÃ
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable Hot And Popular Word Search" /t reg_dword /d 0 /f
 REM Èí¼þ-ÊäÈë·¨-ËÑ¹·ÊäÈë·¨·þÎñ½ûÓÃ
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SogouSvc" /v "Start" /t reg_dword /d 3 /f
@@ -1711,6 +1788,10 @@ REM ´òÓ¡¹²Ïí½Å±¾
 if exist "C:\ShaoHua\Key\FixPrint.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\´òÓ¡¹²Ïí½Å±¾.lnk""):b.TargetPath=""C:\ShaoHua\Key\FixPrint.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
 REM À¬»øÇåÀí½Å±¾
 if exist "C:\ShaoHua\Key\ClearTemp.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\À¬»øÇåÀí½Å±¾.lnk""):b.TargetPath=""C:\ShaoHua\Key\ClearTemp.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
+REM ÇåÀí´«µÝÓÅ»¯ÎÄ¼þ
+del /q /s /f %localappdata%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy
+REM ÇåÀíËõÂÔÍ¼»º´æ
+del /q /s /f %localappdata%\Microsoft\Windows\Explorer
 REM É¾³ýÇý¶¯ÎÄ¼þ
 del "C:\ShaoHua\Drv\Drvceo\*.*" /f /s /q 2>nul
 rd "C:\ShaoHua\Drv\Drvceo\" /s /q 2>nul
