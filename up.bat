@@ -1,11 +1,11 @@
 ÿþa
 cls
-echo off
+@echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=Upgrade½Å±¾
 set Powered=Powered by ÉÛ»ª 18900559020
-set Version=20240620
+set Version=20240722
 set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
 title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
 :start
@@ -51,6 +51,18 @@ echo. Downloading %soft%
 curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%SystemRoot%\%soft%" -L %net%) || (echo.%error%)
 goto :eof
 :list2
+rem InitialSetup
+set soft=InitialSetup.bat
+set softlan=/%soft%
+set softwan=/%soft%
+set softother=/bat/raw/main/%soft%
+call :make
+call :net
+del /f /q "%SystemRoot%\%soft%" >nul 2>nul
+echo. Downloading %soft%
+curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%SystemRoot%\%soft%" -L %net%) || (echo.%error%)
+goto :eof
+:list3
 rem Activate
 set soft=Activate.bat
 set softlan=/%soft%
@@ -62,7 +74,7 @@ del /f /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
 curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
 goto :eof
-:list3
+:list4
 rem ClearTemp
 set soft=ClearTemp.bat
 set softlan=/%soft%
@@ -74,7 +86,7 @@ del /f /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
 curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
 goto :eof
-:list4
+:list5
 rem DNS
 set soft=DNS.bat
 set softlan=/%soft%
@@ -85,21 +97,9 @@ del /f /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
 curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
 goto :eof
-:list5
+:list6
 rem EnableRDC
 set soft=EnableRDC.bat
-set softlan=/%soft%
-set softwan=/%soft%
-set softother=/bat/raw/main/%soft%
-call :make
-call :net
-del /f /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading %soft%
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
-goto :eof
-:list6
-rem FirstDel
-set soft=FirstDel.bat
 set softlan=/%soft%
 set softwan=/%soft%
 set softother=/bat/raw/main/%soft%

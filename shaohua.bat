@@ -4,12 +4,12 @@ cls
 ver|findstr /i "5\.1\." > nul&&(goto:begin)
 net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
 :begin
-echo off
+@echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240717
+set Version=20240724
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 call :CapsLK
@@ -58,8 +58,11 @@ goto :eof
 :patch32
 set bit=32&set arch=X86&set IE_Path64=&set IE_Path32=C:\Program Files\Internet Explorer\iexplore.exe
 goto :eof
+
 :cmd_admin
-REM 开启cmd-admin
+for /F "tokens=1" %%a in ('wmic os get localdatetime ^| find "."') do (set date=%%a&set day=!date:~0,8!)&for /F "tokens=3" %%b in ('reg query "HKCR\.ShaoHua" /v "InitialSetup" 2^>nul ^| find "InitialSetup"') do (if "!day!" EQU "%%b" (goto :eof))
+REM 开启cmd_admin
+reg add "HKLM\SOFTWARE\Sysinternals" /v "PsExecAccept" /t REG_DWORD /d 1 /f
 reg add "HKCR\cmdfile\shell\runas\command" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
 reg add "HKCR\ConsoleHost\command\runas" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\cmd.exe" /t reg_sz /d RUNASADMIN /f
@@ -69,28 +72,45 @@ reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers
 reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t REG_SZ /d "PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File \"%1\"" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
-REM 开始配置用户账户控制(UAC)策略
-echo 设置用户账户控制策略...
-REM 禁用内置管理员的UAC提示
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v ConsentPromptBehaviorAdmin /t REG_DWORD /d 0 /f
-REM 启用内置管理员帐户的管理员批准模式
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v FilterAdministratorToken /t REG_DWORD /d 1 /f
-REM 禁用“用户帐户控制：以管理员批准模式运行所有管理员”
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f
-REM luafv服务设置为自动
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\luafv" /v Start /t REG_DWORD /d 4 /f
-reg add "HKLM\SYSTEM\ControlSet001\Services\luafv" /v Start /t REG_DWORD /d 4 /f
-REM 启用应用程序安装检测并提示提升
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableInstallerDetection /t REG_DWORD /d 1 /f
-REM 配置提升权限时不提示
-secedit /export /cfg C:\Windows\Temp\export.inf
-(findstr /v "ConsentPromptBehaviorAdmin" C:\Windows\Temp\export.inf) > C:\Windows\Temp\export_without.inf
-echo ConsentPromptBehaviorAdmin = 0 >> C:\Windows\Temp\export_without.inf
-secedit /configure /cfg C:\Windows\Temp\export_without.inf /db C:\Windows\Temp\export.sdb
-REM 清理临时文件
-del C:\Windows\Temp\export.inf
-del C:\Windows\Temp\export_without.inf
-del C:\Windows\Temp\export.sdb
+REM UAC_Installer detection(安装程序检测)_禁用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableInstallerDetection" /t REG_DWORD /d 0 /f
+REM UAC_UAC 用户提示_提示输入凭据
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorUser" /t REG_DWORD /d 2 /f
+REM UAC_UAC 管理员提示_不提示，直接提升
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorAdmin" /t REG_DWORD /d 0 /f
+REM UAC_UIAccess 安全位置请求_启用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableSecureUIAPaths" /t REG_DWORD /d 1 /f
+REM UAC_UIAccess 开关_启用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableUIADesktopToggle" /t REG_DWORD /d 1 /f
+REM UAC_仅提升已签名的_禁用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ValidateAdminCodeSignatures" /t REG_DWORD /d 0 /f
+REM UAC_内置管理员帐户_启用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t REG_DWORD /d 1 /f
+REM UAC_启用 UAC-以管理员批准模式运行所有管理员(EnableLUA)_禁用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f
+REM UAC_安全桌面提示_禁用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t REG_DWORD /d 0 /f
+REM UAC_将文件和注册表写入错误虚拟化到每用户位置_启用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableVirtualization" /t REG_DWORD /d 1 /f
+REM UAC_允许以管理员身份运行的程序访问用户映射的网络驱动器_启用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLinkedConnections" /t REG_DWORD /d 1 /f
+REM UAC_允许用户选择打开方式_启用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoInternetOpenWith" /t REG_DWORD /d 0 /f
+REM UAC_计算机组策略异步应用_启用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SyschronousMachineGroupPolicy" /t REG_DWORD /d 0 /f
+REM UAC_用户组策略异步应用_启用
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SyschronousUserGroupPolicy" /t REG_DWORD /d 0 /f
+REM luafv服务设置为手动，禁用文件虚拟化
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\luafv" /v Start /t REG_DWORD /d 3 /f
+reg add "HKLM\SYSTEM\ControlSet001\Services\luafv" /v Start /t REG_DWORD /d 3 /f
+REM 强制更新组策略
+gpupdate /force
+REM 停止并启动luafv服务以应用设置
+net stop luafv
+net start luafv
+REM 重新启动资源管理器
+taskkill /f /im explorer.exe
+start explorer.exe
 goto :eof
 
 :pctime
@@ -268,12 +288,8 @@ reg add "HKCU\Software\Policies\Microsoft\Windows NT\Driver Signing" /v "Behavio
 goto :eof
 
 :better_xt
-REM 系统-通知-开启管理员令牌过滤
-reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t reg_dword /d 1 /f
-REM 系统-通知-启用用户界面访问控制台切换功能
-reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableUIADesktopToggle" /t reg_dword /d 1 /f
-REM 系统-通知-禁止在安全桌面上显示UAC提示
-reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t reg_dword /d 0 /f
+REM 系统-通知-仅关闭系统本身的通知气泡提示
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v EnableBalloonTips /t REG_DWORD /d 0 /f
 REM 系统-通知-关闭Windows的通知-安全和维护
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance" /v "ShowBanner" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance" /v "ShowInActionCenter" /t reg_dword /d 0 /f
@@ -756,10 +772,15 @@ REM 界面-任务栏-禁用任务栏动画效果
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarAnimations /t REG_DWORD /d 0 /f
 REM 界面-任务栏-任务栏中的Cortana调整为隐藏
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v SearchboxTaskbarMode /t REG_DWORD /d 0 /f
-REM 界面-任务栏-在任务栏关闭人脉
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People" /v PeopleBand /t REG_DWORD /d 0 /f
-REM 界面-任务栏-在任务栏隐藏人脉
-reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v "HidePeopleBar" /t reg_dword /d 1 /f
+REM 界面-任务栏-搜索设置为取消
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t REG_DWORD /d 0 /f
+REM 界面-任务栏-关闭显示“任务视图”按钮
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MultitaskingView" /v "ShowTaskViewButton" /t REG_DWORD /d 0 /f
+REM 界面-任务栏-关闭在任务栏显示人脉
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People" /v "PeopleBand" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v PeopleBand /t REG_DWORD /d 0 /f
+
 REM 界面-任务栏-按钮显示图标和文本
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "IconsOnly" /d 0 /t REG_DWORD /f
 REM 界面-任务栏-屏幕键盘不挡任务栏
@@ -806,7 +827,11 @@ REM 界面-开始菜单-禁用开始菜单的邻近追踪功能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProximity /t REG_DWORD /d 0 /f
 REM 界面-开始菜单-禁用开始菜单的应用推荐磁贴
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338388Enabled" /t REG_DWORD /d 0 /f
+REM 界面-开始菜单-禁用开始菜单动画
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "StartMenuAnimation" /t REG_DWORD /d 0 /f
 
+REM 界面-主题与背景-启用Aero Peek功能
+reg add "HKCU\Software\Microsoft\Windows\DWM" /v "EnableAeroPeek" /d 1 /t REG_DWORD /f
 REM 界面-主题与背景-禁用窗口动态效果
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v DisablePreviewDesktop /t REG_DWORD /d 1 /f
 REM 界面-主题与背景-关闭高级缩放设置
@@ -834,16 +859,11 @@ REM 界面-主题与背景-禁用鼠标指针阴影效果
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\CursorShadow" /v "DefaultApplied" /d 0 /t REG_DWORD /f
 REM 界面-主题与背景-禁用列表视图中的半透明选择效果
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewAlphaSelect" /d 0 /t REG_DWORD /f
-REM 界面-主题与背景-设置视觉效果设置为极速模式
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /d 3 /t REG_DWORD /f
 REM 界面-主题与背景-禁用拖动窗口时全屏显示
 reg add "HKCU\Control Panel\Desktop" /v "DragFullWindows" /d 0 /t REG_SZ /f
-REM 界面-主题与背景-配置当前用户桌面用户首选项掩码为 9012038010000000
-reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9012038010000000" /t REG_BINARY /f
-REM 界面-主题与背景-设置当前用户的资源管理器用户首选项掩码为 9012038010000000
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9012038010000000" /t REG_BINARY /f
 REM 界面-主题与背景-界面-主题与背景-设置字体平滑度
 reg add "HKCU\Control Panel\Desktop" /v "FontSmoothing" /d 2 /t REG_SZ /f
+reg add "HKCU\Control Panel\Desktop" /v "FontSmoothingType" /t REG_DWORD /d 2 /f
 REM 界面-主题与背景-禁用窗口最小化和最大化时的动画效果
 reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v "MinAnimate" /d 0 /t REG_SZ /f
 REM 界面-主题与背景-启用列表视图中的阴影效果
@@ -852,21 +872,35 @@ REM 界面-主题与背景-设置桌面窗口管理器的组合策略
 reg add "HKCU\Software\Microsoft\Windows\DWM" /v "CompositionPolicy" /d 1 /t REG_DWORD /f
 REM 界面-主题与背景-禁用始终休眠缩略图
 reg add "HKCU\Software\Microsoft\Windows\DWM" /v "AlwaysHibernateThumbnails" /d 0 /t REG_DWORD /f
-REM 界面-主题与背景-启用Aero Peek功能
-reg add "HKCU\Software\Microsoft\Windows\DWM" /v "EnableAeroPeek" /d 1 /t REG_DWORD /f
 REM 界面-主题与背景-禁用系统改进用户反馈
 reg add "HKCU\Software\Microsoft\Siuf\Rules" /v "NumberOfSIUFInPeriod" /d 0 /t REG_DWORD /f
-REM 界面-主题与背景-调整鼠标悬停时间为100毫秒，以提高鼠标交互的响应速度
+REM 界面-主题与背景-调整鼠标悬停时间为0毫秒，以提高鼠标交互的响应速度
 reg add "HKCU\Control Panel\Desktop" /v "ForegroundLockTimeout" /d 0 /t REG_SZ /f
 REM 界面-主题与背景-调整鼠标悬停时间为100毫秒，以使界面元素快速响应鼠标操作
 reg add "HKCU\Control Panel\Mouse" /v "MouseHoverTime" /d 100 /t REG_SZ /f
 REM 界面-主题与背景-显示设置缩放为100%(124%值为119,100%值为96)
 reg add "HKCU\Control Panel\Desktop" /v "LogPixels" /t reg_dword /d 96 /f
+REM 界面-主题与背景-设置为平铺视图
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "DefaultView" /t REG_SZ /d "Tiles" /f
+REM 界面-主题与背景-设置默认排序方式为名称
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "SortOrderIndex" /t REG_DWORD /d 0 /f
+REM 界面-主题与背景-设置分组依据为类型
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Grouping" /t REG_SZ /d "Type" /f
 REM 界面-主题与背景-禁用桌面图标自动排列功能、自动对齐网络、按名称排序
 reg add "HKCU\Software\Microsoft\Windows\Shell\Bags\1\Desktop" /v "FFlags" /t REG_DWORD /d 1075839524 /f
 REM 界面-主题与背景-修改资源管理器布局的视图模式窗格状态、文件夹设置的排序和排列顺序排序和排列顺序、组设置和窗口位置和大小的上次打开位置、窗口最大化、最小化及位置
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v ShellState /t REG_BINARY /d 240000003EA8000000000000000000000000000001000000130000000000000073000000 /f
+REM 界面-主题与背景-禁用视觉效果
+REM reg add "HKCU\Control Panel\Desktop" /v "VisualFX" /d "0" /t REG_SZ /f
+REM 界面-主题与背景-设置视觉效果设置为极速模式0启用一些特效1最佳性能3
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /d 3 /t REG_DWORD /f
+REM 界面-主题与背景-配置当前用户桌面用户首选项掩码为 9032078010000000（以前是9012038010000000）
+reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9032078010000000" /t REG_BINARY /f
+REM 界面-主题与背景-设置当前用户的资源管理器用户首选项掩码为 9032078010000000（以前是9012038010000000）
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9032078010000000" /t REG_BINARY /f
 
+REM 界面-资源管理器-“此电脑”默认展开
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v NavPaneExpandToThisPC /t REG_DWORD /d 1 /f
 REM 界面-资源管理器-将启动延迟时间设置为 0 毫秒，以加快 Windows Explorer 的启动速度
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v StartupDelayInMSec /t REG_DWORD /d 0 /f
 REM 界面-资源管理器-将等待空闲状态设置为 0，以在启动 Windows Explorer 时不等待空闲状态
@@ -949,9 +983,8 @@ REM 界面-桌面-快捷方式不添加快捷方式的文字
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v link /t REG_BINARY /d 00000000 /f
 REM 界面-桌面-桌面壁纸质量调整为
 reg add "HKCU\Control Panel\Desktop" /v "JPEGImportQuality" /t reg_dword /d 256 /f
-REM 界面-桌面-"我的电脑"增加设备管理器
-reg add "HKCR\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\shell\DeviceManager" /ve /d "设备管理器" /f
-reg add "HKCR\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\shell\DeviceManager\command" /ve /d "devmgmt.msc" /f
+REM 界面-桌面-禁用所有窗口动画
+reg add "HKCU\Control Panel\Desktop" /v "WindowAnimation" /t REG_DWORD /d 0 /f
 
 REM 界面-右键菜单-将“右键菜单”调整为Windows 7模式（by Silence）
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\FlightedFeatures" /v "ImmersiveContextMenu" /t reg_dword /d 0 /f
@@ -975,14 +1008,12 @@ reg add HKCR\Directory\shell\TakeOwnerShip /f /ve /d "管理员取得所有权限"
 reg add HKCR\Directory\shell\TakeOwnerShip /v HasLUAShield /t REG_SZ /d "" /f
 reg add HKCR\Directory\shell\TakeOwnerShip /v NoWorkingDirectory /t REG_SZ /d "" /f
 reg add HKCR\Directory\shell\TakeOwnerShip\Command /f /ve /d "cmd.exe /c takeown /f \"%%1\" /r /d y ^&^& icacls \"%%1\" /grant administrators:F /t"
-
-
 goto :eof
 
 :better_llq
 REM 软件-浏览器-IE-增强-删除现有IE浏览器
-reg delete "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}" /f
-reg delete "HKLM\SOFTWARE\Classes\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}" /f
+REM reg delete "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}" /f
+REM reg delete "HKLM\SOFTWARE\Classes\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}" /f
 REM 软件-浏览器-IE-增强-添加IE浏览器
 reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}" /ve /d "Internet Explorer" /f
 reg add "HKCR\CLSID\{B416D21B-3B22-B6D4-BBD3-BBD452DB3D5B}\DefaultIcon" /ve /d "%IE_Path32%,-32528" /f
@@ -1285,6 +1316,9 @@ REM 软件-浏览器-Chrome-禁止Chrome打印页眉和页脚
 reg add "HKCU\Software\Policies\Google\Chrome" /v "PrintHeaderFooter" /t REG_DWORD /d 0 /f
 REM 软件-浏览器-Chrome-开启Chrome默认背景图片打印模式
 reg add "HKCU\Software\Policies\Google\Chrome" /v "PrintingBackgroundGraphicsDefault" /t REG_SZ /d "enabled" /f
+
+REM 软件-删除驱动总裁安装信息
+reg delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\DrvCeo2.0" /f
 call :better_llq%hs%
 goto :eof
 
@@ -1553,7 +1587,7 @@ INETCPL.CPL
 REM 打印机
 rundll32.exe shell32.dll,SHHelpShortcuts_RunDLL PrintersFolder
 REM 软件安装器
-if exist "C:\ShaoHua\Softprep.exe" start "" /wait C:\ShaoHua\Softprep.exe 2>nul
+for /F "tokens=1" %%a in ('wmic os get localdatetime ^| find "."') do (set date=%%a & set day=!date:~0,8!) && for /F "tokens=3" %%b in ('reg query "HKCR\.ShaoHua" /v "InitialSetup" ^| find "InitialSetup"') do (set sys=%%b) && if "!day!" EQU "!sys!" (if exist "C:\ShaoHua\Softprep.exe" (start "" /wait "C:\ShaoHua\Softprep.exe"))
 goto :eof
 
 :better_rj
@@ -1781,6 +1815,10 @@ goto :eof
 REM 更新策略
 gpupdate /force
 call :finish%hs%
+REM 刷新桌面
+taskkill /f /im explorer.exe 2>nul
+RUNDLL32.EXE USER32.DLL,UpdatePerUserSystemParameters 1, True
+start "" explorer
 if "%hs%"=="_hsf" goto :eof
 REM 系统激活脚本
 if exist "C:\ShaoHua\Key\Activate.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\系统激活脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\Activate.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
@@ -1799,17 +1837,13 @@ del /f /s /q "%USERPROFILE%\AppData\Local\Microsoft\Windows\INetCache\*"
 del /f /s /q "%USERPROFILE%\AppData\Local\Microsoft\Windows\Temporary Internet Files\*"
 del /f /s /q "%TEMP%\*"
 start "" cleanmgr.exe /VERYLOWDISK
-REM 刷新桌面
-taskkill /f /im explorer.exe 2>nul
-RUNDLL32.EXE USER32.DLL,UpdatePerUserSystemParameters 1, True
-start "" explorer
 for /f "tokens=3*" %%i in ('reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion" /v "ProductName"') do set ProductName=%%i %%j
 for /f "tokens=3*" %%i in ('reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion" /v "ReleaseId"') do set ReleaseId=%%i
 for /f "tokens=2* delims=[]" %%i in ('ver') do set v=%%i
 for /f "tokens=2* delims= " %%i in ("%v%") do set CurrentBuildNumber=%%i
 REM start mshta vbscript:msgbox("System："^&vbCrLf^&"%ProductName%"^&vbCrLf^&"%processor_architecture%"^&vbCrLf^&"%ReleaseId% - %CurrentBuildNumber%"^&vbCrLf^&""^&vbCrLf^&"Script："^&vbCrLf^&"ShaoHua - 7x24H - 18900559020"^&vbCrLf^&"Version："^&vbCrLf^&"%Version%",64,"Tips - %date%")(window.close)
 start "" rundll32 shell32,ShellAbout Script  ：邵华 - 18900559020                   Date：%Version% System：%ProductName% - %processor_architecture% - %CurrentBuildNumber%
-reg add "HKCR\.shaohua\patch" /v "%date%-%time%" /d "%Version%" /t REG_SZ /f
+if not "%hs%"=="_hsf" for /F "tokens=1" %%a in ('wmic os get localdatetime ^| find "."') do (set date=%%a & set day=!date:~0,12!& reg add "HKCR\.ShaoHua\Script" /v "!day!" /t reg_sz /d "Script%Version%" /f)
 echo %~dp0|findstr /i "windows" >nul && exit || (del "%~f0" & exit)
 exit
 :finish_hsl

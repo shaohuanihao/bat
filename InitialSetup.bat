@@ -1,0 +1,112 @@
+ÿþa
+cls
+@echo off
+ver|findstr /i "5\.1\." > nul&&(goto:begin)
+net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+:begin
+@echo off
+cls
+disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
+set Name=InitialSetup½Å±¾
+set Powered=Powered by ÉÛ»ª 18900559020
+set Version=20240724
+set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
+title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+REM ver
+for /F "tokens=1" %%a in ('wmic os get localdatetime ^| find "."') do (set date=%%a & set day=!date:~0,8!& reg add "HKCR\.ShaoHua" /v "InitialSetup" /t reg_sz /d "!day!" /f)
+call :cmd_admin
+call :clear
+call :out
+exit
+:cmd_admin
+REM ¿ªÆôcmd_admin
+reg add "HKLM\SOFTWARE\Sysinternals" /v "PsExecAccept" /t REG_DWORD /d 1 /f
+reg add "HKCR\cmdfile\shell\runas\command" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
+reg add "HKCR\ConsoleHost\command\runas" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\cmd.exe" /t reg_sz /d RUNASADMIN /f
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\cmd.exe" /t reg_sz /d RUNASADMIN /f
+reg add "HKCR\ConsoleHost\command\runas" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\conhost.exe" /t reg_sz /d RUNASADMIN /f
+reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t REG_SZ /d "PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File \"%1\"" /f
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
+REM UAC_Installer detection(°²×°³ÌÐò¼ì²â)_½ûÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableInstallerDetection" /t REG_DWORD /d 0 /f
+REM UAC_UAC ÓÃ»§ÌáÊ¾_ÌáÊ¾ÊäÈëÆ¾¾Ý
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorUser" /t REG_DWORD /d 2 /f
+REM UAC_UAC ¹ÜÀíÔ±ÌáÊ¾_²»ÌáÊ¾£¬Ö±½ÓÌáÉý
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorAdmin" /t REG_DWORD /d 0 /f
+REM UAC_UIAccess °²È«Î»ÖÃÇëÇó_ÆôÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableSecureUIAPaths" /t REG_DWORD /d 1 /f
+REM UAC_UIAccess ¿ª¹Ø_ÆôÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableUIADesktopToggle" /t REG_DWORD /d 1 /f
+REM UAC_½öÌáÉýÒÑÇ©ÃûµÄ_½ûÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ValidateAdminCodeSignatures" /t REG_DWORD /d 0 /f
+REM UAC_ÄÚÖÃ¹ÜÀíÔ±ÕÊ»§_ÆôÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t REG_DWORD /d 1 /f
+REM UAC_ÆôÓÃ UAC-ÒÔ¹ÜÀíÔ±Åú×¼Ä£Ê½ÔËÐÐËùÓÐ¹ÜÀíÔ±(EnableLUA)_½ûÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f
+REM UAC_°²È«×ÀÃæÌáÊ¾_½ûÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t REG_DWORD /d 0 /f
+REM UAC_½«ÎÄ¼þºÍ×¢²á±íÐ´Èë´íÎóÐéÄâ»¯µ½Ã¿ÓÃ»§Î»ÖÃ_ÆôÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableVirtualization" /t REG_DWORD /d 1 /f
+REM UAC_ÔÊÐíÒÔ¹ÜÀíÔ±Éí·ÝÔËÐÐµÄ³ÌÐò·ÃÎÊÓÃ»§Ó³ÉäµÄÍøÂçÇý¶¯Æ÷_ÆôÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLinkedConnections" /t REG_DWORD /d 1 /f
+REM UAC_ÔÊÐíÓÃ»§Ñ¡Ôñ´ò¿ª·½Ê½_ÆôÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoInternetOpenWith" /t REG_DWORD /d 0 /f
+REM UAC_¼ÆËã»ú×é²ßÂÔÒì²½Ó¦ÓÃ_ÆôÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SyschronousMachineGroupPolicy" /t REG_DWORD /d 0 /f
+REM UAC_ÓÃ»§×é²ßÂÔÒì²½Ó¦ÓÃ_ÆôÓÃ
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SyschronousUserGroupPolicy" /t REG_DWORD /d 0 /f
+REM luafv·þÎñÉèÖÃÎªÊÖ¶¯£¬½ûÓÃÎÄ¼þÐéÄâ»¯
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\luafv" /v Start /t REG_DWORD /d 3 /f
+reg add "HKLM\SYSTEM\ControlSet001\Services\luafv" /v Start /t REG_DWORD /d 3 /f
+REM Ç¿ÖÆ¸üÐÂ×é²ßÂÔ
+gpupdate /force
+REM Í£Ö¹²¢Æô¶¯luafv·þÎñÒÔÓ¦ÓÃÉèÖÃ
+net stop luafv
+net start luafv
+REM ÖØÐÂÆô¶¯×ÊÔ´¹ÜÀíÆ÷
+taskkill /f /im explorer.exe
+start explorer.exe
+goto :eof
+:clear
+timeout /t 3 >nul
+REM É¾³ýËùÓÐ¼Æ»®ÈÎÎñ
+schtasks /delete /tn * /F
+REM É¾³ýÓÃ»§ºÍÏµÍ³Æô¶¯ÏîÖÐµÄËùÓÐÏî
+@reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /va /f
+@reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /va /f
+@reg delete "HKLM\Software\Microsoft\Shared Tools\MSConfig\startupreg" /f
+REM É¾³ýÆô¶¯ÎÄ¼þ¼ÐÖÐµÄËùÓÐ³ÌÐò
+del /q /f "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*.*"
+del /q /f "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*.*"
+REM É¾³ýËùÓÐÓÃ»§µÄ¹«¹²Æô¶¯ÎÄ¼þ
+del /q /f "C:\Users\All Users\Microsoft\Windows\Start Menu\Programs\Startup\*.*"
+REM É¾³ý Sysprep ÎÄ¼þ¼Ð¼°ÆäÄÚÈÝ
+del /q /f "C:\Sysprep\*.*"
+rd /s /q "C:\Sysprep"
+REM É¾³ýÓÃ»§¿ªÊ¼²Ëµ¥ÖÐµÄÆô¶¯Ïî
+del /q /f "%userprofile%\¿ªÊ¼²Ëµ¥\³ÌÐò\Æô¶¯\*.*"
+REM É¾³ý¶àÓàµÄ¹ã¸æÎÄ¼þ
+rd /s /q "C:\Users\Administrator\AppData\Local\360Chrome"
+rd /s /q "C:\Users\Administrator\AppData\Local\360ChromeX"
+rd /s /q "C:\Users\Administrator\AppData\Local\google"
+rd /s /q "C:\Users\Administrator\AppData\Local\Microsoft\Edge"
+rd /s /q "C:\Users\Administrator\AppData\Local\Sogou\SogouExplorer"
+rd /s /q "C:\Users\Administrator\AppData\Local\Tencent\QQBrowser"
+REM Ìí¼Ó ctfmon.exe µ½ÓÃ»§Æô¶¯Ïî
+@reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "ctfmon" /t REG_SZ /d "C:\Windows\System32\ctfmon.exe" /f
+REM ¼ì²é²¢Æô¶¯ ctfmon.exe Èç¹ûËüÎ´ÔËÐÐ
+tasklist /FI "IMAGENAME eq ctfmon.exe" | find /I "ctfmon.exe" >nul || start "" "C:\WINDOWS\system32\ctfmon.exe"
+goto :eof
+:out
+REM shaohua
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "ShaoHua" /t REG_SZ /d "C:\Windows\shaohua.bat" /f
+rem NAME
+start "" /wait rundll32.exe shell32.dll,Control_RunDLL sysdm.cpl,,1 2>nul
+rem IP
+RunDll32.exe shell32.dll,Control_RunDLL ncpa.cpl 2>nul
+rem ¼ÆËã»úÃû
+sysdm.cpl
+cls&echo.&echo.ÇëÈ·¶¨ÒÑ¾­Íê³É ¼ÆËã»úÃû ºÍ IPµØÖ· µÄÉèÖÃ£¡£¡£¡&echo.&echo.ÈôÒÑÍê³É£¬Çë°´ÏÂÈÎÒâ¼üÖØÆôµçÄÔ¡£&echo.&pause&cls&shutdown -r -t 10 -c "µÚÒ»½×¶ÎÒÑ½áÊø¡£10Ãëºó£¬ÏµÍ³»á×Ô¶¯ÖØÆô£¬Íê³ÉÓàÏÂ²Ù×÷£¡"&del %0
