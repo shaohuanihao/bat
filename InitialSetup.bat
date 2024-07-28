@@ -9,9 +9,10 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=InitialSetup脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240724
+set Version=20240728
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
+:start
 REM ver
 for /F "tokens=1" %%a in ('wmic os get localdatetime ^| find "."') do (set date=%%a & set day=!date:~0,8!& reg add "HKCR\.ShaoHua" /v "InitialSetup" /t reg_sz /d "!day!" /f)
 call :cmd_admin

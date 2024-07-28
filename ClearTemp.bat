@@ -1,15 +1,15 @@
 ÿşa
 cls
-echo off
+@echo off
 ver|findstr /i "5\.1\." > nul&&(goto:begin)
 net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
 :begin
-echo off
+@echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=ClearTemp½Å±¾
 set Powered=Powered by ÉÛ»ª 18900559020
-set Version=20240602
+set Version=20240728
 set Comment=ÔËĞĞÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎğÊÖ¶¯¹Ø±Õ£¡
 title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
 :start

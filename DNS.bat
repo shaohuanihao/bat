@@ -1,15 +1,19 @@
 ÿþa
 cls
 @echo off
+ver|findstr /i "5\.1\." > nul&&(goto:begin)
+net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+:begin
+@echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=DNS½Å±¾
 set Powered=Powered by ÉÛ»ª 18900559020
-set Version=20240528
+set Version=20240728
 set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
-for /f "tokens=2 delims==" %%i in ('wmic computersystem get name /value') do set PCName=%%i
 title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
-:menu
+for /f "tokens=2 delims==" %%i in ('wmic computersystem get name /value') do set PCName=%%i
+:start
 call :CapsLK
 cls
 echo.
