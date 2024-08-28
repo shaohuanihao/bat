@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240728
+set Version=20240828
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -198,6 +198,7 @@ echo 从不自动进入睡眠状态
 powercfg -x -standby-timeout-dc 0
 powercfg -x -standby-timeout-ac 0
 powercfg -hibernate off
+del /f /q C:\hiberfil.sys
 echo 从不自动进入休眠状态
 powercfg -x -hibernate-timeout-dc 0
 powercfg -x -hibernate-timeout-ac 0
@@ -260,26 +261,26 @@ REM 定义卓越性能电源计划的GUID
 set "EXCELLENT_PERFORMANCE_GUID=e9a42b02-d5df-448d-aa00-03f14749eb61"
 REM 搜索已存在的卓越性能电源计划
 for /f "tokens=2 delims=:(" %%a in ('powercfg /list ^| findstr /i "卓越性能"') do (
-    set "GUID=%%a"
-    set "GUID=!GUID: =!"
+	set "GUID=%%a"
+	set "GUID=!GUID: =!"
 )
 REM 如果找到已有的卓越性能计划，激活它
 if defined GUID (
-    powercfg -setactive !GUID!
+	powercfg -setactive !GUID!
 ) else (
-    REM 复制卓越性能计划
-    powercfg -duplicatescheme %EXCELLENT_PERFORMANCE_GUID%
-    REM 再次搜索已创建的卓越性能电源计划
-    for /f "tokens=2 delims=:(" %%a in ('powercfg /list ^| findstr /i "卓越性能"') do (
-        set "GUID=%%a"
-        set "GUID=!GUID: =!"
-    )
-    REM 如果成功找到，激活之
-    if defined GUID (
-        powercfg -setactive !GUID!
-    ) else (
-        echo 无法找到或创建卓越性能
-    )
+	REM 复制卓越性能计划
+	powercfg -duplicatescheme %EXCELLENT_PERFORMANCE_GUID%
+	REM 再次搜索已创建的卓越性能电源计划
+	for /f "tokens=2 delims=:(" %%a in ('powercfg /list ^| findstr /i "卓越性能"') do (
+		set "GUID=%%a"
+		set "GUID=!GUID: =!"
+	)
+	REM 如果成功找到，激活之
+	if defined GUID (
+		powercfg -setactive !GUID!
+	) else (
+		echo 无法找到或创建卓越性能
+	)
 )
 echo 卓越性能已成功启用
 
@@ -297,12 +298,17 @@ REM 硬件-驱动-禁用数据执行保护（DEP）
 bcdedit /set nx AlwaysOff
 REM 硬件-驱动-禁用启动时的完整性检查
 bcdedit -set loadoptions DISABLE_INTEGRITY_CHECKS
+REM 硬件-驱动-关闭MPO
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Dwm" /v "MPO" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\Dwm" /v "OverlayTestMode" /t REG_DWORD /d 5 /f
+REM 硬件-驱动-启用 APPX 开发人员模式
+powershell -Command "Set-ExecutionPolicy RemoteSigned -Scope CurrentUser"
 REM 禁用动态时钟调整功能
 bcdedit /set disabledynamictick yes
 REM 启用平台定时器功能
 bcdedit /set useplatformtick yes
-REM 关闭系统测试模式
-REM bcdedit /set testsigning off
+REM 关闭驱动签名验证
+bcdedit /set testsigning on
 REM 开启调试功能
 REM bcdedit /debug ON
 REM bcdedit /bootdebug ON
@@ -413,6 +419,12 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Ena
 REM 系统-广告-禁用遥测
 REM 系统-广告-诊断跟踪服务为手动启动
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DiagTrack" /v "Start" /t REG_DWORD /d 4 /f
+REM 系统-广告-禁用信息收集服务
+sc config "DiagTrack" start= disabled
+sc config "dmwappuserv" start= disabled
+sc config "ErrorReportingService" start= disabled
+sc config "RemoteRegistry" start= disabled
+sc config "Program Compatibility Assistant Service" start= disabled
 REM 系统-广告-诊断服务为手动启动
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\diagsvc" /v "Start" /t REG_DWORD /d 4 /f
 REM 系统-广告-数据移动应用程序推送服务为手动启动
@@ -433,8 +445,11 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DODow
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DODownloadModeForeground /t REG_DWORD /d 0 /f
 REM 系统-广告-关闭客户体验改善计划
 reg add "HKLM\SOFTWARE\Policies\Microsoft\SQMClient\Windows" /v "CEIPEnable" /d 0 /t REG_DWORD /f
+REM 系统-广告-关闭体验反馈
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Feedback" /v "Disabled" /t REG_DWORD /d 1 /f
 REM 系统-广告-禁止向 Microsoft 发送墨迹和打字数据
 reg add "HKCU\SOFTWARE\Microsoft\InputPersonalization" /v "RestrictImplicitInkCollection" /t "Reg_Dword" /d "1" /f
+reg add "HKCU\Software\Policies\Microsoft\InputPersonalization" /v "RestrictImplicitInkCollection" /t "Reg_Dword" /d "1" /f
 REM 系统-广告-禁止向 Microsoft 发送关于我如何书写的信息，以帮助我们改进将来的打字和写作
 reg add "HKCU\SOFTWARE\Microsoft\InputPersonalization" /v "RestrictImplicitTextCollection" /t "Reg_Dword" /d "1" /f
 REM 系统-广告-禁止 Windows 收集联系人数据
@@ -559,12 +574,14 @@ REM 系统-设置-禁用 Microsoft Store 后台访问应用程序
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications\Microsoft.WindowsStore_8wekyb3d8bbwe" /v "Disabled" /t reg_dword /d 1 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications\Microsoft.WindowsStore_8wekyb3d8bbwe" /v "DisabledByUser" /t reg_dword /d 1 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" /v GlobalUserDisabled /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" /v "BackgroundAccessApplicationsEnabled" /t REG_DWORD /d 0 /f
 REM 系统-设置-禁用 Windows 搜索中的背景应用全局切换功能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v BackgroundAppGlobalToggle /t REG_DWORD /d 0 /f
 REM 系统-设置-设置 embeddedmode 服务的启动类型为自动
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\embeddedmode" /v Start /t REG_DWORD /d 4 /f
 REM 系统-设置-禁用存储感知功能
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense" /v StorageSense /t REG_DWORD /d 0 /f
+powershell -Command "Set-StorageSenseState -Disable"
 REM 系统-设置-禁用存储感知帮助
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" /v "fAllowToGetHelp" /t reg_dword /d 0 /f
 REM 系统-设置-禁用在整个系统中的 SmartScreen 功能
@@ -614,6 +631,12 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /d 
 REM 系统-设置-禁用Microsoft兼容性评估任务
 schtasks /change /TN "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /DISABLE
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe" /v "Debugger" /t REG_SZ /d "%windir%\System32\taskkill.exe" /f
+REM 系统-设置-禁用 Windows 更新保留的存储空间
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v "ReservedStorage" /t REG_DWORD /d 0 /f
+REM 系统-设置-禁用自动下载并安装第三方应用
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer" /v "DisableMSI" /t REG_DWORD /d 2 /f
+
+
 
 REM 系统-性能-启用 StickyKeys 功能，使用户可以轻松按下多个键
 reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v Flags /t REG_SZ /d 506 /f
@@ -650,6 +673,8 @@ reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\Windows" /v "LegacyDe
 REM 系统-性能-修改“如果回收站中的文件存在超过以下时长，请将其删除”选项，修改为“从不”
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\BitBucket" /v NukeOnDelete /t REG_DWORD /d 0 /f
 
+REM 系统-服务-关闭 Windows 防火墙
+netsh advfirewall set allprofiles state off
 REM 系统-服务-关闭超级预读 Superfetch
 sc config SysMain start= disabled
 sc stop SysMain
@@ -738,6 +763,8 @@ reg add "HKCU\Software\Microsoft\Terminal Server Client" /v "ConnectionBarStatus
 REM 系统-远程-启用终端服务客户端的连接栏固定功能。
 reg add "HKCU\Software\Microsoft\Terminal Server Client" /v "PinConnectionBar" /t REG_DWORD /d 1 /f
 
+REM 系统-系统更新-禁用自动执行 Windows 升级
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v "AutoUpdate" /t REG_DWORD /d 2 /f
 REM 系统-系统更新-自动安装无需重启的更新
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "AutoInstallMinorUpdates" /t reg_dword /d 1 /f
 REM 系统-系统更新-更新挂起时如果有用户登录不自动重启计算机
@@ -785,7 +812,12 @@ REM 系统-安全设置-未登录可关机
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ShutdownWithoutLogon" /t REG_DWORD /d 1 /f
 REM 系统-安全设置-禁用关闭原因
 reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v "EnableReasonUI" /t REG_DWORD /d 0 /f
-
+REM 系统-安全设置-关闭 Exploit Protection
+powershell -Command "Set-ProcessMitigation -System -Disable DEP, ASLR, SEHOP, ForceRelocateImages, BlockNonMicrosoftBinaries"
+REM 系统-安全设置-关闭 VBS
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Hyper-V\Guest" /v "EnableVirtualizationBasedSecurity" /t REG_DWORD /d 0 /f
+REM 系统-安全设置-禁用 RPC 隐私保护
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Rpcss\Parameters" /v "EnablePrivacy" /t REG_DWORD /d 0 /f
 REM 系统-安全设置-禁用复杂密码策略
 net accounts /maxpwage:unlimited /minpwlen:0 /minpwage:0 /uniquepw:0
 REM 系统-安全设置-将用户密码的最大有效期设置为永不过期
@@ -808,6 +840,8 @@ REM 系统-安全设置-关闭防火墙
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /v "EnableFirewall" /t reg_dword /d 0 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "EnableFirewall" /t reg_dword /d 0 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\DomainProfile" /v "EnableFirewall" /t reg_dword /d 0 /f
+REM 系统-安全设置-禁用 BitLocker 自动设备加密
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\BitLocker" /v "AutoUnlockDisabled" /t REG_DWORD /d 1 /f
 goto :eof
 
 :better_jm
@@ -881,9 +915,9 @@ reg add "HKCU\Software\Microsoft\CTF\LangBar" /v "ExtraIconsOnMinimized" /t REG_
 REM 界面-任务栏-语言栏-设置语言栏的降级级别为3
 reg add "HKCU\Software\Microsoft\CTF\LangBar\ItemState{ED9D5450-EBE6-4255-8289-F8A31E687228}" /v "DemoteLevel" /t REG_DWORD /d 3 /f
 
-REM 界面-开始菜单-删除现有所有磁贴...
+REM 界面-开始菜单-删除现有所有磁贴
 del /q /s /f %localappdata%\Microsoft\Windows\RoamingTiles
-REM 界面-开始菜单-关闭磁贴功能及显示...
+REM 界面-开始菜单-关闭磁贴功能及显示
 reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v DisableLiveTile /t REG_DWORD /d 1 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_LargeTiles /t REG_DWORD /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProgs /t REG_DWORD /d 0 /f
@@ -1686,6 +1720,14 @@ REM 软件-输入法-显示新词热词 0 为禁用，1 为启用
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableHap" /t reg_dword /d 0 /f
 REM 软件-输入法-显示新词热词搜索的提示 0 为禁用，1 为启用
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable Hot And Popular Word Search" /t reg_dword /d 0 /f
+REM 软件-输入法-微软拼音候选词设置为9个
+reg add "HKCU\Software\Microsoft\InputMethod\Settings" /v "CandidateCount" /t REG_DWORD /d 9 /f
+REM 软件-输入法-禁用输入法切换提示
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell" /v "EnableCloudCandidate" /t REG_DWORD /d 0 /f
+REM 软件-输入法-禁用云候选词
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell" /v "EnableSwitchInputMethodHint" /t REG_DWORD /d 0 /f
+REM 软件-输入法-选项字体大小为“小”
+reg add "HKCU\Software\Microsoft\InputMethod\Settings" /v "CandidateFontSize" /t REG_DWORD /d 0 /f
 REM 软件-输入法-搜狗输入法服务禁用
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SogouSvc" /v "Start" /t reg_dword /d 3 /f
 reg add "HKLM\SYSTEM\ControlSet001\Services\SogouSvc" /v "Start" /t reg_dword /d 3 /f
@@ -1720,16 +1762,16 @@ set FILETYPES=.jpg .jpeg .png .bmp .gif .tif .tiff .ico .jfif
 
 REM 删除所有文件类型的现有关联设置
 for %%t in (%FILETYPES%) do (
-    reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /f
-    reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithProgids" /f
-    reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\UserChoice" /f
+	reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /f
+	reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithProgids" /f
+	reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\UserChoice" /f
 )
 
 REM 添加Windows照片查看器到所有这些文件类型的“建议的应用”
 for %%t in (%FILETYPES%) do (
-    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "MRUList" /t REG_SZ /d "a" /f
-    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "a" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
-    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\UserChoice" /v "Progid" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "MRUList" /t REG_SZ /d "a" /f
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "a" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\UserChoice" /v "Progid" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
 )
 REM 软件-Windows 照片查看器-保留系统默认的 Windows Photo Viewer
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "MRUList" /t REG_SZ /d "a" /f
@@ -1763,7 +1805,21 @@ REM 软件-WPS-关闭WPS Office的自动更新服务
 sc stop WPSUpdateService
 sc config WPSUpdateService start= disabled
 REM 软件-WPS-去除WPS云文档
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace{D426C8B3-0B26-4F0D-BA74-2EE212EDAC6D}" /f 
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace{D426C8B3-0B26-4F0D-BA74-2EE212EDAC6D}" /f
+::删除 WPS网盘
+reg delete "HKCR\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{7AE6DE87-C956-4B40-9C89-3D166C9841D3}" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{7AE6DE87-C956-4B40-9C89-3D166C9841D3}" /f
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{7AE6DE87-C956-4B40-9C89-3D166C9841D3}" /f
+::删除 WPS网盘
+reg delete "HKCR\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
+reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
+reg delete "HKCR\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" /va /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" /va /f
+::删除 WPS网盘
+reg delete "HKCR\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
+reg delete "HKCU\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
+reg delete "HKLM\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
 REM 软件-WPS-禁用WPS Office的启动画面
 reg add "HKCU\Software\Kingsoft\WPS\kui" /v "Startup" /t REG_DWORD /d 0 /f
 REM 软件-WPS-设置WPS Office的界面语言为英文
@@ -1816,6 +1872,24 @@ reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "Default
 REM 软件-福昕阅读器-设置福昕阅读器的图标大小为中等
 reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "ToolbarIconSize" /t REG_DWORD /d 1 /f
 
+REM 软件-服务-开始禁用并停止 wps网盘服务
+net stop wpscloudsvr
+sc config wpscloudsvr start=disabled
+::sc delete wpscloudsvr
+REM 软件-服务-开始禁用并停止并删除edge服务
+net stop MicrosoftEdgeElevationService
+sc config MicrosoftEdgeElevationService start=disabled
+sc delete MicrosoftEdgeElevationService
+net stop edgeupdate
+sc config edgeupdate start=disabled
+sc delete edgeupdate
+net stop edgeupdatem
+sc config edgeupdatem start=disabled
+sc delete edgeupdatem
+REM 软件-服务-开始禁用并停止PDF服务
+net stop FoxitPhantomPDFUpdateService
+sc config FoxitPhantomPDFUpdateService start=disabled
+
 REM 软件-软件启动项-禁用 OneDrive 同步客户端
 reg add "HKLM\Software\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSyncNGSC" /t reg_dword /d 1 /f
 REM 软件-软件启动项-删除OneDrive的启动项
@@ -1863,6 +1937,12 @@ REM 网络-设置DNS缓存负面缓存的最大TTL（生存时间）为0秒。
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" /v "maxnegativecachettl" /d 0 /t reg_dword /f
 REM 网络-启用TCP窗口缩放选项，以提高网络传输性能。
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Tcp1323Opts" /d 1 /t reg_dword /f
+REM 网络-禁用对非最佳努力流量的限制
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Psched" /v "NonBestEffortLimit" /t REG_DWORD /d 0 /f
+REM 网络-网络节流限制为14%
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "NetworkThrottlingIndex" /t REG_DWORD /d 20 /f
+REM 网络-提高系统的响应速度，减少系统在高负载时的延迟
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d 0 /f
 REM 网络-Windows 7禁用拥塞控制提供程序。这可以提高网络吞吐量
 netsh int tcp set global congestionprovider=none 2>nul
 netsh interface tcp set global congestionprovider=ctcp 2>nul
@@ -1884,6 +1964,9 @@ REM 网络-Windows10禁用ECN功能。这可以帮助解决某些网络兼容性问题
 netsh int tcp set global ecncapability=disabled 2>nul
 REM 网络-Windows10启用RFC 1323时间戳。这可以提高网络传输效率
 netsh int tcp set global timestamps=enabled 2>nul
+REM 网络-提高网络响应
+netsh int tcp set global autotuning=normal
+
 goto :eof
 
 :finish
