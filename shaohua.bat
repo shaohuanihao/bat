@@ -289,7 +289,6 @@ powercfg -h off
 powercfg -change -standby-timeout-ac 0
 powercfg -change -standby-timeout-dc 0
 del c:\hiberfil.sys /f /q 2>nul
-
 REM 硬件-驱动-win10禁止更新驱动
 reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "ExcludeWUDriversInQualityUpdate" /t reg_dword /d 1 /f
 REM 硬件-驱动-禁用启动时的完整性检查
@@ -307,8 +306,8 @@ REM 禁用动态时钟调整功能
 bcdedit /set disabledynamictick yes
 REM 启用平台定时器功能
 bcdedit /set useplatformtick yes
-REM 关闭驱动签名验证
-bcdedit /set testsigning on
+REM 关闭驱动签名验证（勿开，否则右下角会提示测试模式，除非bcdedit /set nointegritychecks on关闭提示）
+::bcdedit /set testsigning on
 REM 开启调试功能
 REM bcdedit /debug ON
 REM bcdedit /bootdebug ON
