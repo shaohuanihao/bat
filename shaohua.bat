@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240828
+set Version=20240829
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -632,10 +632,6 @@ schtasks /change /TN "Microsoft\Windows\Application Experience\Microsoft Compati
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe" /v "Debugger" /t REG_SZ /d "%windir%\System32\taskkill.exe" /f
 REM 系统-设置-禁用 Windows 更新保留的存储空间
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v "ReservedStorage" /t REG_DWORD /d 0 /f
-REM 系统-设置-禁用自动下载并安装第三方应用
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer" /v "DisableMSI" /t REG_DWORD /d 2 /f
-
-
 
 REM 系统-性能-启用 StickyKeys 功能，使用户可以轻松按下多个键
 reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v Flags /t REG_SZ /d 506 /f
