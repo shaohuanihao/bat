@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240830
+set Version=20240831
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -64,13 +64,13 @@ goto :eof
 for /F "tokens=1" %%a in ('wmic os get localdatetime ^| find "."') do (set date=%%a&set day=!date:~0,8!)&for /F "tokens=3" %%b in ('reg query "HKCR\.ShaoHua" /v "InitialSetup" 2^>nul ^| find "InitialSetup"') do (if "!day!" EQU "%%b" (goto :eof))
 REM 开启cmd_admin
 reg add "HKLM\SOFTWARE\Sysinternals" /v "PsExecAccept" /t reg_dword /d 1 /f
-reg add "HKCR\cmdfile\shell\runas\command" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
-reg add "HKCR\ConsoleHost\command\runas" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
+reg add "HKCR\cmdfile\shell\runas\command" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
+reg add "HKCR\ConsoleHost\command\runas" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\cmd.exe" /t reg_sz /d RUNASADMIN /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\cmd.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKCR\ConsoleHost\command\runas" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
+reg add "HKCR\ConsoleHost\command\runas" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\conhost.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t REG_SZ /d "PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File \"%1\"" /f
+reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t reg_sz /d "PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File \"%1\"" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 REM UAC_Installer detection(安装程序检测)_禁用
@@ -128,13 +128,13 @@ net start w32time
 w32tm /resync
 goto :eof
 :pctime_hsl
-reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\DateTime\Servers" /v 3 /t REG_SZ /d 38.40.254.250 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" /v NtpServer /t REG_SZ /d 38.40.254.250 /f
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\DateTime\Servers" /v 3 /t reg_sz /d 38.40.254.250 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" /v NtpServer /t reg_sz /d 38.40.254.250 /f
 w32tm /config /manualpeerlist:"38.40.254.250" /syncfromflags:manual /reliable:yes /update
 goto :eof
 :pctime_hsw
 reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\DateTime\Servers" /v 3 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" /v NtpServer /t REG_SZ /d "time.windows.com,0x9" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" /v NtpServer /t reg_sz /d "time.windows.com,0x9" /f
 w32tm /config /manualpeerlist:"time.windows.com" /syncfromflags:manual /reliable:yes /update
 goto :eof
 :pctime_hso
@@ -629,20 +629,20 @@ REM 系统-设置-关闭程序兼容性助手
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /d 1 /t reg_dword /f
 REM 系统-设置-禁用Microsoft兼容性评估任务
 schtasks /change /TN "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /DISABLE
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe" /v "Debugger" /t REG_SZ /d "%windir%\System32\taskkill.exe" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe" /v "Debugger" /t reg_sz /d "%windir%\System32\taskkill.exe" /f
 REM 系统-设置-禁用 Windows 更新保留的存储空间
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v "ReservedStorage" /t reg_dword /d 0 /f
 
 REM 系统-性能-启用 StickyKeys 功能，使用户可以轻松按下多个键
-reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v Flags /t REG_SZ /d 506 /f
+reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v Flags /t reg_sz /d 506 /f
 REM 系统-性能-调整键盘响应速度和频率，以提升用户的键盘输入体验
-reg add "HKCU\Control Panel\Accessibility\Keyboard Response" /v Flags /t REG_SZ /d 122 /f
+reg add "HKCU\Control Panel\Accessibility\Keyboard Response" /v Flags /t reg_sz /d 122 /f
 REM 系统-性能-启用 ToggleKeys 功能，在用户误按特定键时提供声音提示，帮助用户纠正按键错误
-reg add "HKCU\Control Panel\Accessibility\ToggleKeys" /v Flags /t REG_SZ /d 58 /f
+reg add "HKCU\Control Panel\Accessibility\ToggleKeys" /v Flags /t reg_sz /d 58 /f
 REM 系统-性能-关闭win10快速用户切换功能
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "HideFastUserSwitching" /t reg_dword /d 1 /f
 REM 系统-性能-登录windows开启数字键
-reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t "REG_SZ" /d "2" /f
+reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t "reg_sz" /d "2" /f
 reg add "HKU\.DEFAULT\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t reg_sz /d "2" /f
 REM 系统-性能-NTFS文件优化
 reg add "HKLM\SYSTEM\ControlSet001\Control\Session Manager" /v "NtfsDisableLastAccessUpdate" /d 1 /t reg_dword /f
@@ -757,6 +757,8 @@ REM 系统-远程-设置终端服务客户端的连接栏状态为始终显示。这有助于用户在使用远程桌
 reg add "HKCU\Software\Microsoft\Terminal Server Client" /v "ConnectionBarStatus" /t reg_dword /d 1 /f
 REM 系统-远程-启用终端服务客户端的连接栏固定功能。
 reg add "HKCU\Software\Microsoft\Terminal Server Client" /v "PinConnectionBar" /t reg_dword /d 1 /f
+REM 系统-远程-禁用远程注册表访问
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurePipeServers\winreg" /v "RemoteRegAccess" /t reg_dword /d 1 /f
 
 REM 系统-系统更新-禁用自动执行 Windows 升级
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v "AutoUpdate" /t reg_dword /d 2 /f
@@ -867,7 +869,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "T
 REM 界面-任务栏-始终显示菜单栏
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "AlwaysShowMenus" /t reg_dword /d 1 /f
 REM 界面-任务栏-禁用启动、关闭、最小化和最大化窗口的动画
-reg add "HKCU\Control Panel\Desktop" /v "Animation" /t REG_SZ /d "0" /f
+reg add "HKCU\Control Panel\Desktop" /v "Animation" /t reg_sz /d "0" /f
 REM 界面-任务栏-禁用Cortana按钮显示
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowCortanaButton" /d 0 /t reg_dword /f
 REM 界面-任务栏-确保禁用任务栏动画效果的默认应用
@@ -926,7 +928,7 @@ reg add "HKCU\Software\Policies\Microsoft\Windows" /v "ClearTilesOnExit" /t reg_
 REM 界面-开始菜单-关闭“突出显示新安装的程序”
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_NotifyNewApps" /t reg_dword /d 0 /f
 REM 界面-开始菜单-清理推荐项目里的入门图标
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AppKey\10" /v ShellExecute /t REG_SZ /d "control.exe" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AppKey\10" /v ShellExecute /t reg_sz /d "control.exe" /f
 REM 界面-开始菜单-禁用开始菜单的邻近追踪功能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProximity /t reg_dword /d 0 /f
 REM 界面-开始菜单-禁用开始菜单的应用推荐磁贴
@@ -943,9 +945,9 @@ reg add "HKCU\Control Panel\Desktop" /v "Win8DpiScaling" /t reg_dword /d 0 /f
 REM 界面-主题与背景-开启允许 Windows 尝试修复应用
 reg add "HKCU\Control Panel\Desktop" /v "EnablePerProcessSystemDPI" /t reg_dword /d 1 /f
 REM 界面-主题与背景-调整菜单显示速度为0毫秒，实现即点即开的效果
-reg add "HKCU\Control Panel\Desktop" /v "MenuShowDelay" /t "Reg_Sz" /d "0" /f
+reg add "HKCU\Control Panel\Desktop" /v "MenuShowDelay" /t "reg_sz" /d "0" /f
 REM 界面-主题与背景-设置窗口超窄边框
-reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v "PaddedBorderWidth" /d "-15" /t REG_SZ /f
+reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v "PaddedBorderWidth" /d "-15" /t reg_sz /f
 REM 界面-主题与背景-开启开始菜单、任务栏、操作中心和标题栏的颜色
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "ColorPrevalence" /t reg_dword /d 0 /f
 reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "ColorPrevalence" /t reg_dword /d 1 /f
@@ -964,12 +966,12 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\C
 REM 界面-主题与背景-禁用列表视图中的半透明选择效果
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewAlphaSelect" /d 0 /t reg_dword /f
 REM 界面-主题与背景-禁用拖动窗口时全屏显示
-reg add "HKCU\Control Panel\Desktop" /v "DragFullWindows" /d 0 /t REG_SZ /f
+reg add "HKCU\Control Panel\Desktop" /v "DragFullWindows" /d 0 /t reg_sz /f
 REM 界面-主题与背景-界面-主题与背景-设置字体平滑度
-reg add "HKCU\Control Panel\Desktop" /v "FontSmoothing" /d 2 /t REG_SZ /f
+reg add "HKCU\Control Panel\Desktop" /v "FontSmoothing" /d 2 /t reg_sz /f
 reg add "HKCU\Control Panel\Desktop" /v "FontSmoothingType" /t reg_dword /d 2 /f
 REM 界面-主题与背景-禁用窗口最小化和最大化时的动画效果
-reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v "MinAnimate" /d 0 /t REG_SZ /f
+reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v "MinAnimate" /d 0 /t reg_sz /f
 REM 界面-主题与背景-启用列表视图中的阴影效果
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewShadow" /d 1 /t reg_dword /f
 REM 界面-主题与背景-设置桌面窗口管理器的组合策略
@@ -979,23 +981,23 @@ reg add "HKCU\Software\Microsoft\Windows\DWM" /v "AlwaysHibernateThumbnails" /d 
 REM 界面-主题与背景-禁用系统改进用户反馈
 reg add "HKCU\Software\Microsoft\Siuf\Rules" /v "NumberOfSIUFInPeriod" /d 0 /t reg_dword /f
 REM 界面-主题与背景-调整鼠标悬停时间为0毫秒，以提高鼠标交互的响应速度
-reg add "HKCU\Control Panel\Desktop" /v "ForegroundLockTimeout" /d 0 /t REG_SZ /f
+reg add "HKCU\Control Panel\Desktop" /v "ForegroundLockTimeout" /d 0 /t reg_sz /f
 REM 界面-主题与背景-调整鼠标悬停时间为100毫秒，以使界面元素快速响应鼠标操作
-reg add "HKCU\Control Panel\Mouse" /v "MouseHoverTime" /d 100 /t REG_SZ /f
+reg add "HKCU\Control Panel\Mouse" /v "MouseHoverTime" /d 100 /t reg_sz /f
 REM 界面-主题与背景-显示设置缩放为100%(124%值为119,100%值为96)
 reg add "HKCU\Control Panel\Desktop" /v "LogPixels" /t reg_dword /d 96 /f
 REM 界面-主题与背景-设置为平铺视图
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "DefaultView" /t REG_SZ /d "Tiles" /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "DefaultView" /t reg_sz /d "Tiles" /f
 REM 界面-主题与背景-设置默认排序方式为名称
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "SortOrderIndex" /t reg_dword /d 0 /f
 REM 界面-主题与背景-设置分组依据为类型
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Grouping" /t REG_SZ /d "Type" /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Grouping" /t reg_sz /d "Type" /f
 REM 界面-主题与背景-禁用桌面图标自动排列功能、自动对齐网络、按名称排序
 reg add "HKCU\Software\Microsoft\Windows\Shell\Bags\1\Desktop" /v "FFlags" /t reg_dword /d 1075839524 /f
 REM 界面-主题与背景-修改资源管理器布局的视图模式窗格状态、文件夹设置的排序和排列顺序排序和排列顺序、组设置和窗口位置和大小的上次打开位置、窗口最大化、最小化及位置
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v ShellState /t reg_binary /d 240000003EA8000000000000000000000000000001000000130000000000000073000000 /f
 REM 界面-主题与背景-禁用视觉效果
-REM reg add "HKCU\Control Panel\Desktop" /v "VisualFX" /d "0" /t REG_SZ /f
+REM reg add "HKCU\Control Panel\Desktop" /v "VisualFX" /d "0" /t reg_sz /f
 REM 界面-主题与背景-设置视觉效果设置为极速模式0启用一些特效1最佳性能3
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /d 3 /t reg_dword /f
 
@@ -1006,11 +1008,11 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v S
 REM 界面-资源管理器-将等待空闲状态设置为 0，以在启动 Windows Explorer 时不等待空闲状态
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v WaitforIdleState /t reg_dword /d 0 /f
 REM 界面-资源管理器-鼠标关闭加速
-reg add "HKCU\Control Panel\Mouse" /v MouseSpeed /t REG_SZ /d 0 /f
+reg add "HKCU\Control Panel\Mouse" /v MouseSpeed /t reg_sz /d 0 /f
 reg add "HKCU\Control Panel\Mouse" /v MouseThreshold1 /t reg_dword /d 0 /f
 reg add "HKCU\Control Panel\Mouse" /v MouseThreshold2 /t reg_dword /d 0 /f
 REM 界面-资源管理器-关闭窗口最大化和最小化的动画
-reg add "HKCU\Control Panel\Desktop" /v "AnimateWindows" /t REG_SZ /d "0" /f
+reg add "HKCU\Control Panel\Desktop" /v "AnimateWindows" /t reg_sz /d "0" /f
 REM 界面-资源管理器-隐藏“以前的版本”标签
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v ShowPreviousVersions /t reg_dword /d 0 /f
 REM 界面-资源管理器-删除“此电脑”右侧系统盘符上方的文件夹视频
@@ -1058,10 +1060,14 @@ reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "90320780100000
 REM 界面-资源管理器-设置当前用户的资源管理器用户首选项掩码为 9032078010000000（以前是9012038010000000）
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9032078010000000" /t reg_binary /f
 
-REM 界面-应用程序-减少等待应用程序未响应的等待时间
+REM 界面-应用程序-减少等待应用程序未响应的等待时间为3秒
 reg add "HKCU\Control Panel\Desktop" /v "HungAppTimeout" /t reg_sz /d 3000 /f
-REM 界面-应用程序-减少应用程序关闭的等待时间
-reg add "HKCU\Control Panel\Desktop" /v "WaitToKillAppTimeout" /t reg_sz /d 10000 /f
+REM 界面-应用程序-减少应用程序关闭的等待时间为3秒
+reg add "HKCU\Control Panel\Desktop" /v "WaitToKillAppTimeout" /t reg_sz /d "3000" /f
+REM 界面-应用程序-减少服务关闭时的等待时间为3秒
+reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v "WaitToKillServiceTimeout" /t reg_dword /d 3000 /f
+REM 界面-应用程序-优化处理低级别钩子时的超时时间，更快的相应无相应的程序
+reg add "HKCU\Control Panel\Desktop" /v "LowLevelHooksTimeout" /t reg_dword /d 400 /f
 
 REM 界面-桌面-显示"我的电脑"图标
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" /t reg_dword /d 0 /f
@@ -1099,20 +1105,20 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "N
 REM 界面-右键菜单-禁用右键菜单的动画效果
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\MenuAnimation" /v "DefaultApplied" /d 0 /t reg_dword /f
 REM 界面-右键菜单-禁用Win11加入的新右键菜单，默认显示更多选项
-reg add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /v "ThreadingModel" /t REG_SZ /d "" /f
+reg add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /v "ThreadingModel" /t reg_sz /d "" /f
 REM 界面-右键菜单-在“此电脑”上右键点击添加“设备管理器”选项
 reg add "HKCR\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\shell\DeviceManager" /f /ve /d "设备管理器"
 reg add "HKCR\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\shell\DeviceManager" /v "HasLUAShield" /d "" /f
 reg add "HKCR\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\shell\DeviceManager\command" /f /ve /d "mmc devmgmt.msc"
 REM 界面-右键菜单-在文件上右键点击添加“管理员取得所有权限”选项
 reg add HKCR\*\shell\TakeOwnerShip /f /ve /d "管理员取得所有权限"
-reg add HKCR\*\shell\TakeOwnerShip /v HasLUAShield /t REG_SZ /d "" /f
-reg add HKCR\*\shell\TakeOwnerShip /v NoWorkingDirectory /t REG_SZ /d "" /f
+reg add HKCR\*\shell\TakeOwnerShip /v HasLUAShield /t reg_sz /d "" /f
+reg add HKCR\*\shell\TakeOwnerShip /v NoWorkingDirectory /t reg_sz /d "" /f
 reg add HKCR\*\shell\TakeOwnerShip\Command /f /ve /d "cmd.exe /c takeown /f \"%%1\" /r /d y ^&^& icacls \"%%1\" /grant administrators:F /t"
 REM 界面-右键菜单-在文件夹上右键点击添加“管理员取得所有权限”选项
 reg add HKCR\Directory\shell\TakeOwnerShip /f /ve /d "管理员取得所有权限"
-reg add HKCR\Directory\shell\TakeOwnerShip /v HasLUAShield /t REG_SZ /d "" /f
-reg add HKCR\Directory\shell\TakeOwnerShip /v NoWorkingDirectory /t REG_SZ /d "" /f
+reg add HKCR\Directory\shell\TakeOwnerShip /v HasLUAShield /t reg_sz /d "" /f
+reg add HKCR\Directory\shell\TakeOwnerShip /v NoWorkingDirectory /t reg_sz /d "" /f
 reg add HKCR\Directory\shell\TakeOwnerShip\Command /f /ve /d "cmd.exe /c takeown /f \"%%1\" /r /d y ^&^& icacls \"%%1\" /grant administrators:F /t"
 goto :eof
 
@@ -1167,7 +1173,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Ext" /v "Ignore
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Ext" /v "IgnoreFrameApprovalCheck" /t reg_dword /d 1 /f
 
 REM 软件-浏览器-IE-界面-显示菜单栏
-reg add "HKCU\Software\Microsoft\Internet Explorer\Toolbar" /v ITBarLayout /t REG_SZ /d "1" /f
+reg add "HKCU\Software\Microsoft\Internet Explorer\Toolbar" /v ITBarLayout /t reg_sz /d "1" /f
 REM 软件-浏览器-IE-界面-显示收藏夹栏
 reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v Show_Favoritesbar /t reg_dword /d 1 /f
 REM 软件-浏览器-IE-界面-显示状态栏
@@ -1177,9 +1183,9 @@ reg add "HKCU\Software\Microsoft\Internet Explorer\TabbedBrowsing" /v TabProcGro
 REM 软件-浏览器-IE-界面-去除IE右边的笑脸
 reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Restrictions" /v "NoHelpItemSendFeedback" /t reg_dword /d "1" /f
 REM 软件-浏览器-IE-界面-去除IE标题栏上的额外文字
-reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Window Title" /t REG_SZ /d "" /f
+reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Window Title" /t reg_sz /d "" /f
 REM 软件-浏览器-IE-界面-显示图片
-reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Display Inline Images" /t REG_SZ /d "yes" /f
+reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Display Inline Images" /t reg_sz /d "yes" /f
 REM 软件-浏览器-IE-界面-开启在独一行显示标签页
 reg add "HKCU\Software\Microsoft\Internet Explorer\TabbedBrowsing" /v TabProcGrowth /t reg_dword /d 0 /f
 REM 软件-浏览器-IE-界面-遇到弹出窗口时始终在新选项卡中打开弹出窗口
@@ -1191,13 +1197,13 @@ REM 软件-浏览器-IE-功能-忽略你的安全设置级别导致计算机存在安全风险。
 reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "IgnoreServerCertErrors" /t reg_dword /d 1 /f
 reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v WarnOnZoneCrossing /t reg_dword /d 0 /f
 REM 软件-浏览器-IE-功能-禁用IE在用户输入时自动推荐或完成网址和表单信息
-reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\AutoComplete" /v "Append Completion" /t "Reg_Sz" /d "no" /f
+reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\AutoComplete" /v "Append Completion" /t "reg_sz" /d "no" /f
 REM 软件-浏览器-IE-功能-禁用IE的内部网站兼容模式，确保在访问内部网站时不会自动切换到兼容模式。
 reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\BrowserEmulation" /v "IntranetCompatibilityMode" /t "reg_dword" /d "0" /f
 REM 软件-浏览器-IE-功能-在兼容性视图中显示所有网站
 reg add "HKCU\Software\Microsoft\Internet Explorer\BrowserEmulation" /v "AllSitesCompatibilityMode" /t reg_dword /d 1 /f
 REM 软件-浏览器-IE-功能-启用IE下载完成通知，弹出通知窗口提示下载完成。
-reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\Main" /v "NotifyDownloadComplete" /t REG_SZ /d "yes" /f
+reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\Main" /v "NotifyDownloadComplete" /t reg_sz /d "yes" /f
 REM 软件-浏览器-IE-功能-设置IE默认下载目录为用户桌面
 reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\Main" /v "Default Download Directory" /t "Reg_Expand_SZ" /d "%USERPROFILE%\Desktop" /f
 REM 软件-浏览器-IE-功能-关闭IE安全警报
@@ -1205,11 +1211,11 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings" /v "W
 REM 软件-浏览器-IE-功能-取消关闭浏览器自动清理记录
 reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\Privacy" /v "ClearBrowsingHistoryOnExit" /d "0" /t reg_dword /f
 REM 软件-浏览器-IE-功能-不提示我保存密码
-reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Main" /v "FormSuggest PW Ask" /t REG_SZ /d "no" /f
+reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Main" /v "FormSuggest PW Ask" /t reg_sz /d "no" /f
 REM 软件-浏览器-IE-功能-不提示密码
-reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Main" /v "FormSuggest Passwords" /t REG_SZ /d "no" /f
+reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Main" /v "FormSuggest Passwords" /t reg_sz /d "no" /f
 REM 软件-浏览器-IE-功能-不使用自动完成功能
-reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Main" /v "Use FormSuggest" /t Reg_Sz /d "no" /f
+reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Main" /v "Use FormSuggest" /t reg_sz /d "no" /f
 REM 软件-浏览器-IE-功能-设置在 Internet Explorer 中打开链接的方式
 reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Main" /v AssociationActivationMode /t reg_dword /d 0 /f
 REM 软件-浏览器-IE-功能-解锁并关闭IE自动崩溃恢复
@@ -1290,7 +1296,7 @@ REM 软件-浏览器-IE-功能-跳过首次向导
 reg add "HKCU\Software\Policies\Microsoft\Internet Explorer\Main" /v "DisableFirstRunCustomize" /t reg_dword /d 1 /f
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Main" /v "DisableFirstRunCustomize" /t reg_dword /d 1 /f
 REM 软件-浏览器-IE-功能-设置IE检查文件关联
-reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Check_Associations" /t REG_SZ /d "yes" /f
+reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Check_Associations" /t reg_sz /d "yes" /f
 REM 软件-浏览器-IE-功能-设置在新窗口或标签页中始终在Internet Explorer中打开链接
 reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v AlwaysOpenIEInNewWindow /t reg_dword /d 1 /f
 REM 软件-浏览器-IE-功能-当创建新选项卡时，始终切换到新选项卡
@@ -1338,20 +1344,20 @@ reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http
 reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\shell\open\command" /ve /d "%IE_Path32% -nohome" /f
 reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\ftp\shell\open\command" /ve /d "%IE_Path32% -nohome" /f
 REM 软件-浏览器-IE-关联-设置iexplore.exe的路径
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe" /ve /t REG_SZ /d "%IE_Path32%" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe" /ve /t reg_sz /d "%IE_Path32%" /f
 
 REM 软件-浏览器-Edge-禁用从 Internet Explorer 跳转到 Microsoft Edge 
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "RedirectSitesFromInternetExplorerPreventBHO" /t reg_dword /d 1 /f
 REM 软件-浏览器-Edge-禁用 Internet Explorer 的第三方浏览器扩展
 reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "DisableThirdPartyExtensions" /d 1 /f
 REM 软件-浏览器-Edge-禁用 Internet Explorer 在 Microsoft Edge 中打开网站的设置
-reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "InternetExplorerIntegration" /t REG_SZ /d "0" /f
+reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "InternetExplorerIntegration" /t reg_sz /d "0" /f
 REM 软件-浏览器-Edge-允许在 Internet Explorer 模式下重新加载网站
 reg add "HKCU\Software\Microsoft\Edge\InternetExplorerIntegration" /v "InternetExplorerIntegration" /t reg_dword /d 1 /f
 REM 软件-浏览器-Edge-打开 Internet Explorer 模式按钮
 reg add "HKCU\Software\Microsoft\Edge\InternetExplorerIntegration" /v "ShowIEButton" /t reg_dword /d 1 /f
 REM 软件-浏览器-Edge-禁止打开IE弹出EDGE
-reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\Main" /v "Enable Browser Extensions" /t REG_SZ /d "no" /f
+reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\Main" /v "Enable Browser Extensions" /t reg_sz /d "no" /f
 REM 软件-浏览器-Edge-阻止Microsoft Edge“首次运行”欢迎页面
 reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge" /v "PreventFirstRunPage" /t reg_dword /d 0 /f
 REM 软件-浏览器-Edge-rem 禁用IE自动跳转到Edge浏览器
@@ -1362,6 +1368,11 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v DoNotUpdateToEdgeWithCh
 REM 软件-浏览器-Edge-禁止Edge的SmartScreen
 reg add "HKCU\SOFTWARE\Microsoft\Edge\SmartScreenEnabled" /v "" /t reg_dword /d 0 /f
 reg add "HKCU\SOFTWARE\Microsoft\Edge\SmartScreenPuaEnabled" /v "" /t reg_dword /d 0 /f
+REM 软件-浏览器-Edge-禁用 SmartScreen 过滤器
+reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter" /v "Enabled" /t reg_dword /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter" /v "SendSmartScreenFilter" /t reg_dword /d 0 /f
+REM 软件-浏览器-Edge-禁用 Windows SmartScreen
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\SmartScreen" /v "Enabled" /t reg_dword /d 0 /f
 REM 软件-浏览器-Edge-关闭Adobe Flash即点即用
 reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\Security" /v "FlashClickToRunMode" /t reg_dword /d 0 /f
 REM 软件-浏览器-Edge-禁用Microsoft Edge的V9版本钓鱼网站过滤器
@@ -1408,16 +1419,16 @@ reg add "HKCU\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /t r
 reg add "HKCU\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
-reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /d "[*.]com" /t REG_SZ /f
-reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /d "[*.]net" /t REG_SZ /f
-reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "3" /d "[*.]org" /t REG_SZ /f
-reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "4" /d "[*.]cn" /t REG_SZ /f
-reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "5" /d "[*.]cc" /t REG_SZ /f
-reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /d "[*.]com" /t REG_SZ /f
-reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /d "[*.]net" /t REG_SZ /f
-reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "3" /d "[*.]org" /t REG_SZ /f
-reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "4" /d "[*.]cn" /t REG_SZ /f
-reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "5" /d "[*.]cc" /t REG_SZ /f
+reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /d "[*.]com" /t reg_sz /f
+reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /d "[*.]net" /t reg_sz /f
+reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "3" /d "[*.]org" /t reg_sz /f
+reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "4" /d "[*.]cn" /t reg_sz /f
+reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "5" /d "[*.]cc" /t reg_sz /f
+reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /d "[*.]com" /t reg_sz /f
+reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /d "[*.]net" /t reg_sz /f
+reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "3" /d "[*.]org" /t reg_sz /f
+reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "4" /d "[*.]cn" /t reg_sz /f
+reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "5" /d "[*.]cc" /t reg_sz /f
 REM 软件-浏览器-Chrome-允许这些网站上的不安全内容
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome\InsecureContentAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome\InsecureContentAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
@@ -1433,7 +1444,7 @@ reg add "HKLM\SOFTWARE\Policies\Google\Chrome\WebUsbAskForUrls" /v "2" /t reg_sz
 REM 软件-浏览器-Chrome-禁止Chrome打印页眉和页脚
 reg add "HKCU\Software\Policies\Google\Chrome" /v "PrintHeaderFooter" /t reg_dword /d 0 /f
 REM 软件-浏览器-Chrome-开启Chrome默认背景图片打印模式
-reg add "HKCU\Software\Policies\Google\Chrome" /v "PrintingBackgroundGraphicsDefault" /t REG_SZ /d "enabled" /f
+reg add "HKCU\Software\Policies\Google\Chrome" /v "PrintingBackgroundGraphicsDefault" /t reg_sz /d "enabled" /f
 
 REM 软件-驱动总裁-删除安装信息
 reg delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\DrvCeo2.0" /f
@@ -1620,77 +1631,77 @@ reg add "%IE_Domains%\hsbank.cc\*" /v "https" /t reg_dword /d "2" /f
 reg add "%IE_Domains%\hsbank.com\*" /v "http" /t reg_dword /d "2" /f
 reg add "%IE_Domains%\hsbank.com\*" /v "https" /t reg_dword /d "2" /f
 REM 软件-浏览器-IE-hsbank-增加IP到信任站点
-reg add "%IE_Ranges%\Range99" /v ":Range" /d "*" /t REG_SZ /f
-reg add "%IE_Ranges%\Range100" /v ":Range" /d "38.*" /t REG_SZ /f
+reg add "%IE_Ranges%\Range99" /v ":Range" /d "*" /t reg_sz /f
+reg add "%IE_Ranges%\Range100" /v ":Range" /d "38.*" /t reg_sz /f
 reg add "%IE_Ranges%\Range100" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range100" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range101" /v ":Range" /d "38.*.*.*" /t REG_SZ /f
+reg add "%IE_Ranges%\Range101" /v ":Range" /d "38.*.*.*" /t reg_sz /f
 reg add "%IE_Ranges%\Range101" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range101" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range102" /v ":Range" /d "38.10.68.32" /t REG_SZ /f
+reg add "%IE_Ranges%\Range102" /v ":Range" /d "38.10.68.32" /t reg_sz /f
 reg add "%IE_Ranges%\Range102" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range102" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range103" /v ":Range" /d "38.10.68.38" /t REG_SZ /f
+reg add "%IE_Ranges%\Range103" /v ":Range" /d "38.10.68.38" /t reg_sz /f
 reg add "%IE_Ranges%\Range103" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range103" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range104" /v ":Range" /d "38.19.11.176" /t REG_SZ /f
+reg add "%IE_Ranges%\Range104" /v ":Range" /d "38.19.11.176" /t reg_sz /f
 reg add "%IE_Ranges%\Range104" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range104" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range105" /v ":Range" /d "38.19.11.177" /t REG_SZ /f
+reg add "%IE_Ranges%\Range105" /v ":Range" /d "38.19.11.177" /t reg_sz /f
 reg add "%IE_Ranges%\Range105" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range105" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range106" /v ":Range" /d "38.19.13.70" /t REG_SZ /f
+reg add "%IE_Ranges%\Range106" /v ":Range" /d "38.19.13.70" /t reg_sz /f
 reg add "%IE_Ranges%\Range106" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range106" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range107" /v ":Range" /d "38.19.13.241" /t REG_SZ /f
+reg add "%IE_Ranges%\Range107" /v ":Range" /d "38.19.13.241" /t reg_sz /f
 reg add "%IE_Ranges%\Range107" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range107" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range108" /v ":Range" /d "38.19.17.80" /t REG_SZ /f
+reg add "%IE_Ranges%\Range108" /v ":Range" /d "38.19.17.80" /t reg_sz /f
 reg add "%IE_Ranges%\Range108" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range108" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range109" /v ":Range" /d "38.19.19.114" /t REG_SZ /f
+reg add "%IE_Ranges%\Range109" /v ":Range" /d "38.19.19.114" /t reg_sz /f
 reg add "%IE_Ranges%\Range109" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range109" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range110" /v ":Range" /d "38.19.19.157" /t REG_SZ /f
+reg add "%IE_Ranges%\Range110" /v ":Range" /d "38.19.19.157" /t reg_sz /f
 reg add "%IE_Ranges%\Range110" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range110" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range111" /v ":Range" /d "38.19.19.172" /t REG_SZ /f
+reg add "%IE_Ranges%\Range111" /v ":Range" /d "38.19.19.172" /t reg_sz /f
 reg add "%IE_Ranges%\Range111" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range111" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range112" /v ":Range" /d "38.19.19.240" /t REG_SZ /f
+reg add "%IE_Ranges%\Range112" /v ":Range" /d "38.19.19.240" /t reg_sz /f
 reg add "%IE_Ranges%\Range112" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range112" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range113" /v ":Range" /d "38.19.19.243" /t REG_SZ /f
+reg add "%IE_Ranges%\Range113" /v ":Range" /d "38.19.19.243" /t reg_sz /f
 reg add "%IE_Ranges%\Range113" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range113" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range114" /v ":Range" /d "38.19.19.78" /t REG_SZ /f
+reg add "%IE_Ranges%\Range114" /v ":Range" /d "38.19.19.78" /t reg_sz /f
 reg add "%IE_Ranges%\Range114" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range114" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range115" /v ":Range" /d "38.19.64.35" /t REG_SZ /f
+reg add "%IE_Ranges%\Range115" /v ":Range" /d "38.19.64.35" /t reg_sz /f
 reg add "%IE_Ranges%\Range115" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range115" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range116" /v ":Range" /d "38.19.77.104" /t REG_SZ /f
+reg add "%IE_Ranges%\Range116" /v ":Range" /d "38.19.77.104" /t reg_sz /f
 reg add "%IE_Ranges%\Range116" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range116" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range117" /v ":Range" /d "38.19.79.45" /t REG_SZ /f
+reg add "%IE_Ranges%\Range117" /v ":Range" /d "38.19.79.45" /t reg_sz /f
 reg add "%IE_Ranges%\Range117" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range117" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range118" /v ":Range" /d "38.19.79.55" /t REG_SZ /f
+reg add "%IE_Ranges%\Range118" /v ":Range" /d "38.19.79.55" /t reg_sz /f
 reg add "%IE_Ranges%\Range118" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range118" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range119" /v ":Range" /d "38.40.15.101" /t REG_SZ /f
+reg add "%IE_Ranges%\Range119" /v ":Range" /d "38.40.15.101" /t reg_sz /f
 reg add "%IE_Ranges%\Range119" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range119" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range120" /v ":Range" /d "38.19.19.52" /t REG_SZ /f
+reg add "%IE_Ranges%\Range120" /v ":Range" /d "38.19.19.52" /t reg_sz /f
 reg add "%IE_Ranges%\Range120" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range120" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range121" /v ":Range" /d "38.19.19.87" /t REG_SZ /f
+reg add "%IE_Ranges%\Range121" /v ":Range" /d "38.19.19.87" /t reg_sz /f
 reg add "%IE_Ranges%\Range121" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range121" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range122" /v ":Range" /d "38.19.16.33" /t REG_SZ /f
+reg add "%IE_Ranges%\Range122" /v ":Range" /d "38.19.16.33" /t reg_sz /f
 reg add "%IE_Ranges%\Range122" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range122" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range123" /v ":Range" /d "38.19.78.59" /t REG_SZ /f
+reg add "%IE_Ranges%\Range123" /v ":Range" /d "38.19.78.59" /t reg_sz /f
 reg add "%IE_Ranges%\Range123" /v "http" /d "2" /t reg_dword /f
 reg add "%IE_Ranges%\Range123" /v "https" /d "2" /t reg_dword /f
 goto :eof
@@ -1711,8 +1722,11 @@ for /F "tokens=1" %%a in ('wmic os get localdatetime ^| find "."') do (set date=
 goto :eof
 
 :better_rj
-REM 设置开机时输入法默认为英文（注意是否正确）
-reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "DefaultMode" /t REG_SZ /d "0" /f
+REM 软件-禁用在未分配的文件扩展名上启用文件关联WEB服务
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoInternetOpenWith" /t reg_dword /d 1 /f
+
+REM 软件-输入法-设置开机时输入法默认为英文（注意是否正确）
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "DefaultMode" /t reg_sz /d "0" /f
 REM 软件-输入法-默认语言 0 中文，1 英文
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
 REM 软件-输入法-智能模糊拼音 0 禁用，1 启用
@@ -1780,19 +1794,19 @@ for %%t in (%FILETYPES%) do (
 
 REM 添加Windows照片查看器到所有这些文件类型的“建议的应用”
 for %%t in (%FILETYPES%) do (
-	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "MRUList" /t REG_SZ /d "a" /f
-	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "a" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
-	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\UserChoice" /v "Progid" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "MRUList" /t reg_sz /d "a" /f
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "a" /t reg_sz /d "PhotoViewer.FileAssoc.Tiff" /f
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\UserChoice" /v "Progid" /t reg_sz /d "PhotoViewer.FileAssoc.Tiff" /f
 )
 REM 软件-Windows 照片查看器-保留系统默认的 Windows Photo Viewer
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "MRUList" /t REG_SZ /d "a" /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "a" /t REG_SZ /d "Windows.PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "MRUList" /t reg_sz /d "a" /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "a" /t reg_sz /d "Windows.PhotoViewer.FileAssoc.Tiff" /f
 REM 软件-Windows 照片查看器-设置 PhotoViewer.FileAssoc.Tiff 的关联
 icacls "HKCR\.tiff" /grant Administrators:F
 icacls "HKCR\PhotoViewer.FileAssoc.Tiff" /grant Administrators:F
 ftype PhotoViewer.FileAssoc.Tiff="C:\Program Files\Windows Photo Viewer\PhotoViewer.dll" "%1"
 REM 软件-Windows 照片查看器-设置 Windows Photo Viewer 为建议的应用
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\UserChoice" /v "Progid" /t REG_SZ /d "Windows.PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\UserChoice" /v "Progid" /t reg_sz /d "Windows.PhotoViewer.FileAssoc.Tiff" /f
 REM 软件-Windows 照片查看器-设置图片格式关联为 Windows Photo Viewer
 assoc .jpg=PhotoViewer.FileAssoc.Tiff
 assoc .jpeg=PhotoViewer.FileAssoc.Tiff
@@ -1836,7 +1850,7 @@ reg add "HKCU\Software\Kingsoft\WPS\kui" /v "Startup" /t reg_dword /d 0 /f
 REM 软件-WPS-设置WPS Office的界面语言为英文
 reg add "HKCU\Software\Kingsoft\WPS\kui" /v "Lang" /t reg_dword /d 2052 /f
 REM 软件-WPS-设置WPS Office的默认保存格式为docx
-reg add "HKCU\Software\Kingsoft\WPS\kxe" /v "SaveType" /t REG_SZ /d "docx" /f
+reg add "HKCU\Software\Kingsoft\WPS\kxe" /v "SaveType" /t reg_sz /d "docx" /f
 REM 软件-WPS-禁用WPS Office的广告推送
 reg add "HKCU\Software\Kingsoft\WPS\kui" /v "AdPush" /t reg_dword /d 0 /f
 REM 软件-WPS-设置WPS Office的图标大小为中等
@@ -1844,7 +1858,7 @@ reg add "HKCU\Software\Kingsoft\WPS\kui" /v "IconSize" /t reg_dword /d 1 /f
 REM 软件-WPS-禁用WPS Office的实时拼写检查
 reg add "HKCU\Software\Kingsoft\WPS\kxe" /v "AutoCheck" /t reg_dword /d 0 /f
 REM 软件-WPS-设置WPS Office的默认字体为Arial
-reg add "HKCU\Software\Kingsoft\WPS\kui" /v "FontName" /t REG_SZ /d "Arial" /f
+reg add "HKCU\Software\Kingsoft\WPS\kui" /v "FontName" /t reg_sz /d "Arial" /f
 REM 软件-WPS-设置WPS Office的默认字体大小为12
 reg add "HKCU\Software\Kingsoft\WPS\kui" /v "FontSize" /t reg_dword /d 12 /f
 
@@ -1857,7 +1871,7 @@ reg add "HKCU\Software\Microsoft\Office\16.0\Common\FileIO" /v "DisablePausedUpl
 reg add "HKCU\Software\Microsoft\Office\16.0\Common\FileIO" /v "DisableUploadFailureNotification" /t reg_dword /d 1 /f
 reg add "HKCU\Software\Microsoft\Office\16.0\Common\FileIO" /v "DisableNotificationIcon" /t reg_dword /d 1 /f
 REM 软件-Office-设置Office 16的默认保存格式为.docx
-reg add "HKCU\Software\Microsoft\Office\16.0\Common\General" /v "DefaultFormat" /t REG_SZ /d "docx" /f
+reg add "HKCU\Software\Microsoft\Office\16.0\Common\General" /v "DefaultFormat" /t reg_sz /d "docx" /f
 REM 软件-Office-禁用Office 16的欢迎屏幕
 reg add "HKCU\Software\Microsoft\Office\16.0\Common" /v "ShownFirstRunOptin" /t reg_dword /d 1 /f
 REM 软件-Office-禁用Office 16的动画效果
@@ -1877,7 +1891,7 @@ reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "PageDis
 REM 软件-福昕阅读器-禁用福昕阅读器的广告推送
 reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "ShowAdvertisement" /t reg_dword /d 0 /f
 REM 软件-福昕阅读器-设置福昕阅读器的默认字体为Arial
-reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "DefaultFontName" /t REG_SZ /d "Arial" /f
+reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "DefaultFontName" /t reg_sz /d "Arial" /f
 REM 软件-福昕阅读器-设置福昕阅读器的默认字体大小为12
 reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "DefaultFontSize" /t reg_dword /d 12 /f
 REM 软件-福昕阅读器-设置福昕阅读器的图标大小为中等
@@ -1954,29 +1968,33 @@ REM 网络-网络节流限制为14%
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "NetworkThrottlingIndex" /t reg_dword /d 20 /f
 REM 网络-提高系统的响应速度，减少系统在高负载时的延迟
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t reg_dword /d 0 /f
-REM 网络-Windows 7禁用拥塞控制提供程序。这可以提高网络吞吐量
-netsh int tcp set global congestionprovider=none 2>nul
-netsh interface tcp set global congestionprovider=ctcp 2>nul
 REM 网络-Windows 7设置烟囱卸载状态为自动。这可以提高网络传输效率
-netsh int tcp set global chimney=automatic 2>nul
+netsh interface tcp set global chimney=automatic 2>nul
 REM 网络-Windows 7启用接收方缩放状态。这可以提高多核系统的网络性能
-netsh int tcp set global rss=enabled 2>nul
+netsh interface tcp set global rss=enabled 2>nul
 REM 网络-Windows 7启用NetDMA状态。这可以提高网络数据包的处理效率
-netsh int tcp set global netdma=enabled 2>nul
+netsh interface tcp set global netdma=enabled 2>nul
 REM 网络-Windows 7启用直接缓存访问(DCA)。这可以提高网络数据包的传输效率
-netsh int tcp set global dca=enabled 2>nul
-REM 网络-Windows 7设置接收窗口自动调谐级别为受限模式。这可以帮助解决某些网络性能问题
-netsh int tcp set global autotuninglevel=restricted
+netsh interface tcp set global dca=enabled 2>nul
 REM 网络-禁用TCP启发式算法
-netsh int tcp set heuristics disabled
+netsh interface tcp set heuristics disabled
 REM 网络-Windows10在数据中心模板中启用拥塞控制提供程序。这可以提高网络吞吐量
-netsh int tcp set supplemental template=datacenter congestionprovider=ctcp 2>nul
+netsh interface tcp set supplemental template=datacenter congestionprovider=ctcp 2>nul
 REM 网络-Windows10禁用ECN功能。这可以帮助解决某些网络兼容性问题
-netsh int tcp set global ecncapability=disabled 2>nul
+netsh interface tcp set global ecncapability=disabled 2>nul
 REM 网络-Windows10启用RFC 1323时间戳。这可以提高网络传输效率
-netsh int tcp set global timestamps=enabled 2>nul
+netsh interface tcp set global timestamps=enabled 2>nul
 REM 网络-提高网络响应
-netsh int tcp set global autotuning=normal
+netsh interface tcp set global autotuning=normal
+REM 网络-禁用 TCP/IP 的 Nagle 算法
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "TcpNoDelay" /t reg_dword /d 1 /f
+REM 网络-禁用 Windows 的 QoS 数据包调度
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "EnableDeadGWDetect" /t reg_dword /d 0 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "MaxUserPort" /t reg_dword /d 65534 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "TcpTimedWaitDelay" /t reg_dword /d 30 /f
+REM 网络-关闭网络适配器的节流
+netsh interface tcp set global autotuninglevel=disabled
+netsh interface tcp set global congestionprovider=none
 goto :eof
 
 :finish
