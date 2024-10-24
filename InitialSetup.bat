@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=InitialSetup脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240728
+set Version=20241020
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -80,15 +80,15 @@ REM 删除用户和系统启动项中的所有项
 @reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /va /f
 @reg delete "HKLM\Software\Microsoft\Shared Tools\MSConfig\startupreg" /f
 REM 删除启动文件夹中的所有程序
-del /q /f "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*.*"
-del /q /f "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*.*"
+del /q /f "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*"
+del /q /f "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*"
 REM 删除所有用户的公共启动文件
-del /q /f "C:\Users\All Users\Microsoft\Windows\Start Menu\Programs\Startup\*.*"
+del /q /f "C:\Users\All Users\Microsoft\Windows\Start Menu\Programs\Startup\*"
 REM 删除 Sysprep 文件夹及其内容
-del /q /f "C:\Sysprep\*.*"
 rd /s /q "C:\Sysprep"
+del /q /f "C:\Sysprep\*"
 REM 删除用户开始菜单中的启动项
-del /q /f "%userprofile%\开始菜单\程序\启动\*.*"
+del /q /f "%userprofile%\开始菜单\程序\启动\*"
 REM 删除多余的广告文件
 rd /s /q "C:\Users\Administrator\AppData\Local\360Chrome"
 rd /s /q "C:\Users\Administrator\AppData\Local\360ChromeX"

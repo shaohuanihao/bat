@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=FixPrint½Å±¾
 set Powered=Powered by ÉÛ»ª 18900559020
-set Version=20240728
+set Version=20241020
 set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
 title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
 :start
@@ -122,18 +122,18 @@ goto end
 sc config spooler start= disabled
 net stop spooler
 net session /delete /y
-attrib %systemroot%\System32\spool\PRINTERS\*.* -R /s
-del %systemroot%\System32\spool\PRINTERS\*.* /q /s
+attrib "%systemroot%\System32\spool\PRINTERS\*" -R /s
+del "%systemroot%\System32\spool\PRINTERS\*" /q /s
 dism /online /enable-feature /featurename:Printing-Foundation-LPDPrintService /NoRestart 2>nul
 net start lpdsvc
 sc config spooler start= auto
 net start spooler
 goto end
 :office
-del /a /f /s /q "C:\Documents and Settings\%UserName%\Application Data\Microsoft\Templates\*.*"
-del /a /f /s /q "C:\Documents and Settings\Administrator\Application Data\Microsoft\Templates\*.*"
+del /a /f /s /q "C:\Documents and Settings\%UserName%\Application Data\Microsoft\Templates\*"
+del /a /f /s /q "C:\Documents and Settings\Administrator\Application Data\Microsoft\Templates\*"
 regsvr32 /u /s pintlgnt.ime
-del /f /s /q "%userprofile%\local settings\temp\*.*"
+del /f /s /q "%userprofile%\local settings\temp\*"
 del /f /s /q "%appdata%\microsoft\Templates\*.dot"
 del /f /s /q "%appdata%\microsoft\Word\Startup\*.dot"
 goto end
@@ -143,4 +143,3 @@ echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¾ÛÉ¢ÖÕÓÐÊ±¡¡ÔÙ¼ûÒàÓÐÆÚ&echo.&
 echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
 echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
 echo.¡¡Èç¹û»¹ÓÐÎÊÌâ¾Í´òÎÒµç»°°É...&timeout /t 6 >nul&exit
-

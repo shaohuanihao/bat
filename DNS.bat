@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=DNS脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240728
+set Version=20241020
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 for /f "tokens=2 delims==" %%i in ('wmic computersystem get name /value') do set PCName=%%i
@@ -32,7 +32,7 @@ if %errorlevel%==2 goto HS-Lan
 if %errorlevel%==3 goto HS-Wan
 if %errorlevel%==4 goto PC-Other
 if %errorlevel%==5 exit
-if %errorlevel%==6 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.如您想使用全部功能，请联系邵华18900559020安装最新操作系统镜像。&timeout /t 10)
+if %errorlevel%==6 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.如您想使用全部功能，请联系邵华18900559020安装最新操作系统镜像。&timeout /t 6)
 :CapsLK
 for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i"=="False" mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
 goto :eof

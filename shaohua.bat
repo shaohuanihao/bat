@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240831
+set Version=20241020
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -913,7 +913,7 @@ REM 界面-任务栏-语言栏-设置语言栏的降级级别为3
 reg add "HKCU\Software\Microsoft\CTF\LangBar\ItemState{ED9D5450-EBE6-4255-8289-F8A31E687228}" /v "DemoteLevel" /t reg_dword /d 3 /f
 
 REM 界面-开始菜单-删除现有所有磁贴
-del /q /s /f %localappdata%\Microsoft\Windows\RoamingTiles
+del /q /s /f "%localappdata%\Microsoft\Windows\RoamingTiles\*"
 REM 界面-开始菜单-关闭磁贴功能及显示
 reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v DisableLiveTile /t reg_dword /d 1 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_LargeTiles /t reg_dword /d 0 /f
@@ -2003,11 +2003,11 @@ gpupdate /force
 REM 禁用新建的“联系人”右键菜单：
 reg delete "HKCR\.contact" /f 2>nul
 REM 禁用发送到的“传真接收人”扩展菜单：
-del /f /s /q "%APPDATA%\Microsoft\Windows\SendTo\Fax Recipient.lnk" 2>nul
+del /f /q "%APPDATA%\Microsoft\Windows\SendTo\Fax Recipient.lnk" 2>nul
 REM 禁用发送到的“ZIP”扩展菜单：
-del /f /s /q "%APPDATA%\Microsoft\Windows\SendTo\Compressed (zipped) Folder.ZFSendToTarget" 2>nul
+del /f /q "%APPDATA%\Microsoft\Windows\SendTo\Compressed (zipped) Folder.ZFSendToTarget" 2>nul
 REM 禁用发送到的“邮件收件人”扩展菜单：
-del /f /s /q "%APPDATA%\Microsoft\Windows\SendTo\Mail Recipient.MAPIMail" 2>nul
+del /f /q "%APPDATA%\Microsoft\Windows\SendTo\Mail Recipient.MAPIMail" 2>nul
 call :finish%hs%
 REM 刷新桌面
 taskkill /f /im explorer.exe 2>nul
@@ -2021,12 +2021,12 @@ if exist "C:\ShaoHua\Key\FixPrint.bat" start "" mshta VBScript:Execute("Set a=Cr
 REM 垃圾清理脚本
 if exist "C:\ShaoHua\Key\ClearTemp.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\垃圾清理脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\ClearTemp.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
 REM 清理传递优化文件
-del /q /s /f %localappdata%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy
+del /q /s /f "%localappdata%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\*"
 REM 清理缩略图缓存
-del /q /s /f %localappdata%\Microsoft\Windows\Explorer
+del /q /s /f "%localappdata%\Microsoft\Windows\Explorer\*"
 REM 删除驱动文件
-del "C:\ShaoHua\Drv\Drvceo\*.*" /f /s /q 2>nul
 rd "C:\ShaoHua\Drv\Drvceo\" /s /q 2>nul
+del "C:\ShaoHua\Drv\Drvceo\*" /f /s /q 2>nul
 del /f /s /q "%USERPROFILE%\AppData\Local\Microsoft\Windows\INetCache\*"
 del /f /s /q "%USERPROFILE%\AppData\Local\Microsoft\Windows\Temporary Internet Files\*"
 del /f /s /q "%TEMP%\*"
@@ -2042,7 +2042,7 @@ echo %~dp0|findstr /i "windows" >nul && exit || (del "%~f0" & exit)
 exit
 :finish_hsl
 call :upan
-REM 显示此电脑种的打印机文件夹
+REM 显示此电脑中的打印机文件夹
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{2227A280-3AEA-1069-A2DE-08002B30309D}" /ve /f
 del "C:\users\public\desktop\书生电子公文系统7.4.2.lnk" /q /f 2>nul
 del "C:\users\public\desktop\Sursen Maker 2.0.lnk" /q /f 2>nul
@@ -2065,9 +2065,12 @@ del /f /s /q "%local%\*oem7*" 2>nul
 del /f /s /q "%local%\*office2007*" 2>nul
 del /f /s /q "%local%\tools\*dns*" 2>nul
 del /f /s /q "%local%\tools\*Share*" 2>nul
+del /f /s /q "%local%\Soft\*inst*" 2>nul
+del /f /s /q "%local%\Soft\*lva_*" 2>nul
+del /f /s /q "%local%\Soft\*WeChat*" 2>nul
 del /f /s /q "%systemdrive%\sysprep\*" 2>nul
-del "C:\ShaoHua\Drv\Drvceo\*.*" /f /s /q 2>nul
 rd "C:\ShaoHua\Drv\Drvceo\" /s /q 2>nul
+del "C:\ShaoHua\Drv\Drvceo\*" /f /s /q 2>nul
 goto :eof
 :finish_hsw
 call :finish_hso
@@ -2086,8 +2089,8 @@ reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\N
 if "%hs%"=="_hsf" goto :eof
 del "C:\Windows\System32\UCli.exe" /f /s /q 2>nul
 del "C:\Windows\System32\config.ini" /f /s /q 2>nul
-del "C:\windows\Hsbank\*.*" /f /s /q 2>nul
 rd "C:\shaohua\Hsbank\" /s /q 2>nul
+del "C:\windows\Hsbank\*" /f /s /q 2>nul
 del "%USERPROFILE%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
 del "%PUBLIC%%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
 rd "%ProgramFiles%\360\360ent" /s /q 2>nul

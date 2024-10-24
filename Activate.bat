@@ -9,26 +9,26 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=Activate脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20240728
+set Version=20241020
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
 call :CapsLK
-cls&echo.&echo.　请选择您当前电脑是徽行马鞍山地区的内网还是外网？&echo.&echo.　请手动输入！不要乱选！&echo.&echo.　　输入 A 选择为 【自动　判断】（10秒后默认执行）&echo.　　输入 L 选择为 【HS-Lan内网】&echo.　　输入 W 选择为 【HS-Wan外网】&echo.&echo.　高级选项：&echo.&echo.　　输入 E 转换到 【Enterprise企业版】&echo.　　输入 P 转换到 【Professional专业版】&echo.&echo.　　输入 Q 脚本将 【退出】&echo.&echo.　请输入：&choice /T 10 /C ALWPEQS /d A /N >nul 2>nul
+cls&echo.&echo.　请选择您当前电脑是徽行马鞍山地区的内网还是外网？&echo.&echo.　请手动输入！不要乱选！&echo.&echo.　　输入 A 选择为 【自动　判断】（10秒后默认执行）&echo.　　输入 L 选择为 【HS-Lan内网】&echo.　　输入 W 选择为 【HS-Wan外网】&echo.&echo.　高级选项：&echo.&echo.　　输入 E 转换到 【Enterprise企业版】&echo.　　输入 P 转换到 【Professional专业版】&echo.&echo.　　输入 Q 脚本将 【退出】&echo.&echo.　请输入：&choice /T 6 /C ALWPEQS /d A /N >nul 2>nul
 if %errorlevel%==1 goto spc
 if %errorlevel%==2 goto HS-Lan
 if %errorlevel%==3 goto HS-Wan
 if %errorlevel%==4 goto top
 if %errorlevel%==5 goto toe
 if %errorlevel%==6 exit
-if %errorlevel%==7 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.如您想使用全部功能，请联系邵华18900559020安装最新操作系统镜像。&&timeout /t 10)
+if %errorlevel%==7 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.如您想使用全部功能，请联系邵华18900559020安装最新操作系统镜像。&&timeout /t 6)
 :CapsLK
 for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i"=="False" mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
 goto :eof
 :spc
 set osi=&set wsi=&arp -a|findstr /i "38.40." >nul && (set Pc=HS-Lan&goto HS-Lan)||(arp -a|findstr /i "38.41." >nul && (set Pc=HS-Lan&goto HS-Lan)||(arp -a|findstr /i "10.198." >nul && (set Pc=HS-Wan&goto HS-Wan)||(set Pc=PC-Other&cls&echo.&echo.　根据您的电脑特征，无法判断您是内网还是外网，5秒后返回菜单&timeout /t 5&goto start)))
 :HS-Lan
-title %Pc% ★ %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%&set osi=38.19.14.203&set wsi=38.19.14.202&goto osi
+title %Pc% ★ %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%&set osi=38.10.112.101&set wsi=38.10.112.100&goto osi
 :HS-Wan
 title %Pc% ★ %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%&set osi=60.16.12.38&set wsi=60.16.12.38&goto osi
 :toe

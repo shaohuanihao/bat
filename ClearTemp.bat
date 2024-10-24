@@ -1,13 +1,15 @@
 ÿþa
 cls
 @echo off
+ver|findstr /i "5\.1\." > nul&&(goto:begin)
+net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
 :begin
 @echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=ClearTemp½Å±¾
 set Powered=Powered by ÉÛ»ª 18900559020
-set Version=20240928
+set Version=20241020
 set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
 title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
 :start
@@ -16,15 +18,15 @@ call :CapsLK
 cls&for /f "tokens=2 delims=()" %%i in ('fsutil volume diskfree c:^|find /i "¿ÉÓÃ"') do set myvar=%%i&cls&echo.
 echo.¡¡µ±Ç°CÅÌ¿ÉÓÃÈÝÁ¿Îª%myvar%¡£&echo.
 echo.¡¡¡¡¡¾ E ¡¿¿ªÆô×ÔÆô¶¯¡¡ ¡¾ D ¡¿¹Ø±Õ×ÔÆô¶¯¡¡ ¡¾ A Ä¬ÈÏ¡¿×Ô¶¯»¯ÏÂÁÐ²Ù×÷¡¡ ¡¾ U ¡¿¸üÐÂ½Å±¾¡¡ ¡¾ Q ¡¿ÍË³ö½Å±¾&echo.
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡a1): Ç¿ÖÆ¹Ø±Õ Î¢ÐÅ ½ø³Ì
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡a2): Ç¿ÖÆ¹Ø±Õ ¸÷ÖÖÖ÷Á÷ä¯ÀÀÆ÷ ½ø³Ì
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡a3): ÇåÀí Î¢ÐÅ ×Ô¶¯±£´æµÄ ÎÄµµ ^& Í¼Æ¬ ^& ÊÓÆµ ^& ÁÄÌì¼ÇÂ¼ Ò»ÇÐ ÎÄ¼þ
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡a4): ÇåÀí ÏµÍ³ Temp ÁÙÊ± ÎÄ¼þ
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡a5): ÇåÀí ´òÓ¡×Ô¶¯±£´æ¼ÇÂ¼ ÎÄ¼þ
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡a6): ÇåÀí ¸÷ÖÖÖ÷Á÷ä¯ÀÀÆ÷ »º´æ ÎÄ¼þ
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡a7): ÇåÀí Windows Éý¼¶ÁÙÊ± ÎÄ¼þ
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡a8): ÇåÀí ÏµÍ³À¬»ø¸ñÊ½¼°¼ÇÂ¼ÎÄ¼þ ÎÄ¼þ
-echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡a9): Æô¶¯ ´ÅÅÌÇåÀí³ÌÐò ×Ô¶¯ÇåÀí&echo.
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡A1): Ç¿ÖÆ¹Ø±Õ Î¢ÐÅ ½ø³Ì
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡A2): Ç¿ÖÆ¹Ø±Õ ¸÷ÖÖÖ÷Á÷ä¯ÀÀÆ÷ ½ø³Ì
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡A3): ÇåÀí Î¢ÐÅ ×Ô¶¯±£´æµÄ ÎÄµµ ^& Í¼Æ¬ ^& ÊÓÆµ ^& ÁÄÌì¼ÇÂ¼ Ò»ÇÐ ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡A4): ÇåÀí ÏµÍ³ Temp ÁÙÊ± ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡A5): ÇåÀí ´òÓ¡×Ô¶¯±£´æ¼ÇÂ¼ ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡A6): ÇåÀí ¸÷ÖÖÖ÷Á÷ä¯ÀÀÆ÷ »º´æ ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡A7): ÇåÀí Windows Éý¼¶ÁÙÊ± ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡A8): ÇåÀí ÏµÍ³À¬»ø¸ñÊ½¼°¼ÇÂ¼ÎÄ¼þ ÎÄ¼þ
+echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡A9): Æô¶¯ ´ÅÅÌÇåÀí³ÌÐò ×Ô¶¯ÇåÀí&echo.
 echo.¡¡À¬»øÇåÀíËÙ¶ÈÈ¡¾öÓÚÖÚ¶àÒòËØ£ºÓ²ÅÌµÄ¶ÁÐ´ËÙ¶È¡¢CPU¼°ÄÚ´æµÄÕ¼ÓÃ¡¢µçÄÔÎÄ¼þµÄÊýÁ¿¡¢É±¶¾¼°¹Ü¿ØÈí¼þµÄºóÌ¨¼à¿ØµÈ¡­&echo.
 echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡%Version%¡¡ÉÛ»ª¡¡18900559020
 choice /T 6 /C EDAUQ /d A /n /m "¡¡½Å±¾6ÃëºóÄ¬ÈÏÑ¡A£¬ÇëÑ¡Ôñ£º"
@@ -86,9 +88,9 @@ if %errorlevel%==2 goto :eof
 call :tishi
 for /f "tokens=1,2,*" %%i in ('REG QUERY HKCU\Software\Tencent\WeChat /v FileSavePath') do set "regvalue=%%k"
 if defined regvalue (
-    del /f /s /q "%regvalue%\WeChat Files\*.*"
+    del /f /s /q "%regvalue%\WeChat Files\*"
 )
-del /f /s /q "%userprofile%\Documents\WeChat Files\*.*" 2>nul
+del /f /s /q "%userprofile%\Documents\WeChat Files\*" 2>nul
 goto :eof
 :l4
 rem Clear temp and temp cache directories
@@ -106,7 +108,7 @@ cls&echo.&echo.¡¡ÊÇ·ñÈ·ÈÏÇå³ý¡¡¡¾´òÓ¡×Ô¶¯±£´æ¼ÇÂ¼ÎÄ¼þ¡¿¡¡£¿
 call :xuanze
 if %errorlevel%==2 goto :eof
 call :tishi
-del /f /s /q "C:\Windows\System32\spool\PRINTERS\*.*"
+del /f /s /q "C:\Windows\System32\spool\PRINTERS\*"
 goto :eof
 :l6
 rem Delete browser cache files
@@ -114,30 +116,30 @@ cls&echo.&echo.¡¡ÊÇ·ñÈ·ÈÏÇå³ý¡¡¡¾Internet Explorer ^& 360XX ^& Google Chrome ^& 
 call :xuanze
 if %errorlevel%==2 goto :eof
 call :tishi
-del /f /s /q "%userprofile%\AppData\Local\Microsoft\Windows\INetCache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\Google\Chrome\User Data\Default\Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\Google\User Data\Default\Media Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\360Chrome\User Data\Default\Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\360Chrome\User Data\Default\Media Cache\*.*"
-del /f /s /q "%userprofile%\AppData\roaming\360se\User Data\Default\Cache\*.*"
-del /f /s /q "%userprofile%\AppData\roaming\360se\User Data\Default\Media Cache\*.*"
-del /f /s /q "%userprofile%\AppData\roaming\360se6\User Data\Default\Cache\*.*"
-del /f /s /q "%userprofile%\AppData\roaming\360se6\User Data\Default\Media Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\360EntBrowser\User Data\Default\Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\360EntBrowser\User Data\Default\Media Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\360ChromeExt\User Data\Default\Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\360ChromeExt\User Data\Default\Media Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\360SafeBrowser\User Data\Default\Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\360SafeBrowser\User Data\Default\Media Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\360SpeedBrowser\User Data\Default\Cache\*.*"  
-del /f /s /q "%userprofile%\AppData\Local\360SpeedBrowser\User Data\Default\Media Cache\*.*"  
-del /f /s /q "%userprofile%\AppData\Local\360SecureBrowser\User Data\Default\Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\360SecureBrowser\User Data\Default\Media Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\Microsoft\Edge\User Data\Default\Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\Microsoft\Edge\User Data\Default\Cache\*.*"
-del /f /s /q "%userprofile%\AppData\Local\Microsoft\Edge\User Data\Default\Media Cache\*.*"
-del /f /s /q "%appdata%\Mozilla\Firefox\Profiles\*\cache2\entries\*.*"
-del /f /s /q "%appdata%\Opera Software\Opera Stable\Cache\*.*"
+del /f /s /q "%userprofile%\AppData\Local\Microsoft\Windows\INetCache\*"
+del /f /s /q "%userprofile%\AppData\Local\Google\Chrome\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\Google\User Data\Default\Media Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360Chrome\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360Chrome\User Data\Default\Media Cache\*"
+del /f /s /q "%userprofile%\AppData\roaming\360se\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\roaming\360se\User Data\Default\Media Cache\*"
+del /f /s /q "%userprofile%\AppData\roaming\360se6\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\roaming\360se6\User Data\Default\Media Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360EntBrowser\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360EntBrowser\User Data\Default\Media Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360ChromeExt\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360ChromeExt\User Data\Default\Media Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360SafeBrowser\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360SafeBrowser\User Data\Default\Media Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360SpeedBrowser\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360SpeedBrowser\User Data\Default\Media Cache\*"  
+del /f /s /q "%userprofile%\AppData\Local\360SecureBrowser\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\360SecureBrowser\User Data\Default\Media Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\Microsoft\Edge\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\Microsoft\Edge\User Data\Default\Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\Microsoft\Edge\User Data\Default\Media Cache\*"
+del /f /s /q "%appdata%\Mozilla\Firefox\Profiles\*\cache2\entries\*"
+del /f /s /q "%appdata%\Opera Software\Opera Stable\Cache\*"
 del /f /s /q "%userprofile%\Library\Caches\com.apple.Safari\Cache.db"
 goto :eof
 :l7
@@ -169,17 +171,17 @@ rem del /f /s /q %systemdrive%\*.chk
 rem ÁÙÊ±±¸·ÝÎÄ¼þ
 rem del /f /s /q %systemdrive%\*.old
 rem »ØÊÕÕ¾ÎÄ¼þ
-del /f /s /q %systemdrive%\recycled\*.*
+del /f /s /q "%systemdrive%\recycled\*"
 rem ±¸·ÝÎÄ¼þ
 rem del /f /s /q %windir%\*.bak
 rem Ô¤¶ÁÎÄ¼þ
 rem del /f /s /q %windir%\prefetch\*.*
 rem ÁÙÊ±Ä¿Â¼
-del /f /s /q %windir%\temp\*.*
+del /f /s /q "%windir%\temp\*"
 rem ×î½ü·ÃÎÊÎÄ¼þµÄ¼ÍÂ¼
-del /f /s /q %userprofile%\recent\*.*
-del /f /s /q "%userprofile%\Local Settings\Temporary Internet Files\*.*"
-del /f /s /q "%userprofile%\Local Settings\Temp\*.*"
+del /f /s /q "%userprofile%\recent\*"
+del /f /s /q "%userprofile%\Local Settings\Temporary Internet Files\*"
+del /f /s /q "%userprofile%\Local Settings\Temp\*"
 goto :eof
 :l9
 rem Run disk cleanup tool by Sageset id 60
@@ -192,6 +194,7 @@ rem Cleanmgr.exe /sagerun:60
 start "" cleanmgr.exe /VERYLOWDISK
 goto :eof
 :enable
+if not exist "C:\ShaoHua\Key\ClearTemp.bat" copy /Y "%~f0" "C:\ShaoHua\Key\ClearTemp.bat" >nul
 schtasks /create /tn "ClearTemp" /tr "C:\ShaoHua\Key\ClearTemp.bat" /sc onlogon /ru "%username%" /rl highest /f >nul 2>&1
 echo.&echo.¡¡[¿ªÆô×ÔÆô¶¯]¡¡²Ù×÷Íê³É...¡¡½Å±¾¼´½«·µ»ØÖ÷²Ëµ¥...&timeout /t 3 >nul&goto :start
 :disable
