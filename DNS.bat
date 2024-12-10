@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=DNS脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20241020
+set Version=20241209
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 for /f "tokens=2 delims==" %%i in ('wmic computersystem get name /value') do set PCName=%%i
@@ -18,7 +18,7 @@ call :CapsLK
 cls
 echo.
 echo.　请选择您当前电脑　【%PCName%】　是　内网　还是　外网　？&echo.&echo.
-echo.　　　　　　　　　　　　输入　A　选择为　【自动　判断】　（10秒后默认执行）&echo.
+echo.　　　　　　　　　　　　输入　A　选择为　【自动　判断】　（6秒后默认执行）&echo.
 echo.　　　　　　　　　　　　输入　L　选择为　【HS-Lan内网】&echo.
 echo.　　　　　　　　　　　　输入　W　选择为　【HS-Wan外网】&echo.
 echo.　　　　　　　　　　　　输入　O　选择为　【PC-Other其他】&echo.
@@ -67,28 +67,26 @@ set Pc=&arp -a|findstr /i "38.40." >nul && (set Pc=HS-Lan)||(arp -a|findstr /i "
 goto :eof
 :const
 set wangka1=本地连接&set wangka2=本地连接 2&set wangka3=以太网&set wangka4=以太网 2&set wangka5=以太网 3
-set HS-Lan1=38.19.64.129&set HS-Lan2=38.16.36.8&set HS-Lan3=38.19.18.10&set HS-Lan4=38.16.68.8&set HS-Lan5=38.19.17.240
-set HS-Wan1=61.132.163.68&set HS-Wan2=218.104.78.2&set HS-Wan3=202.102.192.68&set HS-Wan4=202.102.199.68&set HS-Wan5=58.242.2.2
+set HS-Lan1=38.19.64.129&set HS-Lan2=38.16.36.8&set HS-Lan3=38.19.18.10&set HS-Lan4=38.16.68.8
+set HS-Wan1=61.132.163.68&set HS-Wan2=218.104.78.2
 set add1=netsh interface ipv4 add dnsservers "
 set add3=" address="
 set add5=" index="
 set add7=" validate=no 2>nul
 goto :eof
 :del
-netsh interface ipv4 delete dnsservers "%wangka1%" all 2>nul
-netsh interface ipv4 delete dnsservers "%wangka2%" all 2>nul
-netsh interface ipv4 delete dnsservers "%wangka3%" all 2>nul
-netsh interface ipv4 delete dnsservers "%wangka4%" all 2>nul
+for %%i in ("%wangka1%" "%wangka2%" "%wangka3%" "%wangka4%" "%wangka5%") do (netsh interface ipv4 delete dnsservers %%i all >nul 2>nul)
 goto :eof
 :add
 set Ano=1&set Bno=1
 :SetA
-if "%Ano%"=="6" goto ex
+if "%Ano%"=="5" goto ex
 call set wangka=%%wangka%Ano%%%
 :SetB
-if "%Bno%"=="6" goto SetbBEnd
+if "%Bno%"=="5" goto SetbBEnd
 call set net=%%%Pc%%Bno%%%
-%add1%%wangka%%add3%%net%%add5%%Bno%%add7%
+%add1%%wangka%%add3%%net%%add5%%Bno%%add7% >nul 2>nul
+if !errorlevel! equ 0 echo 成功设置: 网卡=!wangka! DNS=!net!
 set /a Bno=%Bno%+1
 goto SetB
 :SetbBEnd

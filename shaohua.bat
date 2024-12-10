@@ -1773,8 +1773,10 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "N
 
 REM 软件-输入法-设置开机时输入法默认为英文（注意是否正确）
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "DefaultMode" /t reg_sz /d "0" /f
+reg add "HKLM\Software\Microsoft\InputMethod\Settings\CHS" /v "DefaultMode" /t reg_sz /d "0" /f
 REM 软件-输入法-默认语言 0 中文，1 英文
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
+reg add "HKLM\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
 REM 软件-输入法-智能模糊拼音 0 禁用，1 启用
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableSmartFuzzyPinyin" /t reg_dword /d 1 /f
 REM 软件-输入法-模糊拼音 0 禁用，1 启用
@@ -2088,6 +2090,10 @@ echo %~dp0|findstr /i "windows" >nul && exit || (del "%~f0" & exit)
 exit
 :finish_hsl
 call :upan
+REM 修改外网chrome首页
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v HomepageLocation /t REG_SZ /d "http://38.40.18.180" /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v HomepageIsNewTabPage /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v ShowHomeButton /t REG_DWORD /d 1 /f
 REM 显示此电脑中的打印机文件夹
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{2227A280-3AEA-1069-A2DE-08002B30309D}" /ve /f
 del "C:\users\public\desktop\书生电子公文系统7.4.2.lnk" /q /f 2>nul
@@ -2095,6 +2101,12 @@ del "C:\users\public\desktop\Sursen Maker 2.0.lnk" /q /f 2>nul
 del "C:\users\public\desktop\SursenOfdMaker.lnk" /q /f 2>nul
 del "C:\shaohua\soft\WeChatSetup.exe" /q /f 2>nul
 del "C:\shaohua\soft\ThunderSpeed.exe" /q /f 2>nul
+del "C:\shaohua\soft\assist.exe" /q /f 2>nul
+del "C:\shaohua\soft\HSebankClient.exe" /q /f 2>nul
+del "C:\shaohua\soft\PowerShadow_8.5.exe" /q /f 2>nul
+del "C:\shaohua\soft\windows生产外网V5.4.1.exe" /q /f 2>nul
+del "C:\shaohua\soft\离线安装包20241206-外网Windows.exe" /q /f 2>nul
+del "C:\shaohua\soft\lva_setupfull_20241205174952.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Key\*.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Office修复工具\Office启动一键修复.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Office修复工具\打印任务一键清除.exe" /q /f 2>nul
@@ -2123,6 +2135,10 @@ call :finish_hso
 call :upan
 REM 显示此电脑种的打印机文件夹
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{2227A280-3AEA-1069-A2DE-08002B30309D}" /ve /f
+REM 修改外网chrome首页
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v HomepageLocation /t REG_SZ /d "http://www.baidu.com" /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v HomepageIsNewTabPage /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v ShowHomeButton /t REG_DWORD /d 1 /f
 goto :eof
 :finish_hso
 REM 永久暂停Windows自动更新
@@ -2138,7 +2154,7 @@ del "C:\Windows\System32\config.ini" /f /q 2>nul
 rd "C:\shaohua\Hsbank\" /s /q 2>nul
 del "C:\windows\Hsbank\*" /f /s /q 2>nul
 del "%USERPROFILE%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
-del "%PUBLIC%%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
+del "%PUBLIC%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
 rd "%ProgramFiles%\360\360ent" /s /q 2>nul
 goto :eof
 :finish_hsf

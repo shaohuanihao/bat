@@ -1,0 +1,83 @@
+ÿþa
+cls
+@echo off
+ver|findstr /i "5\.1\." > nul&&(goto:begin)
+net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+:begin
+@echo off
+cls
+disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
+set Name=SafeLoad
+set Powered=Powered by ÉÛ»ª 18900559020
+set Version=20241209
+set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
+title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+:start
+call :CapsLK
+call :fix
+call :patch
+echo.&echo.¡¡ÕýÔÚ¼ì²é·þÎñÆ÷Í¨Ñ¶¡­&echo.
+call :ping
+choice /T 1 /C SH /d H /N >nul 2>nul
+if %errorlevel%==1 call :input
+call :down
+call :run
+exit
+
+:CapsLK
+for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i"=="False" mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
+goto :eof
+
+:fix
+echo.&echo.¡¡ÕýÔÚ¼ì²éÏµÍ³»·¾³¡­&echo.
+schtasks /delete /tn "%Name%" /f >nul 2>nul
+schtasks /create /tn "%Name%" /tr "C:\ShaoHua\Key\%Name%.bat" /sc ONLOGON /ru "Administrator" /rl highest /f >nul 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoDrives" /t REG_DWORD /d 8 /f >nul 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoViewOnDrive /t REG_DWORD /d 8 /f >nul 2>nul
+powershell -Command "Stop-Process -Name explorer -Force"
+goto :eof
+
+:patch
+set server=10.198.78.78
+set no=0
+set pingmax=10
+set local=D:\SH\
+set s_bat=http://%server%/Safe.bat
+set l_bat=%local%Key\Safe.bat
+set s_ps=http://%server%/Safe.ps1
+set l_ps=%local%Key\Safe.ps1
+goto :eof
+
+:ping
+ping -n 1 %server% > nul && (goto :eof) || (set /a no+=1 & if %no% geq %pingmax% (goto :run) else (echo.µÚ%no%´Î³¢ÊÔ... & timeout /t 1 > nul & goto :ping))
+goto :eof
+
+:down
+echo.&echo.¡¡ÕýÔÚ³¢ÊÔ¸üÐÂ·þÎñ¶Ë×îÐÂÎÄ¼þ¡­&echo.
+if not exist "%local%key" (mkdir "%local%key") >nul 2>nul
+for /f "delims=" %%a in ('curl -# -L -o NUL "%s_bat%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_bat_status=%%a) >nul 2>nul
+for /f "delims=" %%b in ('curl -# -L -o NUL "%s_ps%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_ps_status=%%b) >nul 2>nul
+if "%s_bat_status%"=="200" (curl -s -S -L -o "%l_bat%" --progress-bar --max-time 3 %s_bat% ) else (echo.ÏÂÔØÊ§°Ü£¬HTTP ×´Ì¬Âë£º%s_bat_status%) >nul 2>nul
+if "%s_ps_status%"=="200" (curl -s -S -L -o "%l_ps%" --progress-bar --max-time 3 %s_ps% ) else (echo.ÏÂÔØÊ§°Ü£¬HTTP ×´Ì¬Âë£º%s_ps_status%) >nul 2>nul
+goto :eof
+
+:run
+echo.&echo.¡¡ÊÇ·ñÇåÀíÏµÍ³À¬»øÎÄ¼þ£¿Ä¬ÈÏN£¨²»ÇåÀí£©£¬3Ãëºó×Ô¶¯Ìø¹ý¡£&echo.
+choice /T 3 /C YN /d N
+if %errorlevel%==1 if exist "%l_bat%" (start "" "%l_bat%")
+if %errorlevel%==0 exit
+exit
+
+:input
+set /p input=""
+if "%input%"=="disable" (schtasks /delete /tn "%Name%" /f)
+if "%input%"=="shaohua" (goto :safe) else (goto :eof)
+goto :eof
+
+:safe
+schtasks /delete /tn "%Name%" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoDrives" /f >nul 2>nul
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoViewOnDrive" /f >nul 2>nul
+powershell -Command "Stop-Process -Name explorer -Force"
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoViewOnDrive" /f >nul 2>nul
+exit

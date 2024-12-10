@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=ClearTemp脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20241020
+set Version=20241210
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -17,7 +17,7 @@ set userInput=
 call :CapsLK
 cls&for /f "tokens=2 delims=()" %%i in ('fsutil volume diskfree c:^|find /i "可用"') do set myvar=%%i&cls&echo.
 echo.　当前C盘可用容量为%myvar%。&echo.
-echo.　　【 E 】开启自启动　 【 D 】关闭自启动　 【 A 默认】自动化下列操作　 【 U 】更新脚本　 【 Q 】退出脚本&echo.
+echo.　　【 A 默认】自动化下列操作　　　　　 【 C 】定向清理　　　　　 【 U 】更新脚本　　　　　 【 Q 】退出脚本&echo.
 echo.　　　　　　　A1): 强制关闭 微信 进程
 echo.　　　　　　　A2): 强制关闭 各种主流浏览器 进程
 echo.　　　　　　　A3): 清理 微信 自动保存的 文档 ^& 图片 ^& 视频 ^& 聊天记录 一切 文件
@@ -29,12 +29,11 @@ echo.　　　　　　　A8): 清理 系统垃圾格式及记录文件 文件
 echo.　　　　　　　A9): 启动 磁盘清理程序 自动清理&echo.
 echo.　垃圾清理速度取决于众多因素：硬盘的读写速度、CPU及内存的占用、电脑文件的数量、杀毒及管控软件的后台监控等…&echo.
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　%Version%　邵华　18900559020
-choice /T 6 /C EDAUQ /d A /n /m "　脚本6秒后默认选A，请选择："
-if %errorlevel%==1 goto :enable
-if %errorlevel%==2 goto :disable
-if %errorlevel%==3 goto :auto
-if %errorlevel%==4 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.缺少核心文件，如您想使用全部功能，请联系邵华18900559020。&&timeout /t 6)
-if %errorlevel%==5 exit
+choice /T 6 /C ACUQ /d A /n /m "　脚本6秒后默认选A，请选择："
+if %errorlevel%==1 goto :auto
+if %errorlevel%==2 goto :clear
+if %errorlevel%==3 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.缺少核心文件，如您想使用全部功能，请联系邵华18900559020。&&timeout /t 6)
+if %errorlevel%==4 exit
 :auto
 cls&echo.&echo.　自动清理中，请稍后...&echo.
 call :l1
@@ -193,13 +192,9 @@ rem Cleanmgr.exe /sageset:60
 rem Cleanmgr.exe /sagerun:60
 start "" cleanmgr.exe /VERYLOWDISK
 goto :eof
-:enable
-if not exist "C:\ShaoHua\Key\ClearTemp.bat" copy /Y "%~f0" "C:\ShaoHua\Key\ClearTemp.bat" >nul
-schtasks /create /tn "ClearTemp" /tr "C:\ShaoHua\Key\ClearTemp.bat" /sc onlogon /ru "%username%" /rl highest /f >nul 2>&1
-echo.&echo.　[开启自启动]　操作完成...　脚本即将返回主菜单...&timeout /t 3 >nul&goto :start
-:disable
-schtasks /delete /tn "ClearTemp" /f >nul 2>&1
-echo.&echo.　[关闭自启动]　操作完成...　脚本即将返回主菜单...&timeout /t 3 >nul&goto :start
+:clear
+if exist "D:\SH\Key\safe.bat" call "D:\SH\Key\safe.bat" 2>nul
+echo.&echo.　[定向清理]　操作完成...　脚本即将返回主菜单...&timeout /t 3 >nul&goto :start
 :xuanze
 echo.&echo.　按【Y】继续，按【N】跳过。&echo.&echo.　请确认！&echo.&echo.　3秒后，将视为Y继续。
 choice /T 3 /C YN /d Y /N >nul 2>nul
