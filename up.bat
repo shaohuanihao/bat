@@ -88,13 +88,14 @@ set softwan=/%soft%
 echo.%softwan%
 set softother=/bat/raw/main/%soft%
 echo.%softother%
-pause
 call :make
 call :net
 del /f /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
 curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
 echo.%local%\Key\%soft%111111111111
+echo.%net%
+pause
 goto :eof
 :list5
 rem DNS
@@ -111,6 +112,8 @@ del /f /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
 curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
 echo.%local%\Key\%soft%22222222
+echo.%net%
+pause
 goto :eof
 :list6
 rem EnableRDC
