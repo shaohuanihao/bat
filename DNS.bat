@@ -7,9 +7,9 @@ net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
 @echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
-set Name=DNS脚本
+set Name=DNS
 set Powered=Powered by 邵华 18900559020
-set Version=20241209
+set Version=20241226
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 for /f "tokens=2 delims==" %%i in ('wmic computersystem get name /value') do set PCName=%%i
@@ -86,7 +86,7 @@ call set wangka=%%wangka%Ano%%%
 if "%Bno%"=="5" goto SetbBEnd
 call set net=%%%Pc%%Bno%%%
 %add1%%wangka%%add3%%net%%add5%%Bno%%add7% >nul 2>nul
-if !errorlevel! equ 0 echo 成功设置: 网卡=!wangka! DNS=!net!
+if !errorlevel! equ 0 echo. & echo 成功设置: 网卡=!wangka! DNS=!net! 
 set /a Bno=%Bno%+1
 goto SetB
 :SetbBEnd
@@ -96,9 +96,10 @@ goto SetA
 :ex
 goto :eof
 :exit
+timeout /t 2 > nul
 ipconfig /flushdns >nul 2>nul
 echo.&echo.　部署完成...&echo.&echo.&echo.&echo.&echo.&echo.
 echo.　　　　　　　　　　　　　　　　　　　　　　　聚散终有时　再见亦有期&echo.&echo.&echo.&echo.&echo.&echo.
 echo.
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　%Version%　邵华　18900559020&echo.
-echo.　如果还有问题就打我电话吧...&timeout /t 6 >nul&exit
+echo.　如果还有问题就打我电话吧...&timeout /t 3 >nul&exit

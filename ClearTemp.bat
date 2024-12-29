@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=ClearTemp½Å±¾
 set Powered=Powered by ÉÛ»ª 18900559020
-set Version=20241210
+set Version=20241212
 set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
 title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
 :start
@@ -32,7 +32,7 @@ echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡
 choice /T 6 /C ACUQ /d A /n /m "¡¡½Å±¾6ÃëºóÄ¬ÈÏÑ¡A£¬ÇëÑ¡Ôñ£º"
 if %errorlevel%==1 goto :auto
 if %errorlevel%==2 goto :clear
-if %errorlevel%==3 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.È±ÉÙºËÐÄÎÄ¼þ£¬ÈçÄúÏëÊ¹ÓÃÈ«²¿¹¦ÄÜ£¬ÇëÁªÏµÉÛ»ª18900559020¡£&&timeout /t 6)
+if %errorlevel%==3 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.È±ÉÙºËÐÄÎÄ¼þ£¬ÈçÄúÏëÊ¹ÓÃÈ«²¿¹¦ÄÜ£¬ÇëÁªÏµÉÛ»ª18900559020¡£&&timeout /t 3)
 if %errorlevel%==4 exit
 :auto
 cls&echo.&echo.¡¡×Ô¶¯ÇåÀíÖÐ£¬ÇëÉÔºó...&echo.
@@ -193,7 +193,7 @@ rem Cleanmgr.exe /sagerun:60
 start "" cleanmgr.exe /VERYLOWDISK
 goto :eof
 :clear
-if exist "D:\SH\Key\safe.bat" call "D:\SH\Key\safe.bat" 2>nul
+if exist "D:\SH\Key\SafeClear.bat" call "D:\SH\Key\SafeClear.bat" 2>nul
 echo.&echo.¡¡[¶¨ÏòÇåÀí]¡¡²Ù×÷Íê³É...¡¡½Å±¾¼´½«·µ»ØÖ÷²Ëµ¥...&timeout /t 3 >nul&goto :start
 :xuanze
 echo.&echo.¡¡°´¡¾Y¡¿¼ÌÐø£¬°´¡¾N¡¿Ìø¹ý¡£&echo.&echo.¡¡ÇëÈ·ÈÏ£¡&echo.&echo.¡¡3Ãëºó£¬½«ÊÓÎªY¼ÌÐø¡£
@@ -211,4 +211,4 @@ echo.&echo.¡¡²Ù×÷Íê³É,µ±Ç°CÅÌ¿ÉÓÃÈÝÁ¿Îª%myvar%...&echo.&echo.&echo.&echo.&echo.&
 echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¾ÛÉ¢ÖÕÓÐÊ±¡¡ÔÙ¼ûÒàÓÐÆÚ&echo.&echo.&echo.&echo.&echo.&echo.
 echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª
 echo.¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&echo.
-echo.¡¡Èç¹û»¹ÓÐÎÊÌâ¾Í´òÎÒµç»°°É...&timeout /t 6 >nul&exit
+echo.¡¡Èç¹û»¹ÓÐÎÊÌâ¾Í´òÎÒµç»°°É...&timeout /t 3 >nul&exit

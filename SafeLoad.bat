@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=SafeLoad
 set Powered=Powered by 邵华 18900559020
-set Version=20241209
+set Version=20241217
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -40,12 +40,14 @@ goto :eof
 :patch
 set server=10.198.78.78
 set no=0
-set pingmax=10
+set pingmax=6
 set local=D:\SH\
-set s_bat=http://%server%/Safe.bat
-set l_bat=%local%Key\Safe.bat
+set s_safe=http://%server%/Safe.bat
+set l_safe=%local%Key\Safe.bat
 set s_ps=http://%server%/Safe.ps1
 set l_ps=%local%Key\Safe.ps1
+set s_safeclear=http://%server%/SafeClear.bat
+set l_safeclear=%local%Key\SafeClear.bat
 goto :eof
 
 :ping
@@ -55,16 +57,20 @@ goto :eof
 :down
 echo.&echo.　正在尝试更新服务端最新文件…&echo.
 if not exist "%local%key" (mkdir "%local%key") >nul 2>nul
-for /f "delims=" %%a in ('curl -# -L -o NUL "%s_bat%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_bat_status=%%a) >nul 2>nul
+for /f "delims=" %%a in ('curl -# -L -o NUL "%s_safe%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_safe_status=%%a) >nul 2>nul
 for /f "delims=" %%b in ('curl -# -L -o NUL "%s_ps%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_ps_status=%%b) >nul 2>nul
-if "%s_bat_status%"=="200" (curl -s -S -L -o "%l_bat%" --progress-bar --max-time 3 %s_bat% ) else (echo.下载失败，HTTP 状态码：%s_bat_status%) >nul 2>nul
+for /f "delims=" %%c in ('curl -# -L -o NUL "%s_safeclear%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_sc_status=%%c) >nul 2>nul
+if "%s_safe_status%"=="200" (curl -s -S -L -o "%l_safe%" --progress-bar --max-time 3 %s_safe% ) else (echo.下载失败，HTTP 状态码：%s_safe_status%) >nul 2>nul
 if "%s_ps_status%"=="200" (curl -s -S -L -o "%l_ps%" --progress-bar --max-time 3 %s_ps% ) else (echo.下载失败，HTTP 状态码：%s_ps_status%) >nul 2>nul
+if "%s_sc_status%"=="200" (curl -s -S -L -o "%l_safeclear%" --progress-bar --max-time 3 %s_safeclear% ) else (echo.下载失败，HTTP 状态码：%s_sc_status%) >nul 2>nul
 goto :eof
 
 :run
+
+if exist "%l_safe%" (call "%l_safe%") >nul 2>nul
 echo.&echo.　是否清理系统垃圾文件？默认N（不清理），3秒后自动跳过。&echo.
 choice /T 3 /C YN /d N
-if %errorlevel%==1 if exist "%l_bat%" (start "" "%l_bat%")
+if %errorlevel%==1 if exist "%l_safeclear%" (start "" "%l_safeclear%")
 if %errorlevel%==0 exit
 exit
 
