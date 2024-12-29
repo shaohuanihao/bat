@@ -208,8 +208,11 @@ goto :eof
 :make
 set L=&set W=&set O=
 set L=%urllan%%softlan%
+echo.%L%
 set W=%urlwan%%softwan%
+echo.%W%
 set O=%urlother%%softother%
+echo.%O%
 goto :eof
 :net
 set net=&set Pc=
