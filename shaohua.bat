@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20241108
+set Version=20241212
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -51,7 +51,7 @@ if %errorlevel%==3 set Pc=PC-Other&set hs=_hso&&goto :eof
 if %errorlevel%==2 set Pc=HS-Lan&set hs=_hsl&&goto :eof
 if %errorlevel%==1 set Pc=HS-Wan&set hs=_hsw&&goto :eof
 REM 根据ARP设置电脑电脑所属
-arp -a|findstr /i "38.40." >nul && (set Pc=HS-Lan&set hs=_hsl)||(arp -a|findstr /i "38.41." >nul && (set Pc=HS-Lan&set hs=_hsl)||(arp -a|findstr /i "10.198." >nul && (set Pc=HS-Wan&set hs=_hsw)||(set Pc=PC-Other&cls&echo. &echo.　暂无法判断您的环境&echo.&echo.　本脚本专供于徽商银行马鞍山地区网络环境使用&echo.　如您有定制需求请于我司联系&echo. &echo.　马鞍山创锐电子科技有限公司 - 邵华 - 7x24H - 18900559020&timeout /t 6 >nul&exit)))
+arp -a|findstr /i "38.40." >nul && (set Pc=HS-Lan&set hs=_hsl)||(arp -a|findstr /i "38.41." >nul && (set Pc=HS-Lan&set hs=_hsl)||(arp -a|findstr /i "10.198." >nul && (set Pc=HS-Wan&set hs=_hsw)||(set Pc=PC-Other&cls&echo. &echo.　暂无法判断您的环境&echo.&echo.　本脚本专供于徽商银行马鞍山地区网络环境使用&echo.　如您有定制需求请于我司联系&echo. &echo.　马鞍山创锐电子科技有限公司 - 邵华 - 7x24H - 18900559020&timeout /t 3 >nul&exit)))
 goto :eof
 :patch64
 set bit=64&set arch=X64&set IE_Path64=C:\Program Files\Internet Explorer\iexplore.exe&set IE_Path32=C:\Program Files (x86)\Internet Explorer\iexplore.exe
@@ -1771,20 +1771,15 @@ goto :eof
 REM 软件-禁用在未分配的文件扩展名上启用文件关联WEB服务
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoInternetOpenWith" /t reg_dword /d 1 /f
 
-REM 软件-输入法-设置开机时输入法默认为英文（注意是否正确）
-reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "DefaultMode" /t reg_sz /d "0" /f
-reg add "HKLM\Software\Microsoft\InputMethod\Settings\CHS" /v "DefaultMode" /t reg_sz /d "0" /f
-REM 软件-输入法-默认语言 0 中文，1 英文
+REM 软件-输入法-默认语言 0 中文，1 英文，肯定正确！
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
 reg add "HKLM\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
 REM 软件-输入法-智能模糊拼音 0 禁用，1 启用
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableSmartFuzzyPinyin" /t reg_dword /d 1 /f
 REM 软件-输入法-模糊拼音 0 禁用，1 启用
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable Fuzzy Input" /t reg_dword /d 1 /f
-REM 软件-输入法-自学习 0 为禁用，1 为启用
-reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable self-learning" /t reg_dword /d 1 /f
 REM 软件-输入法-智能自学习 0 为禁用，1 为启用
-reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableSmartSelfLearning" /t reg_dword /d 1 /f
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableSmartSelfLearning" /t reg_dword /d 0 /f
 REM 软件-输入法-云计算 0 为禁用，1 为启用
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable Cloud Candidate" /t reg_dword /d 0 /f
 REM 软件-输入法-中英文切换快捷键（默认 ctrl + 空格，还可使用）0 默认为 shift，1 为 ctrl，2 为 无
@@ -1793,6 +1788,16 @@ REM 软件-输入法-显示新词热词 0 为禁用，1 为启用
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableHap" /t reg_dword /d 0 /f
 REM 软件-输入法-显示新词热词搜索的提示 0 为禁用，1 为启用
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable Hot And Popular Word Search" /t reg_dword /d 0 /f
+REM 软件-输入法-自学习 0 为禁用，1 为启用
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable self-learning" /t reg_dword /d 0 /f
+REM 软件-输入法-用户自定义短语 0 为禁用，1 为启用
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Enable EUDP" /t reg_dword /d 0 /f
+REM 软件-输入法-上下文菜单 0 为禁用，1 为启用
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "ContextMenuFlags" /t reg_dword /d 0 /f
+REM 软件-输入法-U模式输入 0 为禁用，1 为启用
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableUMode" /t reg_dword /d 0 /f
+REM 软件-输入法-人名输入 0 为禁用，1 为启用
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnablePeopleName" /t reg_dword /d 0 /f
 REM 软件-输入法-微软拼音候选词设置为9个
 reg add "HKCU\Software\Microsoft\InputMethod\Settings" /v "CandidateCount" /t reg_dword /d 9 /f
 REM 软件-输入法-禁用输入法切换提示
@@ -2090,7 +2095,7 @@ echo %~dp0|findstr /i "windows" >nul && exit || (del "%~f0" & exit)
 exit
 :finish_hsl
 call :upan
-REM 修改外网chrome首页
+REM 修改内网chrome首页
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v HomepageLocation /t REG_SZ /d "http://38.40.18.180" /f
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v HomepageIsNewTabPage /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v ShowHomeButton /t REG_DWORD /d 1 /f
@@ -2099,14 +2104,12 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\Name
 del "C:\users\public\desktop\书生电子公文系统7.4.2.lnk" /q /f 2>nul
 del "C:\users\public\desktop\Sursen Maker 2.0.lnk" /q /f 2>nul
 del "C:\users\public\desktop\SursenOfdMaker.lnk" /q /f 2>nul
-del "C:\shaohua\soft\WeChatSetup.exe" /q /f 2>nul
-del "C:\shaohua\soft\ThunderSpeed.exe" /q /f 2>nul
-del "C:\shaohua\soft\assist.exe" /q /f 2>nul
-del "C:\shaohua\soft\HSebankClient.exe" /q /f 2>nul
-del "C:\shaohua\soft\PowerShadow_8.5.exe" /q /f 2>nul
-del "C:\shaohua\soft\windows生产外网V5.4.1.exe" /q /f 2>nul
-del "C:\shaohua\soft\离线安装包20241206-外网Windows.exe" /q /f 2>nul
-del "C:\shaohua\soft\lva_setupfull_20241205174952.exe" /q /f 2>nul
+del "C:\ShaoHua\Soft\WeChatSetup.exe" /q /f 2>nul
+del "C:\ShaoHua\Soft\ThunderSpeed.exe" /q /f 2>nul
+del "C:\ShaoHua\Soft\PowerShadow_8.5.exe" /q /f 2>nul
+del "C:\ShaoHua\Soft\windows生产外网V5.4.1.exe" /q /f 2>nul
+del "C:\ShaoHua\Soft\离线安装包20241206-外网Windows.exe" /q /f 2>nul
+del "C:\ShaoHua\Soft\lva_setupfull_20241205174952.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Key\*.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Office修复工具\Office启动一键修复.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Office修复工具\打印任务一键清除.exe" /q /f 2>nul
@@ -2149,10 +2152,14 @@ REM 删除此电脑种的安全U盘_V3文件夹
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{679F137C-3162-45da-BE3C-2F9C3D093F69}" /f
 reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{679F137C-3162-45da-BE3C-2F9C3D093F69}" /f
 if "%hs%"=="_hsf" goto :eof
+if "%hs%"=="_hso" del "C:\ShaoHua\Soft\PowerShadow_8.5.exe" /q /f 2>nul
+if "%hs%"=="_hso" del "C:\ShaoHua\Soft\windows生产外网V5.4.1.exe" /q /f 2>nul
+if "%hs%"=="_hso" del "C:\ShaoHua\Soft\离线安装包20241206-外网Windows.exe" /q /f 2>nul
+if "%hs%"=="_hso" del "C:\ShaoHua\Soft\lva_setupfull_20241205174952.exe" /q /f 2>nul
 del "C:\Windows\System32\UCli.exe" /f /q 2>nul
 del "C:\Windows\System32\config.ini" /f /q 2>nul
-rd "C:\shaohua\Hsbank\" /s /q 2>nul
-del "C:\windows\Hsbank\*" /f /s /q 2>nul
+rd "C:\ShaoHua\Hsbank\" /s /q 2>nul
+del "C:\Windows\Hsbank\*" /f /s /q 2>nul
 del "%USERPROFILE%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
 del "%PUBLIC%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
 rd "%ProgramFiles%\360\360ent" /s /q 2>nul
