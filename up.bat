@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=Upgrade脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20241226
+set Version=20241229
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -81,39 +81,26 @@ goto :eof
 :list4
 rem ClearTemp
 set soft=ClearTemp.bat
-echo.%soft%
 set softlan=/%soft%
-echo.%softlan%
 set softwan=/%soft%
-echo.%softwan%
 set softother=/bat/raw/main/%soft%
-echo.%softother%
 call :make
 call :net
 del /f /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
 curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
-echo.%local%\Key\%soft%111111111111
-echo.%net%
-pause
 goto :eof
 :list5
 rem DNS
 set soft=DNS.bat
-echo.%soft%
 set softlan=/%soft%
-echo.%softlan%
 set softwan=/%soft%
-echo.%softwan%
 set softother=/bat/raw/main/%soft%
-echo.%softother%
 call :make
+call :net
 del /f /q "%local%\Key\%soft%" >nul 2>nul
 echo. Downloading %soft%
 curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
-echo.%local%\Key\%soft%22222222
-echo.%net%
-pause
 goto :eof
 :list6
 rem EnableRDC
@@ -208,11 +195,8 @@ goto :eof
 :make
 set L=&set W=&set O=
 set L=%urllan%%softlan%
-echo.%L%
 set W=%urlwan%%softwan%
-echo.%W%
 set O=%urlother%%softother%
-echo.%O%
 goto :eof
 :net
 set net=&set Pc=
