@@ -30,7 +30,7 @@ set al=1
 :SetA
 if "%al%"=="10" goto ex
 call :list%al%
-set /a al=%al%+1
+echo.&set /a al=%al%+1
 goto SetA
 :ex
 del /f /q up.txt
