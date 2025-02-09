@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=InitialSetup脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20241020
+set Version=20250209
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -21,14 +21,14 @@ call :out
 exit
 :cmd_admin
 REM 开启cmd_admin
-reg add "HKLM\SOFTWARE\Sysinternals" /v "PsExecAccept" /t REG_DWORD /d 1 /f
-reg add "HKCR\cmdfile\shell\runas\command" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
-reg add "HKCR\ConsoleHost\command\runas" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
+reg add "HKLM\SOFTWARE\Sysinternals" /v "PsExecAccept" /t reg_dword /d 1 /f
+reg add "HKCR\cmdfile\shell\runas\command" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
+reg add "HKCR\ConsoleHost\command\runas" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\cmd.exe" /t reg_sz /d RUNASADMIN /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\cmd.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKCR\ConsoleHost\command\runas" /ve /t REG_SZ /d "cmd.exe /C \"%1\" %*" /f
+reg add "HKCR\ConsoleHost\command\runas" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\conhost.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t REG_SZ /d "PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File \"%1\"" /f
+reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t reg_sz /d "PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File \"%1\"" /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 REM UAC_Installer detection(安装程序检测)_禁用
@@ -73,6 +73,9 @@ start explorer.exe
 goto :eof
 :clear
 timeout /t 3 >nul
+REM 软件-输入法-默认语言 0 中文，1 英文，肯定正确！
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
+reg add "HKLM\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
 REM 删除所有计划任务
 schtasks /delete /tn * /F
 REM 删除用户和系统启动项中的所有项
@@ -110,4 +113,11 @@ rem IP
 RunDll32.exe shell32.dll,Control_RunDLL ncpa.cpl 2>nul
 rem 计算机名
 sysdm.cpl
+Reg delete "HKCU\Software\Kingsoft\Office\6.0\et" /f
+Reg delete "HKCU\Software\Kingsoft\Office\6.0\wps" /f
+Reg delete "HKCU\Software\Kingsoft\Office\6.0\wpp" /f
+Reg delete "HKCU\Software\kingsoft\Office\6.0\Common\AuthInfo" /f
+del /q /f "%allusersprofile%\Application Data\Kingsoft\office6\license2.dat"
+del /q /f "%programdata%\Kingsoft\office6\license2.dat"
+start "" "C:\Program Files (x86)\Kingsoft\WPS Office\11.8.2.12090\office6\ksomisc.exe" -addsn 26B4J-UDCM6-XR46L-DAVW9-WDACG
 cls&echo.&echo.请确定已经完成 计算机名 和 IP地址 的设置！！！&echo.&echo.若已完成，请按下任意键重启电脑。&echo.&pause&cls&shutdown -r -t 10 -c "第一阶段已结束。10秒后，系统会自动重启，完成余下操作！"&del %0

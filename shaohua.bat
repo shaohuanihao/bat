@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20241212
+set Version=20250209
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -2107,9 +2107,11 @@ del "C:\users\public\desktop\SursenOfdMaker.lnk" /q /f 2>nul
 del "C:\ShaoHua\Soft\WeChatSetup.exe" /q /f 2>nul
 del "C:\ShaoHua\Soft\ThunderSpeed.exe" /q /f 2>nul
 del "C:\ShaoHua\Soft\PowerShadow_8.5.exe" /q /f 2>nul
+del "C:\ShaoHua\Soft\Shadow Defender 1.5.0.726.exe" /q /f 2>nul
 del "C:\ShaoHua\Soft\windows生产外网V5.4.1.exe" /q /f 2>nul
 del "C:\ShaoHua\Soft\离线安装包20241206-外网Windows.exe" /q /f 2>nul
 del "C:\ShaoHua\Soft\lva_setupfull_20241205174952.exe" /q /f 2>nul
+rd "%local%\Soft\安装包" /s /q 2>nul
 del "C:\ShaoHua\Tools\Key\*.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Office修复工具\Office启动一键修复.exe" /q /f 2>nul
 del "C:\ShaoHua\Tools\Office修复工具\打印任务一键清除.exe" /q /f 2>nul
@@ -2142,6 +2144,10 @@ REM 修改外网chrome首页
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v HomepageLocation /t REG_SZ /d "http://www.baidu.com" /f
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v HomepageIsNewTabPage /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v ShowHomeButton /t REG_DWORD /d 1 /f
+REM 安装包脚本
+if exist "C:\ShaoHua\Soft\安装包" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\软件安装包.lnk""):b.TargetPath=""C:\ShaoHua\Soft\安装包"":b.WorkingDirectory=""C:\ShaoHua\Soft\安装包"":b.Save:close") 2>nul
+REM 刻录机脚本
+if exist "C:\ShaoHua\Tools\Burner.exe" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\光盘刻录.lnk""):b.TargetPath=""C:\ShaoHua\Tools\Burner.exe"":b.WorkingDirectory=""C:\ShaoHua\Tools"":b.Save:close") 2>nul
 goto :eof
 :finish_hso
 REM 永久暂停Windows自动更新
@@ -2153,9 +2159,11 @@ reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\N
 reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{679F137C-3162-45da-BE3C-2F9C3D093F69}" /f
 if "%hs%"=="_hsf" goto :eof
 if "%hs%"=="_hso" del "C:\ShaoHua\Soft\PowerShadow_8.5.exe" /q /f 2>nul
+if "%hs%"=="_hso" del "C:\ShaoHua\Soft\Shadow Defender 1.5.0.726.exe" /q /f 2>nul
 if "%hs%"=="_hso" del "C:\ShaoHua\Soft\windows生产外网V5.4.1.exe" /q /f 2>nul
 if "%hs%"=="_hso" del "C:\ShaoHua\Soft\离线安装包20241206-外网Windows.exe" /q /f 2>nul
 if "%hs%"=="_hso" del "C:\ShaoHua\Soft\lva_setupfull_20241205174952.exe" /q /f 2>nul
+if "%hs%"=="_hso" rd "%local%\Soft\安装包" /s /q 2>nul
 del "C:\Windows\System32\UCli.exe" /f /q 2>nul
 del "C:\Windows\System32\config.ini" /f /q 2>nul
 rd "C:\ShaoHua\Hsbank\" /s /q 2>nul

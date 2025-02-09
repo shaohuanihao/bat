@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=FixPrint脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20241020
+set Version=20250209
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -38,7 +38,19 @@ exit
 for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i"=="False" mshta vbscript:createobject("wscript.shell").sendkeys("{CAPSLOCK}")(window.close)
 goto :eof
 :fix
+net stop spooler
+curl -# -I "http://38.40.12.180/sh/win32spl.dll" > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "C:\ShaoHua\Key\win32spl.dll" -L "http://38.40.12.180/sh/win32spl.dll") || (echo.)
+curl -# -I "http://10.198.78.78/sh/win32spl.dll" > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "C:\ShaoHua\Key\win32spl.dll" -L "http://10.198.78.78/sh/win32spl.dll") || (echo.)
+curl -# -I "https://gitee.com/shaohuanihao/win32spl.dll" > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "C:\ShaoHua\Key\win32spl.dll" -L "https://gitee.com/shaohuanihao/win32spl.dll") || (echo.)
+del /f /q up.txt 2>nul
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print" /v "RpcAuthnLevelPrivacyEnabled" /d "0" /t reg_dword /f >nul 2>nul
+reg add "HKLM\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /d "0" /t reg_dword /f >nul 2>nul
+dism /online /enable-feature /featurename:SMB1Protocol /NoRestart 2>nul
+copy /Y "C:\Windows\System32\win32spl.dll" "%~dp0\bak\win32spl.dll" 2>nul
+Takeown /A /F C:\Windows\System32\win32spl.dll 2>nul
+icacls  "C:\Windows\System32\win32spl.dll" /grant "administrators":F 2>nul
+icacls  "C:\Windows\System32\win32spl.dll" /grant SYSTEM:F 2>nul
+copy  "%~dp0\win32spl.dll" C:\Windows\System32\win32spl.dll /Y 2>nul
 @wusa /quiet /uninstall /kb:5000802 >nul 2>nul
 @wusa /quiet /uninstall /kb:5000808 >nul 2>nul
 @wusa /quiet /uninstall /kb:5006670 >nul 2>nul
@@ -51,6 +63,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print" /v "RpcAuthnLevelPrivacyEn
 @wusa /quiet /uninstall /kb:5005568 >nul 2>nul
 @wusa /quiet /uninstall /kb:5005566 >nul 2>nul
 @wusa /quiet /uninstall /kb:5005565 >nul 2>nul
+net start spooler
 goto end
 :update
 net user PrintUser Hs123456 >nul 2>nul
@@ -81,9 +94,11 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccou
 net user guest /active:no>nul 2>nul
 reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v forceguest /t REG_DWORD /d 0 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print" /v "RpcAuthnLevelPrivacyEnabled" /d "0" /t reg_dword /f >nul 2>nul
+reg add "HKLM\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /d "0" /t reg_dword /f >nul 2>nul
 net start rpcss
 net start server
 dism /online /enable-feature /featurename:Printing-Foundation-LPDPrintService /NoRestart 2>nul
+dism /online /enable-feature /featurename:SMB1Protocol /NoRestart 2>nul
 net start lpdsvc
 net start spooler
 net start SSDPSRV
@@ -104,7 +119,7 @@ set /p input=请输入IP:
 echo;"%input%"|>nul findstr "^\"[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\"$"||(goto client)
 for %%a in (%input:.= %) do (echo;%%a|>nul findstr "^25[0-5]$ ^2[0-4][0-9]$ ^1[0-9][0-9]$ ^[1-9][0-9]$ ^[0-9]$"||(goto client))
 echo.&echo.对方IP地址为：【%input%】&set p=&for /f "tokens=3 delims=: " %%p in ('ping -a %input% -w 1 -n 1') do (set /a p+=1&if !p!==1 echo.　对方计算机名为：【%%p】&set name=%%p)
-echo.&echo.注意：计算机名理应为MAS-HS********这般格式，如上方没有出现，请重新输入&echo.&echo.&echo.&echo.&echo.
+echo.&echo.注意：计算机名理应为MAS-HS********这般格式，如上方没有出现，建议重新输入&echo.&echo.&echo.&echo.&echo.
 choice /C:YN /N /M "　[ 按‘Y’确认 / 按‘N’重输 ]"
 if errorlevel 2 goto client
 if errorlevel 1 goto cmdkey
@@ -124,7 +139,6 @@ net stop spooler
 net session /delete /y
 attrib "%systemroot%\System32\spool\PRINTERS\*" -R /s
 del "%systemroot%\System32\spool\PRINTERS\*" /q /s
-dism /online /enable-feature /featurename:Printing-Foundation-LPDPrintService /NoRestart 2>nul
 net start lpdsvc
 sc config spooler start= auto
 net start spooler
