@@ -37,10 +37,10 @@ cls&title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï ÕýÔÚÇÐ»»EnterpriseÆóÒµ°
 cls&title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï ÕýÔÚÇÐ»»Professional×¨Òµ°æ...&cscript %windir%\system32\slmgr.vbs /rilc&cscript %windir%\system32\slmgr.vbs /upk >nul 2>&1&cscript %windir%\system32\slmgr.vbs /ckms >nul 2>&1&cscript %windir%\system32\slmgr.vbs /cpky >nul 2>&1&cscript %windir%\system32\slmgr.vbs /ipk W269N-WFGWX-YVC9B-4J6C9-T83GX&timeout /t 5&goto start
 goto spc
 :osi
-cls&set ver=0&set pf=%ProgramFiles(x86)%&title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï ÕýÔÚÊÊÅäOffice¼¤»î·þÎñÆ÷...
+cls&set ver=4&set pf=%ProgramFiles(x86)%&title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï ÕýÔÚÊÊÅäOffice¼¤»î·þÎñÆ÷...
 :pf
 if "%pf%"=="%ProgramFiles%" if %ver%==7 goto wsi
-if "%ver%"=="7" (set pf=%ProgramFiles%&set ver=0&goto pf)
+if "%ver%"=="7" (set pf=%ProgramFiles%&set ver=4&goto pf)
 cd "%pf%\Microsoft Office\Office1%ver%\" 2>nul&cls&cscript "%pf%\Microsoft Office\Office1%ver%\ospp.vbs" /sethst:%osi% 2>nul&cls&cscript "%pf%\Microsoft Office\Office1%ver%\ospp.vbs" /act 2>nul&cls&set /a ver=%ver%+1&goto pf
 :wsi
 title %Pc% ¡ï %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï ÕýÔÚÊÊÅäWindows¼¤»î·þÎñÆ÷...&cscript %windir%\system32\slmgr.vbs /skms %wsi% 2>nul&cscript %windir%\system32\slmgr.vbs /ato 2>nul&timeout /t 3&cls&cscript %windir%\system32\slmgr.vbs /dli 2>nul&echo¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¾ÛÉ¢ÖÕÓÐÊ±¡¡ÔÙ¼ûÒàÓÐÆÚ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ ÉÛ»ª&echo¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡18900559020&timeout /t 6 >nul&exit

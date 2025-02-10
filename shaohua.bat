@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20250209
+set Version=20250210
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -198,7 +198,7 @@ echo 从不自动进入睡眠状态
 powercfg -x -standby-timeout-dc 0
 powercfg -x -standby-timeout-ac 0
 powercfg -hibernate off
-del /f /q C:\hiberfil.sys
+del /q /f C:\hiberfil.sys
 echo 从不自动进入休眠状态
 powercfg -x -hibernate-timeout-dc 0
 powercfg -x -hibernate-timeout-ac 0
@@ -793,6 +793,8 @@ REM 系统-远程-不将远程桌面会话中的客户端打印机设置为默认打印机
 reg add "HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services" /v "fForceClientLptDef" /t reg_dword /d 1 /f
 REM 系统-远程-禁用RPC的隐私级别认证
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print" /v "RpcAuthnLevelPrivacyEnabled" /t reg_dword /d 0 /f
+REM 系统-远程-允许添加驱动非管理员身份运行
+reg add "HKLM\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /d "0" /t reg_dword /f
 REM 系统-远程-禁用客户端打印机重定向
 reg add "HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services" /v "fDisableCpm" /t reg_dword /d 1 /f
 REM 系统-远程-设置远程桌面连接优先使用TCP连接
@@ -957,7 +959,7 @@ REM 界面-任务栏-语言栏-在最小化时不显示语言栏上的额外图标
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarMn" /t reg_dword /d 0 /f
 
 REM 界面-开始菜单-删除现有所有磁贴
-del /q /s /f "%localappdata%\Microsoft\Windows\RoamingTiles\*"
+del /q /f /s "%localappdata%\Microsoft\Windows\RoamingTiles\*"
 REM 界面-开始菜单-关闭磁贴功能及显示
 reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v DisableLiveTile /t reg_dword /d 1 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_LargeTiles /t reg_dword /d 0 /f
@@ -1494,8 +1496,8 @@ reg add "HKCU\Software\Policies\Google\Chrome" /v "PrintingBackgroundGraphicsDef
 
 REM 软件-驱动总裁-删除安装信息
 reg delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\DrvCeo2.0" /f
-del /f /q "%ProgramData%\Microsoft\Windows\Start Menu\驱动下载.lnk"
-del /f /q "%windir%\Help\dcold.exe"
+del /q /f "%ProgramData%\Microsoft\Windows\Start Menu\驱动下载.lnk"
+del /q /f "%windir%\Help\dcold.exe"
 call :better_llq%hs%
 goto :eof
 
@@ -2056,11 +2058,14 @@ gpupdate /force
 REM 禁用新建的“联系人”右键菜单：
 reg delete "HKCR\.contact" /f 2>nul
 REM 禁用发送到的“传真接收人”扩展菜单：
-del /f /q "%APPDATA%\Microsoft\Windows\SendTo\Fax Recipient.lnk" 2>nul
+del /q /f "%APPDATA%\Microsoft\Windows\SendTo\Fax Recipient.lnk" 2>nul
 REM 禁用发送到的“ZIP”扩展菜单：
-del /f /q "%APPDATA%\Microsoft\Windows\SendTo\Compressed (zipped) Folder.ZFSendToTarget" 2>nul
+del /q /f "%APPDATA%\Microsoft\Windows\SendTo\Compressed (zipped) Folder.ZFSendToTarget" 2>nul
 REM 禁用发送到的“邮件收件人”扩展菜单：
-del /f /q "%APPDATA%\Microsoft\Windows\SendTo\Mail Recipient.MAPIMail" 2>nul
+del /q /f "%APPDATA%\Microsoft\Windows\SendTo\Mail Recipient.MAPIMail" 2>nul
+REM 删除驱动文件
+if "%hs%" NEQ "_hsf" rd /q /s "C:\ShaoHua\Drv\Drvceo\" 2>nul
+if "%hs%" NEQ "_hsf" del /q /f /s "C:\ShaoHua\Drv\Drvceo\*" 2>nul
 call :finish%hs%
 REM 刷新桌面
 taskkill /f /im explorer.exe 2>nul
@@ -2074,15 +2079,12 @@ if exist "C:\ShaoHua\Key\FixPrint.bat" start "" mshta VBScript:Execute("Set a=Cr
 REM 垃圾清理脚本
 if exist "C:\ShaoHua\Key\ClearTemp.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\垃圾清理脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\ClearTemp.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
 REM 清理传递优化文件
-del /q /s /f "%localappdata%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\*"
+del /q /f /s "%localappdata%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\*"
 REM 清理缩略图缓存
-del /q /s /f "%localappdata%\Microsoft\Windows\Explorer\*"
-REM 删除驱动文件
-rd "C:\ShaoHua\Drv\Drvceo\" /s /q 2>nul
-del "C:\ShaoHua\Drv\Drvceo\*" /f /s /q 2>nul
-del /f /s /q "%USERPROFILE%\AppData\Local\Microsoft\Windows\INetCache\*"
-del /f /s /q "%USERPROFILE%\AppData\Local\Microsoft\Windows\Temporary Internet Files\*"
-del /f /s /q "%TEMP%\*"
+del /q /f /s "%localappdata%\Microsoft\Windows\Explorer\*"
+del /q /f /s "%USERPROFILE%\AppData\Local\Microsoft\Windows\INetCache\*"
+del /q /f /s "%USERPROFILE%\AppData\Local\Microsoft\Windows\Temporary Internet Files\*"
+del /q /f /s "%TEMP%\*"
 start "" cleanmgr.exe /VERYLOWDISK
 for /f "tokens=3*" %%i in ('reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion" /v "ProductName"') do set ProductName=%%i %%j
 for /f "tokens=3*" %%i in ('reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion" /v "ReleaseId"') do set ReleaseId=%%i
@@ -2101,39 +2103,40 @@ reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v HomepageIsNewTabPage /t REG_DW
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v ShowHomeButton /t REG_DWORD /d 1 /f
 REM 显示此电脑中的打印机文件夹
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{2227A280-3AEA-1069-A2DE-08002B30309D}" /ve /f
-del "C:\users\public\desktop\书生电子公文系统7.4.2.lnk" /q /f 2>nul
-del "C:\users\public\desktop\Sursen Maker 2.0.lnk" /q /f 2>nul
-del "C:\users\public\desktop\SursenOfdMaker.lnk" /q /f 2>nul
-del "C:\ShaoHua\Soft\WeChatSetup.exe" /q /f 2>nul
-del "C:\ShaoHua\Soft\ThunderSpeed.exe" /q /f 2>nul
-del "C:\ShaoHua\Soft\PowerShadow_8.5.exe" /q /f 2>nul
-del "C:\ShaoHua\Soft\Shadow Defender 1.5.0.726.exe" /q /f 2>nul
-del "C:\ShaoHua\Soft\windows生产外网V5.4.1.exe" /q /f 2>nul
-del "C:\ShaoHua\Soft\离线安装包20241206-外网Windows.exe" /q /f 2>nul
-del "C:\ShaoHua\Soft\lva_setupfull_20241205174952.exe" /q /f 2>nul
-rd "%local%\Soft\安装包" /s /q 2>nul
-del "C:\ShaoHua\Tools\Key\*.exe" /q /f 2>nul
-del "C:\ShaoHua\Tools\Office修复工具\Office启动一键修复.exe" /q /f 2>nul
-del "C:\ShaoHua\Tools\Office修复工具\打印任务一键清除.exe" /q /f 2>nul
+del /q /f "C:\users\public\desktop\书生电子公文系统7.4.2.lnk" 2>nul
+del /q /f "C:\users\public\desktop\Sursen Maker 2.0.lnk" 2>nul
+del /q /f "C:\users\public\desktop\SursenOfdMaker.lnk" 2>nul
+del /q /f "C:\ShaoHua\Key\SafeLoad.bat" 2>nul
+del /q /f "C:\ShaoHua\Soft\WeChatSetup.exe" 2>nul
+del /q /f "C:\ShaoHua\Soft\ThunderSpeed.exe" 2>nul
+del /q /f "C:\ShaoHua\Soft\PowerShadow_8.5.exe" 2>nul
+del /q /f "C:\ShaoHua\Soft\Shadow Defender 1.5.0.726.exe" 2>nul
+del /q /f "C:\ShaoHua\Soft\windows生产外网V5.4.1.exe" 2>nul
+del /q /f "C:\ShaoHua\Soft\离线安装包20241206-外网Windows.exe" 2>nul
+del /q /f "C:\ShaoHua\Soft\lva_setupfull_20241205174952.exe" 2>nul
+del /q /f "C:\ShaoHua\Soft\assist.exe" 2>nul
+del /q /f "C:\ShaoHua\Soft\HSebankClient.exe" 2>nul
+rd /q /s "C:\ShaoHua\Soft\安装包" 2>nul
+del /q /f "C:\ShaoHua\Tools\Key\*.exe" 2>nul
+del /q /f "C:\ShaoHua\Tools\Office修复工具\Office启动一键修复.exe" 2>nul
+del /q /f "C:\ShaoHua\Tools\Office修复工具\打印任务一键清除.exe" 2>nul
 set "local=C:\ShaoHua" >nul 2>nul
-rd "%systemdrive%\sysprep\" /s /q 2>nul
-rd "%local%\Tools\Key" /s /q 2>nul
-rd "%local%\Tools\DNS" /s /q 2>nul
-rd "%local%\Tools\局域网共享" /s /q 2>nul
-rd "%local%\Tools\Key" /s /q 2>nul
-del /f /s /q "%local%\*一键*" 2>nul
-del /f /s /q "%local%\*共享*" 2>nul
-del /f /s /q "%local%\*KMS_VL*" 2>nul
-del /f /s /q "%local%\*oem7*" 2>nul
-del /f /s /q "%local%\*office2007*" 2>nul
-del /f /s /q "%local%\tools\*dns*" 2>nul
-del /f /s /q "%local%\tools\*Share*" 2>nul
-del /f /s /q "%local%\Soft\*inst*" 2>nul
-del /f /s /q "%local%\Soft\*lva_*" 2>nul
-del /f /s /q "%local%\Soft\*WeChat*" 2>nul
-del /f /s /q "%systemdrive%\sysprep\*" 2>nul
-rd "C:\ShaoHua\Drv\Drvceo\" /s /q 2>nul
-del "C:\ShaoHua\Drv\Drvceo\*" /f /s /q 2>nul
+rd /q /s "%systemdrive%\sysprep\" 2>nul
+rd /q /s "C:\ShaoHua\Tools\Key" 2>nul
+rd /q /s "C:\ShaoHua\Tools\DNS" 2>nul
+rd /q /s "C:\ShaoHua\Tools\局域网共享" 2>nul
+rd /q /s "C:\ShaoHua\Tools\Key" 2>nul
+del /q /f /s "C:\ShaoHua\*一键*" 2>nul
+del /q /f /s "C:\ShaoHua\*共享*" 2>nul
+del /q /f /s "C:\ShaoHua\*KMS_VL*" 2>nul
+del /q /f /s "C:\ShaoHua\*oem7*" 2>nul
+del /q /f /s "C:\ShaoHua\*office2007*" 2>nul
+del /q /f /s "C:\ShaoHua\tools\*dns*" 2>nul
+del /q /f /s "C:\ShaoHua\tools\*Share*" 2>nul
+del /q /f /s "C:\ShaoHua\Soft\*inst*" 2>nul
+del /q /f /s "C:\ShaoHua\Soft\*lva_*" 2>nul
+del /q /f /s "C:\ShaoHua\Soft\*WeChat*" 2>nul
+del /q /f /s "%systemdrive%\sysprep\*" 2>nul
 goto :eof
 :finish_hsw
 call :finish_hso
@@ -2158,35 +2161,37 @@ REM 删除此电脑种的安全U盘_V3文件夹
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{679F137C-3162-45da-BE3C-2F9C3D093F69}" /f
 reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{679F137C-3162-45da-BE3C-2F9C3D093F69}" /f
 if "%hs%"=="_hsf" goto :eof
-if "%hs%"=="_hso" del "C:\ShaoHua\Soft\PowerShadow_8.5.exe" /q /f 2>nul
-if "%hs%"=="_hso" del "C:\ShaoHua\Soft\Shadow Defender 1.5.0.726.exe" /q /f 2>nul
-if "%hs%"=="_hso" del "C:\ShaoHua\Soft\windows生产外网V5.4.1.exe" /q /f 2>nul
-if "%hs%"=="_hso" del "C:\ShaoHua\Soft\离线安装包20241206-外网Windows.exe" /q /f 2>nul
-if "%hs%"=="_hso" del "C:\ShaoHua\Soft\lva_setupfull_20241205174952.exe" /q /f 2>nul
-if "%hs%"=="_hso" rd "%local%\Soft\安装包" /s /q 2>nul
-del "C:\Windows\System32\UCli.exe" /f /q 2>nul
-del "C:\Windows\System32\config.ini" /f /q 2>nul
-rd "C:\ShaoHua\Hsbank\" /s /q 2>nul
-del "C:\Windows\Hsbank\*" /f /s /q 2>nul
-del "%USERPROFILE%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
-del "%PUBLIC%\Desktop\360企业安全浏览器.lnk" /f /q 2>nul
-rd "%ProgramFiles%\360\360ent" /s /q 2>nul
+if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\PowerShadow_8.5.exe" 2>nul
+if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\Shadow Defender 1.5.0.726.exe" 2>nul
+if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\windows生产外网V5.4.1.exe" 2>nul
+if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\离线安装包20241206-外网Windows.exe" 2>nul
+if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\lva_setupfull_20241205174952.exe" 2>nul
+if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\assist.exe" 2>nul
+if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\HSebankClient.exe" 2>nul
+if "%hs%"=="_hso" rd /q /s "C:\ShaoHua\Soft\安装包" 2>nul
+del /q /f "C:\Windows\System32\UCli.exe" 2>nul
+del /q /f "C:\Windows\System32\config.ini" 2>nul
+rd /q /s "C:\ShaoHua\Hsbank\" 2>nul
+del /q /f /s "C:\Windows\Hsbank\*" 2>nul
+del /q /f "%USERPROFILE%\Desktop\360企业安全浏览器.lnk" 2>nul
+del /q /f "%PUBLIC%\Desktop\360企业安全浏览器.lnk" 2>nul
+rd /q /s "%ProgramFiles%\360\360ent" 2>nul
 goto :eof
 :finish_hsf
 call :finish_hso
 goto :eof
 :upan
 REM 安全U盘_v1_V2_V3_DEL
-del /f /q "%userprofile%\Desktop\安全U盘.lnk" 2>nul
-del /f /q "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Network Shortcuts\安全U盘.exe" 2>nul
-del /f /q "%UserProfile%\AppData\Roaming\Microsoft\Windows\Network Shortcuts\安全U盘.exe" 2>nul
+del /q /f "%userprofile%\Desktop\安全U盘.lnk" 2>nul
+del /q /f "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Network Shortcuts\安全U盘.exe" 2>nul
+del /q /f "%UserProfile%\AppData\Roaming\Microsoft\Windows\Network Shortcuts\安全U盘.exe" 2>nul
 reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{679F137C-3162-45da-BE3C-2F9C3D093F68}" /f 2>nul
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{679F137C-3162-45da-BE3C-2F9C3D093F68}" /f 2>nul
 reg delete "HKCR\CLSID\{679F137C-3162-45da-BE3C-2F9C3D093F68}" /f 2>nul
 reg delete "HKCU\Software\Classes\CLSID\{679F137C-3162-45da-BE3C-2F9C3D093F68}" /f 2>nul
 reg delete "HKLM\Software\Classes\CLSID\{679F137C-3162-45da-BE3C-2F9C3D093F68}" /f 2>nul
-del /f /q "%userprofile%\Desktop\安全U盘_V2.lnk" 2>nul
-del /f /q "%userprofile%\Desktop\安全U盘_V3.lnk" 2>nul
+del /q /f "%userprofile%\Desktop\安全U盘_V2.lnk" 2>nul
+del /q /f "%userprofile%\Desktop\安全U盘_V3.lnk" 2>nul
 if "%hs%"=="_hsf" goto :eof
 if exist "C:\ShaoHua\Soft\FugueExplorer_v3.exe" call :upanadd
 goto :eof
