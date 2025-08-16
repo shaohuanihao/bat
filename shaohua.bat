@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20250210
+set Version=20250816
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -163,6 +163,8 @@ taskkill /f /t /im Lcserver.exe 2>nul
 goto :eof
 
 :better_yj
+REM 硬件-电源解除电源限制
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling" /v "PowerThrottlingOff" /t reg_dword /d 1 /f
 REM 硬件-电源性能优化
 echo 解锁处理器相关的电源选项
 powercfg -attributes SUB_PROCESSOR -ATTRIB_HIDE
@@ -289,6 +291,9 @@ powercfg -h off
 powercfg -change -standby-timeout-ac 0
 powercfg -change -standby-timeout-dc 0
 del c:\hiberfil.sys /f /q 2>nul
+REM 硬件-驱动-win10禁止完整性检查
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy" /v "VerifiedAndReputablePolicyState" /t reg_dword /d 0 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Config" /v "VulnerableDriverBlocklistEnable" /t reg_dword /d 0 /f
 REM 硬件-驱动-win10禁止更新驱动
 reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "ExcludeWUDriversInQualityUpdate" /t reg_dword /d 1 /f
 REM 硬件-驱动-禁用启动时的完整性检查
@@ -410,6 +415,8 @@ reg add "HKCU\SOFTWARE\Microsoft\Siuf\Rules" /v "NumberOfSIUFInPeriod" /t reg_dw
 reg delete "HKCU\SOFTWARE\Microsoft\Siuf\Rules" /v "PeriodInNanoSeconds" /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "DoNotShowFeedbackNotifications" /t reg_dword /d 1 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "DoNotShowFeedbackNotifications" /t reg_dword /d 1 /f
+REM 系统-通知-关闭"完成设备设置以充分利用Windows的建议"通知
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f
 
 REM 系统-广告-关闭广告标识符
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t reg_dword /d 0 /f
@@ -490,6 +497,8 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" 
 REM 系统-广告-关闭允许网站通过访问语言列表来提供相关服务
 reg add "HKCU\Control Panel\International\User Profile" /v "HttpAcceptLanguageOptOut" /t reg_dword /d 1 /f
 
+REM 系统-Windows Defender-关闭AMSI接口的AV
+reg add "HKLM\SOFTWARE\Microsoft\Wbem" /v "AmsiEnable" /t reg_dword /d 0 /f
 REM 系统-Windows Defender-关闭Windows附件策略中的防病毒扫描功能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "ScanWithAntiVirus" /t reg_dword /d 0 /f
 REM 系统-Windows Defender-禁止SmartScreen 的应用和文件检查功能
@@ -537,6 +546,8 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
 
 REM 系统-设置-关闭Windowsink
 reg add "HKLM\Software\Microsoft\Windows\WindowsInkWorkspace" /v "AllowWindowsInkWorkspace" /t reg_dword /d 0 /f
+REM 系统-设置-关闭MS Teams自动安装
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications" /v ConfigureChatAutoInstall /t reg_dword /d 0 /f
 REM 系统-设置-关闭小娜
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCortana /t reg_dword /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCortanaAboveLock /t reg_dword /d 0 /f
@@ -601,14 +612,22 @@ REM 系统-设置-修改允许游戏 DVR 设置为启用
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR" /v AllowGameDVR /t reg_dword /d 1 /f
 REM 系统-设置-修改默认应用程序管理的允许游戏 DVR 设置为禁用
 reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR" /v value /t reg_dword /d 0 /f
+REM 系统-设置-关闭程序兼容性引擎
+reg add "HKLM\Software\Policies\Microsoft\Windows\AppCompat" /v "DisableEngine" /t REG_DWORD /d 1 /f
+REM 系统-设置-关闭修复数据库
+reg add "HKLM\Software\Policies\Microsoft\Windows\AppCompat" /v "SbEnable" /t REG_DWORD /d 1 /f
 REM 系统-设置-关闭程序兼容性助手
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /d 1 /t reg_dword /f
+reg add "HKLM\Software\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /t REG_DWORD /d 1 /f
+REM 系统-设置-禁用家庭组
+reg add "HKLM\Software\Policies\Microsoft\Windows\HomeGroup" /v "DisableHomeGroup" /t REG_DWORD /d 1 /f
 REM 系统-设置-禁用Microsoft兼容性评估任务
 schtasks /change /TN "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /DISABLE
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe" /v "Debugger" /t reg_sz /d "%windir%\System32\taskkill.exe" /f
 REM 系统-设置-禁用 Windows 更新保留的存储空间
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v "ReservedStorage" /t reg_dword /d 0 /f
 
+REM 系统-性能-启用GPU硬件加速
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t reg_dword /d 2 /f
 REM 系统-性能-启用 StickyKeys 功能，使用户可以轻松按下多个键
 reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v Flags /t reg_sz /d 506 /f
 REM 系统-性能-调整键盘响应速度和频率，以提升用户的键盘输入体验
@@ -620,6 +639,8 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "Hid
 REM 系统-性能-登录windows开启数字键
 reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t "reg_sz" /d "2" /f
 reg add "HKU\.DEFAULT\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t reg_sz /d "2" /f
+REM 系统-性能-禁用NTFS最后访问更新时间
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v "NtfsDisableLastAccessUpdate" /d 2147483649 /t reg_dword /f
 REM 系统-性能-NTFS文件优化
 reg add "HKLM\SYSTEM\ControlSet001\Control\Session Manager" /v "NtfsDisableLastAccessUpdate" /d 1 /t reg_dword /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager" /v "NtfsDisableLastAccessUpdate" /d 1 /t reg_dword /f
@@ -782,6 +803,8 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "NoI
 REM 系统-格式关联-关闭打开方式从应用商店选择其它应用
 reg add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v "NoUseStoreOpenWith" /t reg_dword /d 1 /f
 
+REM 系统-远程-禁用远程修改注册表
+reg add "HKLM\System\CurrentControlSet\Control\SecurePipeServers\Winreg" /v "RemoteRegAccess" /t reg_dword /d 0 /f
 REM 系统-远程-允许远程协助
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Remote Assistance" /v "fAllowToGetHelp" /t reg_dword /d 1 /f
 REM 系统-远程-允许远程桌面连接
@@ -810,6 +833,8 @@ reg add "HKCU\Software\Microsoft\Terminal Server Client" /v "PinConnectionBar" /
 REM 系统-远程-禁用远程注册表访问
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurePipeServers\winreg" /v "RemoteRegAccess" /t reg_dword /d 1 /f
 
+REM 系统-系统更新-更新不包括恶意软件删除工具
+reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "DoNotIncludeMalwareRemovalTool" /t reg_dword /d 1 /f
 REM 系统-系统更新-禁用自动执行 Windows 升级
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v "AutoUpdate" /t reg_dword /d 2 /f
 REM 系统-系统更新-自动安装无需重启的更新
@@ -872,6 +897,10 @@ REM 系统-安全设置-禁止文件属性访问限制或安全警告
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "SaveZoneInformation" /t reg_dword /d 1 /f
 REM 系统-安全设置-禁止运行计算机自动维护计划
 reg add "HKLM\Software\Policies\Microsoft\Windows\ScheduledDiagnostics" /v "EnabledExecution" /t reg_dword /d 0 /f
+REM 系统-安全设置-完全停止windows的自动维护
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /v "MaintenanceDisabled" /t reg_dword /d 1 /f
+REM 系统-安全设置-允许直接运行来自网络的exebat
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Associations" /v "LowRiskFileTypes" /t reg_sz /d ".exe;.reg.;.bat.;.vbs;.cmd;.ps1;.zip;.rar;.msi;.msu;.lnk;.7z;.tar.gz;.doc;.docx;.pdf;" /f
 REM 系统-安全设置-允许直接运行来自网络的exebat
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Associations" /v "ModRiskFileTypes" /t reg_sz /d ".bat;.exe;.reg;.vbs;.chm;.msi;.js;.cmd;.zip;.rar;.7z" /f
 reg add "HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Policies\Associations" /v "ModRiskFileTypes" /t reg_sz /d ".bat;.exe;.reg;.vbs;.chm;.msi;.js;.cmd;.zip;.rar;.7z" /f
@@ -883,6 +912,8 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\Firewall
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\DomainProfile" /v "EnableFirewall" /t reg_dword /d 0 /f
 REM 系统-安全设置-禁用 BitLocker 自动设备加密
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\BitLocker" /v "AutoUnlockDisabled" /t reg_dword /d 1 /f
+REM 系统-安全设置-禁用windows安装时候 BitLocker 自动磁盘加密
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\BitLocker" /v "PreventDeviceEncryption" /t reg_dword /d 1 /f
 goto :eof
 
 :better_jm
@@ -924,12 +955,18 @@ REM 界面-任务栏-任务栏中的Cortana调整为隐藏
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v SearchboxTaskbarMode /t reg_dword /d 0 /f
 REM 界面-任务栏-搜索设置为取消
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t reg_dword /d 0 /f
+REM 界面-任务栏-关闭搜索栏中bing结果和建议
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "DisableSearchBoxSuggestions" /t reg_dword /d 1 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "BingSearchEnabled" /t reg_dword /d 0 /f
 REM 界面-任务栏-关闭显示“任务视图”按钮
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MultitaskingView" /v "ShowTaskViewButton" /t reg_dword /d 0 /f
 REM 界面-任务栏-关闭在任务栏显示人脉
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People" /v "PeopleBand" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v PeopleBand /t reg_dword /d 0 /f
+REM 界面-任务栏-删除在任务栏新闻和兴趣小部件
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v "AllowNewsAndInterests" /t reg_dword /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Feeds" /v "EnShellFeedsTaskbarViewMode" /t reg_dword /d 883378425 /f
 
 REM 界面-任务栏-按钮显示图标和文本
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "IconsOnly" /d 0 /t reg_dword /f
@@ -949,8 +986,10 @@ REM 界面-任务栏-隐藏某些SATA硬盘任务栏图标
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvata" /v "DisableRemovable" /t reg_dword /d 1 /f
 REM 界面-任务栏-语言栏-将语言栏隐藏到任务栏
 reg add "HKCU\Software\Microsoft\CTF\MSUTB" /v "ShowDeskBand" /t reg_dword /d 1 /f
-REM 界面-任务栏-语言栏-取消语言栏上的帮助按钮
+REM 界面-任务栏-语言栏-取消语言栏上的帮助按钮，将语言栏隐藏到任务栏
 reg add "HKCU\Software\Microsoft\CTF\LangBar" /v "ShowStatus" /t reg_dword /d 4 /f
+REM 界面-任务栏-语言栏-隐藏语言栏上的帮助按钮
+reg add "HKCU\Software\Microsoft\CTF\LangBar" /v "ShowHelp" /t reg_dword /d 0 /f
 REM 界面-任务栏-语言栏-在最小化时不显示语言栏上的额外图标
 reg add "HKCU\Software\Microsoft\CTF\LangBar" /v "ExtraIconsOnMinimized" /t reg_dword /d 0 /f
 REM 界面-任务栏-语言栏-设置语言栏的降级级别为3
@@ -963,6 +1002,7 @@ del /q /f /s "%localappdata%\Microsoft\Windows\RoamingTiles\*"
 REM 界面-开始菜单-关闭磁贴功能及显示
 reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v DisableLiveTile /t reg_dword /d 1 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_LargeTiles /t reg_dword /d 0 /f
+REM 界面-开始菜单-关闭突出显示新安装的程序
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProgs /t reg_dword /d 0 /f
 REM 界面-开始菜单-关闭开始屏幕自动显示"应用"视图
 reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v ShowAppsViewOnStart /d 0 /t reg_dword /f
@@ -982,6 +1022,10 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" 
 REM 界面-开始菜单-禁用开始菜单动画
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "StartMenuAnimation" /t reg_dword /d 0 /f
 
+REM 界面-主题与背景-删除最近访问过的文件夹的详细信息，包括每个文件夹的视图设置
+reg delete "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\BagMRU" /f
+REM 界面-主题与背景-删除所有文件夹的视图和排序设置的默认值
+reg delete "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags" /f
 REM 界面-主题与背景-启用Aero Peek功能
 reg add "HKCU\Software\Microsoft\Windows\DWM" /v "EnableAeroPeek" /d 1 /t reg_dword /f
 REM 界面-主题与背景-禁用窗口动态效果
@@ -1046,6 +1090,8 @@ REM 界面-主题与背景-禁用视觉效果
 REM reg add "HKCU\Control Panel\Desktop" /v "VisualFX" /d "0" /t reg_sz /f
 REM 界面-主题与背景-设置视觉效果设置为极速模式0启用一些特效1最佳性能3
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /d 3 /t reg_dword /f
+REM 界面-主题与背景-禁用系统视觉动画
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "TurnOffSPIAnimations" /d 1 /t reg_dword /f
 
 REM 界面-资源管理器-“此电脑”默认展开
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v NavPaneExpandToThisPC /t reg_dword /d 1 /f
@@ -1101,10 +1147,10 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "H
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowSuperHidden" /t reg_dword /d 0 /f
 REM 界面-资源管理器-取消显示所有文件夹
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "NavPaneShowAllFolders" /t reg_dword /d 0 /f
-REM 界面-资源管理器-配置当前用户桌面用户首选项掩码为 9032078010000000（以前是9012038010000000）
-reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9032078010000000" /t reg_binary /f
-REM 界面-资源管理器-设置当前用户的资源管理器用户首选项掩码为 9032078010000000（以前是9012038010000000）
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9032078010000000" /t reg_binary /f
+REM 界面-资源管理器-配置当前用户桌面用户首选项掩码为 上次是9032078010000000（系统默认是9012038010000000）
+reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9030078010000000" /t reg_binary /f
+REM 界面-资源管理器-设置当前用户的资源管理器用户首选项掩码为 上次是9032078010000000（系统默认是9012038010000000）
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9030078010000000" /t reg_binary /f
 
 REM 界面-应用程序-减少等待应用程序未响应的等待时间为3秒
 reg add "HKCU\Control Panel\Desktop" /v "HungAppTimeout" /t reg_sz /d 3000 /f
@@ -1351,6 +1397,10 @@ REM 软件-浏览器-IE-功能-当创建新选项卡时，始终切换到新选项卡
 reg add "HKCU\Software\Microsoft\Internet Explorer\TabbedBrowsing" /v "OpenInForeground" /t reg_dword /d 1 /f
 REM 软件-浏览器-IE-功能-设置IE浏览器当其他程序从当前窗口的新选项卡打开连接
 reg add "HKCU\Software\Microsoft\Internet Explorer\TabbedBrowsing" /v "ShortcutBehavior" /t reg_dword /d 1 /f
+REM 软件-浏览器-IE-功能-关闭自动更新
+reg add "HKLM\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings" /v "DisableAutoUpdate" /t reg_dword /d 1 /f
+REM 软件-浏览器-IE-功能-隐藏右上角的笑脸反馈按钮
+reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "EnableBrowserExtensions" /t reg_dword /d 0 /f
 
 REM 软件-浏览器-IE-关联-格式关联
 assoc .htm=htmlfile
@@ -1418,6 +1468,7 @@ reg add "HKCU\SOFTWARE\Microsoft\Edge\SmartScreenEnabled" /v "" /t reg_dword /d 
 reg add "HKCU\SOFTWARE\Microsoft\Edge\SmartScreenPuaEnabled" /v "" /t reg_dword /d 0 /f
 REM 软件-浏览器-Edge-禁用 SmartScreen 过滤器
 reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter" /v "Enabled" /t reg_dword /d 0 /f
+reg add "HKLM\Software\Policies\Microsoft\MicrosoftEdge\PhishingFilter" /v "EnabledV9" /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter" /v "SendSmartScreenFilter" /t reg_dword /d 0 /f
 REM 软件-浏览器-Edge-禁用 Windows SmartScreen
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\SmartScreen" /v "Enabled" /t reg_dword /d 0 /f
@@ -1776,6 +1827,7 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "N
 REM 软件-输入法-默认语言 0 中文，1 英文，肯定正确！
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
 reg add "HKLM\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
+reg add "HKCU\Software\Microsoft\IME\15.0\IMETC" /v "DefaultInputMode" /t REG_DWORD /d 1 /f
 REM 软件-输入法-智能模糊拼音 0 禁用，1 启用
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableSmartFuzzyPinyin" /t reg_dword /d 1 /f
 REM 软件-输入法-模糊拼音 0 禁用，1 启用
@@ -1836,23 +1888,6 @@ reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ic
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ico\OpenWithProgids" /f
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jfif\OpenWithList" /f
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jfif\OpenWithProgids" /f
-REM 添加Windows照片查看器到所有这些文件类型的“建议的应用”
-REM 定义一个变量，包含所有需要处理的文件扩展名
-set FILETYPES=.jpg .jpeg .png .bmp .gif .tif .tiff .ico .jfif
-
-REM 删除所有文件类型的现有关联设置
-for %%t in (%FILETYPES%) do (
-	reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /f
-	reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithProgids" /f
-	reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\UserChoice" /f
-)
-
-REM 添加Windows照片查看器到所有这些文件类型的“建议的应用”
-for %%t in (%FILETYPES%) do (
-	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "MRUList" /t reg_sz /d "a" /f
-	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\OpenWithList" /v "a" /t reg_sz /d "PhotoViewer.FileAssoc.Tiff" /f
-	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\%%t\UserChoice" /v "Progid" /t reg_sz /d "PhotoViewer.FileAssoc.Tiff" /f
-)
 REM 软件-Windows 照片查看器-保留系统默认的 Windows Photo Viewer
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "MRUList" /t reg_sz /d "a" /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "a" /t reg_sz /d "Windows.PhotoViewer.FileAssoc.Tiff" /f
@@ -1872,12 +1907,16 @@ assoc .tif=PhotoViewer.FileAssoc.Tiff
 assoc .tiff=PhotoViewer.FileAssoc.Tiff
 assoc .ico=PhotoViewer.FileAssoc.Tiff
 assoc .jfif=PhotoViewer.FileAssoc.Tiff
+REM 软件-Windows 照片查看器-启用 Windows 照片查看器
+reg add "HKLM\Software\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".jpg" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKLM\Software\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".jpeg" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
+reg add "HKLM\Software\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".png" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
 REM 软件-Windows 照片查看器-解决Win10报内存不足，方法2为实验产品，开启1G缓存
 REM reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\ICM\RegisteredProfiles" /v "sRGB" /t reg_sz /d "RSWOP.icm" /f
 reg add "HKCU\Software\Microsoft\Windows Photo Viewer\Viewer" /f /v MemCacheSize /t reg_dword /d 1073741824
 
 REM 软件-Windows Media Player-不显示首次使用对话框
-reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsMediaPlayer" /v "GroupPrivacyAcceptance" /t reg_dword /d 1 /f
+reg add "HKCU\Software\Microsoft\MediaPlayer\Preferences" /v "AcceptedPrivacyStatement" /t REG_DWORD /d 1 /f
 REM 软件-Windows Media Player-禁用自动更新功能
 reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsMediaPlayer" /v "DisableAutoUpdate" /t reg_dword /d 1 /f
 
@@ -2074,8 +2113,6 @@ start "" explorer
 if "%hs%"=="_hsf" goto :eof
 REM 系统激活脚本
 if exist "C:\ShaoHua\Key\Activate.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\系统激活脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\Activate.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
-REM 打印共享脚本
-if exist "C:\ShaoHua\Key\FixPrint.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\打印共享脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\FixPrint.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
 REM 垃圾清理脚本
 if exist "C:\ShaoHua\Key\ClearTemp.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\垃圾清理脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\ClearTemp.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
 REM 清理传递优化文件
@@ -2114,8 +2151,6 @@ del /q /f "C:\ShaoHua\Soft\Shadow Defender 1.5.0.726.exe" 2>nul
 del /q /f "C:\ShaoHua\Soft\windows生产外网V5.4.1.exe" 2>nul
 del /q /f "C:\ShaoHua\Soft\离线安装包20241206-外网Windows.exe" 2>nul
 del /q /f "C:\ShaoHua\Soft\lva_setupfull_20241205174952.exe" 2>nul
-del /q /f "C:\ShaoHua\Soft\assist.exe" 2>nul
-del /q /f "C:\ShaoHua\Soft\HSebankClient.exe" 2>nul
 rd /q /s "C:\ShaoHua\Soft\安装包" 2>nul
 del /q /f "C:\ShaoHua\Tools\Key\*.exe" 2>nul
 del /q /f "C:\ShaoHua\Tools\Office修复工具\Office启动一键修复.exe" 2>nul
@@ -2166,8 +2201,6 @@ if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\Shadow Defender 1.5.0.726.exe" 2>nu
 if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\windows生产外网V5.4.1.exe" 2>nul
 if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\离线安装包20241206-外网Windows.exe" 2>nul
 if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\lva_setupfull_20241205174952.exe" 2>nul
-if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\assist.exe" 2>nul
-if "%hs%"=="_hso" del /q /f "C:\ShaoHua\Soft\HSebankClient.exe" 2>nul
 if "%hs%"=="_hso" rd /q /s "C:\ShaoHua\Soft\安装包" 2>nul
 del /q /f "C:\Windows\System32\UCli.exe" 2>nul
 del /q /f "C:\Windows\System32\config.ini" 2>nul
