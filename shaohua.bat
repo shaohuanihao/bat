@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20250816
+set Version=20250826
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -884,8 +884,19 @@ REM 系统-安全设置-关闭VBS
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Hyper-V\Guest" /v "EnableVirtualizationBasedSecurity" /t reg_dword /d 0 /f
 REM 系统-安全设置-禁用 RPC 隐私保护
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Rpcss\Parameters" /v "EnablePrivacy" /t reg_dword /d 0 /f
-REM 系统-安全设置-禁用复杂密码策略
-net accounts /maxpwage:unlimited /minpwlen:0 /minpwage:0 /uniquepw:0
+REM 系统-安全设置-允许空密码登录
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v "LimitBlankPasswordUse" /t REG_DWORD /d 0 /f
+REM 系统-安全设置-关闭密码复杂性要求
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v "EnablePasswordComplexity" /t REG_DWORD /d 0 /f
+REM 系统-安全设置-关闭账户锁定
+net accounts /lockoutthreshold:0
+net accounts /lockoutduration:0
+net accounts /lockoutwindow:0
+REM 系统-安全设置-设置密码永不过期
+net accounts /maxpwage:999
+net accounts /minpwlen:0
+net accounts /minpwage:0
+net accounts /uniquepw:0
 REM 系统-安全设置-将用户密码的最大有效期设置为永不过期
 net accounts /maxpwage:unlimited
 wmic UserAccount where Name='administrator' set PasswordExpires=False
@@ -1457,37 +1468,142 @@ reg add "HKCU\Software\Microsoft\Edge\InternetExplorerIntegration" /v "ShowIEBut
 REM 软件-浏览器-Edge-禁止打开IE弹出EDGE
 reg add "HKCU\SOFTWARE\Microsoft\Internet Explorer\Main" /v "Enable Browser Extensions" /t reg_sz /d "no" /f
 REM 软件-浏览器-Edge-阻止Microsoft Edge“首次运行”欢迎页面
-reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge" /v "PreventFirstRunPage" /t reg_dword /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "PreventFirstRunPage" /t reg_dword /d 1 /f
 REM 软件-浏览器-Edge-rem 禁用IE自动跳转到Edge浏览器
 reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v IE11DisableEdgeRedirect /t reg_dword /d 1 /f
 REM 软件-浏览器-Edge-禁用Edge浏览器
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v AllowPrelaunch /t reg_dword /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v DoNotUpdateToEdgeWithChromium /t reg_dword /d 1 /f
-REM 软件-浏览器-Edge-禁止Edge的SmartScreen
-reg add "HKCU\SOFTWARE\Microsoft\Edge\SmartScreenEnabled" /v "" /t reg_dword /d 0 /f
-reg add "HKCU\SOFTWARE\Microsoft\Edge\SmartScreenPuaEnabled" /v "" /t reg_dword /d 0 /f
 REM 软件-浏览器-Edge-禁用 SmartScreen 过滤器
-reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter" /v "Enabled" /t reg_dword /d 0 /f
-reg add "HKLM\Software\Policies\Microsoft\MicrosoftEdge\PhishingFilter" /v "EnabledV9" /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\PhishingFilter" /v "SendSmartScreenFilter" /t reg_dword /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge\PhishingFilter" /v "Enabled" /t reg_dword /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge\PhishingFilter" /v "SendSmartScreenFilter" /t reg_dword /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge\PhishingFilter" /v "EnabledV9" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "SmartScreenEnabled" /t REG_DWORD /d 0 /f
 REM 软件-浏览器-Edge-禁用 Windows SmartScreen
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\SmartScreen" /v "Enabled" /t reg_dword /d 0 /f
 REM 软件-浏览器-Edge-关闭Adobe Flash即点即用
-reg add "HKLM\SOFTWARE\Policies\Microsoft\MicrosoftEdge\Security" /v "FlashClickToRunMode" /t reg_dword /d 0 /f
-REM 软件-浏览器-Edge-禁用Microsoft Edge的V9版本钓鱼网站过滤器
-reg add "HKCU\Software\Microsoft\MicrosoftEdge\PhishingFilter" /v "EnabledV9" /t reg_dword /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge\Security" /v "FlashClickToRunMode" /t reg_dword /d 0 /f
 REM 软件-浏览器-Edge-禁用启动加速功能的策略
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v StartupBoostEnabled /t reg_dword /d 0 /f
 REM 软件-浏览器-Edge-禁用后台模式启用
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v BackgroundModeEnabled /t reg_dword /d 0 /f
+REM 软件-浏览器-Edge-启用IE模式
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "InternetExplorerIntegrationLevel" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-设置 IE 模式站点列表 XML 路径
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "InternetExplorerIntegrationSiteList" /t REG_SZ /d "file:///C:/hsbankweb.xml" /f
+REM 软件-浏览器-Edge-创建站点列表 XML 文件
+(
+echo ^<?xml version="1.0" encoding="UTF-8"?^>
+echo ^<site-list version="1"^>
+echo     ^<site url="38.10.68.32"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.10.68.38"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.11.176"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.11.177"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.13.241"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.13.70"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.19.114"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.19.157"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.19.172"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.19.240"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.19.52"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.19.78"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.19.87"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.64.35"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.77.104"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.78.59"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.79.45"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.79.55"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.40.15.101"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo     ^<site url="38.19.11.177"^>
+echo         ^<compat-mode^>Default^</compat-mode^>
+echo         ^<open-in^>IE11^</open-in^>
+echo     ^</site^>
+echo ^</site-list^>
+) > C:\hsbankweb.xml
+REM 软件-浏览器-Edge-禁用安全增强功能
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "SecurityLevel" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "AllowOutdatedPlugins" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "DefaultJavaScriptSetting" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-禁用SmartScreen
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "SmartScreenEnabled" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "SmartScreenPuaEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-启用硬件加速
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Edge" /v "HardwareAccelerationModeEnabled" /t reg_dword /d 1 /f
+REM 软件-浏览器-Edge-启用平滑滚动（示例）
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "SmoothScrollEnabled" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-设定主页及启动页（Policies 会强制）
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "RestoreOnStartup" /t REG_DWORD /d 4 /f
+REM 软件-浏览器-Edge-允许扩展
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "ExtensionsEnabled" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-阻止从 Microsoft Edge 加载商店扩展
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "ExtensionsBlocklist" /t REG_SZ /d "microsoft-edge-extension://*" /f
+REM 软件-浏览器-Edge-允许第三方 Cookie
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "BlockThirdPartyCookies" /t REG_DWORD /d 0 /f
 
 REM 软件-浏览器-Chrome-使chrome支持flash
-reg add "HKCU\SOFTWARE\Policies\Chromium" /v "AllowOutdatedPlugins" /t reg_dword /d 1 /f
-reg add "HKCU\SOFTWARE\Policies\Chromium" /v "RunAllFlashInAllowMode" /t reg_dword /d 1 /f
-reg add "HKCU\SOFTWARE\Policies\Chromium" /v "DefaultPluginsSetting" /t reg_dword /d 1 /f
-reg add "HKCU\SOFTWARE\Policies\Chromium" /v "HardwareAccelerationModeEnabled" /t reg_dword /d 1 /f
-reg add "HKCU\SOFTWARE\Policies\Chromium\PluginsAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
-reg add "HKCU\SOFTWARE\Policies\Chromium\PluginsAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Edge" /v "AllowOutdatedPlugins" /t reg_dword /d 1 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Edge" /v "RunAllFlashInAllowMode" /t reg_dword /d 1 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Edge" /v "DefaultPluginsSetting" /t reg_dword /d 1 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Edge" /v "HardwareAccelerationModeEnabled" /t reg_dword /d 1 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Edge\PluginsAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Edge\PluginsAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
 REM 软件-浏览器-Chrome-下载前询问每个文件的保存位置
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "PromptForDownloadLocation" /t reg_dword /d 1 /f
 REM 软件-浏览器-Chrome-允许运行过时的插件
@@ -1559,7 +1675,8 @@ goto :eof
 
 :better_llq_kj_set
 if "%bl%"=="5" goto :eof
-set IE_Zones=HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\%bl%
+rem 老地址：HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\
+set IE_Zones=HKCU\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\%bl%
 echo ZONE%bl%
 REM 安全级别12000=高、11500=中-高、11000＝中、10500＝中低、10000＝低、0=自定义
 reg add "%IE_Zones%" /v "CurrentLevel" /d "0" /t reg_dword /f
@@ -1585,7 +1702,7 @@ REM 覆盖每站点（基于域）ActiveX 限制
 reg add "%IE_Zones%" /v "120B" /d "3" /t reg_dword /f
 REM 未知
 reg add "%IE_Zones%" /v "120C" /d "0" /t reg_dword /f
-REM 活动脚本编写
+REM 活动脚本编写、弹出窗口
 reg add "%IE_Zones%" /v "1400" /d "0" /t reg_dword /f
 REM Java 小程序脚本编写
 reg add "%IE_Zones%" /v "1402" /d "0" /t reg_dword /f
@@ -1601,7 +1718,7 @@ REM 启用 XSS 筛选器
 reg add "%IE_Zones%" /v "1409" /d "3" /t reg_dword /f
 REM 提交未加密的表单数据
 reg add "%IE_Zones%" /v "1601" /d "0" /t reg_dword /f
-REM 字体下载
+REM 字体下载、文件下载
 reg add "%IE_Zones%" /v "1604" /d "0" /t reg_dword /f
 REM 运行 Java
 reg add "%IE_Zones%" /v "1605" /d "0" /t reg_dword /f
