@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20250830
+set Version=20251101
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -420,14 +420,27 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /
 
 REM 系统-广告-关闭广告标识符
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t reg_dword /d 0 /f
-REM 系统-广告-禁用遥测
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t reg_dword /d 0 /f
+REM 系统-广告-禁用是0，基本是1，遥测。实测1更好
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t reg_dword /d 1 /f
 REM 系统-广告-关闭应用程序影响遥测
 reg add "HKLM\Software\Policies\Microsoft\Windows\AppCompat" /v "AITEnable" /t reg_dword /d 0 /f
+REM 系统-广告-禁用OneSettings配置设置的下载
+reg add "HKLM\Software\Policies\Microsoft\Windows\DataCollection" /v "DisableOneSettingsDownloads" /t REG_DWORD /d 1 /f
+REM 系统-广告-禁用对此设备上用户账户信息的应用访问
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation" /v "Value" /t REG_SZ /d "Deny" /f
+REM 系统-广告-禁用对设备诊断信息的应用访问
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appDiagnostics" /v "Value" /t REG_SZ /d "Deny" /f
+REM 系统-广告-禁止将文本消息备份到云端
+reg add "HKLM\Software\Policies\Microsoft\Windows\Messaging" /v "AllowMessageSync" /t REG_DWORD /d 0 /f
+REM 系统-广告-禁用并重置整个计算机的广告ID
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t REG_DWORD /d 0 /f
+REM 系统-广告-禁用发送手写错误报告
+reg add "HKLM\Software\Policies\Microsoft\Windows\HandwritingErrorReports" /v "PreventHandwritingErrorReports" /t REG_DWORD /d 1 /f
+REM 系统-广告-禁用发送笔迹数据
+reg add "HKLM\Software\Policies\Microsoft\Windows\TabletPC" /v "PreventHandwritingDataSharing" /t REG_DWORD /d 1 /f
 REM 系统-广告-关闭数据收集中的遥测
 reg add "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t reg_dword /d 0 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t reg_dword /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t reg_dword /d 0 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "LimitEnhancedDiagnosticDataWindowsAnalytics" /t reg_dword /d 0 /f
 REM 系统-广告-禁用传递优化内容
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DODownloadMode /t reg_dword /d 0 /f
@@ -681,11 +694,11 @@ REM 系统-性能-禁用页面文件
 )
 
 REM 系统-服务-关闭windows传递优化服务，减少网络和系统资源占用
-net stop DoSvc
+sc stop DoSvc
 sc config DoSvc start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DoSvc" /v "Start" /t reg_dword /d "4" /f
 REM 系统-服务-禁用Windows Defender安全中心服务
-net stop WinDefend
+sc stop WinDefend
 sc config WinDefend start= disabled
 reg add "HKLM\SYSTEM\ControlSet001\Services\SecurityHealthService" /v "Start" /t reg_dword /d 4 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t reg_dword /d 4 /f
@@ -694,117 +707,116 @@ REM 系统-服务-设置embeddedmode服务启动类型为自动
 sc config embeddedmode start= auto
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\embeddedmode" /v Start /t reg_dword /d 4 /f
 REM 系统-服务-将诊断跟踪服务设为手动启动，减少不必要的后台诊断数据收集
-net stop DiagTrack
-sc config DiagTrack start= demand
+sc config DiagTrack start= disabled
+sc stop DiagTrack
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DiagTrack" /v "Start" /t reg_dword /d 4 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t reg_dword /d 0 /f
 REM 系统-服务-诊断服务设为手动启动，降低系统资源因诊断而产生的消耗
-net stop diagsvc
-sc config diagsvc start= demand
+sc stop diagsvc
+sc config diagsvc start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\diagsvc" /v "Start" /t reg_dword /d 4 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack" /v "Enabled" /t reg_dword /d 0 /f
 REM 系统-服务-数据移动应用程序推送服务设为手动启动，减少推送相关的资源占用
-net stop dmwappushservice
-sc config dmwappushservice start= demand
+sc config dmwappushservice start= disabled
+sc stop dmwappushservice
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\dmwappushservice" /v "Start" /t reg_dword /d 3 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\PushNotifications" /v "NoToastApplicationNotificationOnLockScreen" /t reg_dword /d 1 /f
 REM 系统-服务-诊断中心标准收集器服务设为手动启动，减少诊断数据收集资源占用
-net stop diagnosticshub.standardcollector.service
+sc stop diagnosticshub.standardcollector.service
 sc config diagnosticshub.standardcollector.service start= demand
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\diagnosticshub.standardcollector.service" /v "Start" /t reg_dword /d 4 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "MaxTelemetryAllowed" /t reg_dword /d 0 /f
 REM 系统-服务-关闭Windows防火墙，此操作会降低系统网络安全性，在安全环境下操作
-net stop MpsSvc
+sc stop MpsSvc
 sc config MpsSvc start= disabled
 netsh advfirewall set allprofiles state off
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess" /v "Start" /t reg_dword /d 4 /f
 REM 系统-服务-关闭超级预读Superfetch，可释放部分内存资源，但可能影响系统启动速度优化
-net stop SysMain
+sc stop SysMain
 sc config SysMain start= disabled
 sc stop SysMain
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SysMain" /v "Start" /t reg_dword /d 4 /f
 REM 系统-服务-关闭系统预读Prefetch，减少内存占用，但可能影响某些程序启动速度
-net stop Prefetch
+sc stop Prefetch
 sc config Prefetch start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v EnablePrefetcher /t reg_dword /d 0 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v EnableSuperfetch /t reg_dword /d 0 /f
 REM 系统-服务-禁止疑难解答，减少系统资源占用和后台运行干扰
-net stop WdiSystemHost
-net stop WdiServiceHost
+sc stop WdiSystemHost
+sc stop WdiServiceHost
 sc config WdiServiceHost start= disabled
 sc config WdiSystemHost start= disabled
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting" /v "Disabled" /t reg_dword /d 1 /f
 REM 系统-服务-禁用程序兼容性助手，减少后台资源占用，但可能影响程序兼容性检查
-net stop PcaSvc
+sc stop PcaSvc
 sc config PcaSvc start= disabled
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /t reg_dword /d 1 /f
 REM 系统-服务-禁用远程修改注册表，增强系统安全性，防止远程恶意修改
-net stop RemoteRegistry
+sc stop RemoteRegistry
 sc config RemoteRegistry start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\RemoteRegistry" /v "Start" /t reg_dword /d 4 /f
 REM 系统-服务-禁用诊断服务
-net stop DPS
+sc stop DPS
 sc config DPS start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DPS" /v "Start" /t reg_dword /d 4 /f
 REM 系统-服务-开启IPv6转换服务，满足网络通信中IPv6相关需求
-net start iphlpsvc
+sc start iphlpsvc
 sc config iphlpsvc start= auto
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\iphlpsvc" /v "Start" /t reg_dword /d 2 /f
 REM 系统-服务-关闭Windows Search，减少系统资源占用，但会影响搜索功能
-net stop WSearch
+sc stop WSearch
 sc config WSearch start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\WSearch" /v "Start" /t reg_dword /d 4 /f
 REM 系统-服务-禁用错误报告，减少系统向微软发送错误信息的资源消耗
-net stop WerSvc
+sc stop WerSvc
 sc config WerSvc start= disabled
 reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v "Disabled" /t reg_dword /d 1 /f
 REM 系统-服务-禁用家庭组，减少网络共享相关的系统资源占用和潜在安全风险
-net stop HomeGroupProvider
+sc stop HomeGroupProvider
 sc config HomeGroupProvider start= disabled
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\HomeGroup\Services" /v "HomeGroupProvider" /t reg_dword /d 4 /f
 REM 系统-服务-设置NTFS链接跟踪服务为手动启动，减少资源占用
-net stop TrkWks
+sc stop TrkWks
 sc config TrkWks start= demand
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\TrkWks" /v "Start" /t reg_dword /d 3 /f
 REM 系统-服务-禁用备份服务，释放系统资源，但无法自动备份数据
-net stop SDRSVC
+sc stop SDRSVC
 sc config SDRSVC start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SDRSVC" /v "Start" /t reg_dword /d 4 /f
 REM 系统-服务-禁用AppReadiness，减少系统对应用准备相关的资源占用
-net stop AppReadiness
+sc stop AppReadiness
 sc config AppReadiness start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\AppReadiness" /v "Start" /t reg_dword /d 4 /f
 REM 系统-服务-禁用Windows To Go，减少相关服务资源占用
-net stop WTGService
+sc stop WTGService
 sc config WTGService start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\WTGService" /v "Start" /t reg_dword /d 4 /f
 REM 系统-服务-开启LPD打印服务，满足打印需求
-net start lpdsvc
+sc start lpdsvc
 sc config lpdsvc start= auto
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\lpdsvc" /v "Start" /t reg_dword /d 2 /f
 REM 系统-服务-将DMW应用用户服务设为禁用，减少资源占用
-net stop dmwappuserv
+sc stop dmwappuserv
 sc config dmwappuserv start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\dmwappuserv" /v "Start" /t reg_dword /d 4 /f
 REM 系统-服务-错误报告服务设为禁用，减少系统资源用于报告错误
-net stop ErrorReportingService
+sc stop ErrorReportingService
 sc config ErrorReportingService start= disabled
 reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v "Disabled" /t reg_dword /d 1 /f
 REM 系统-服务-程序兼容性助手服务设为禁用，减少资源占用
-net stop "Program Compatibility Assistant Service"
+sc stop "Program Compatibility Assistant Service"
 sc config "Program Compatibility Assistant Service" start= disabled
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /t reg_dword /d 1 /f
 REM 系统-服务-将Windows错误报告支持服务设为手动启动，减少资源占用
-net stop wercplsupport
+sc stop wercplsupport
 sc config wercplsupport start= demand
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\wercplsupport" /v Start /t reg_dword /d 4 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting" /v "Disabled" /t reg_dword /d 0 /f
 REM 系统-服务-停止Windows Update服务，可临时阻止系统更新，但可能导致安全风险
-net stop wuauserv
+sc stop wuauserv
 sc config wuauserv start= disabled
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoUpdate" /t reg_dword /d 1 /f
 REM 系统-服务-禁用windows更新服务，注意这会使系统无法自动更新，有安全隐患
-net stop WaaSMedicSvc
+sc stop WaaSMedicSvc
 sc config WaaSMedicSvc start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\UsoSvc" /v "start" /t reg_dword /d "4" /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v "DisableWindowsUpdateAccess" /t reg_dword /d 1 /f
@@ -1173,10 +1185,10 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "H
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowSuperHidden" /t reg_dword /d 0 /f
 REM 界面-资源管理器-取消显示所有文件夹
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "NavPaneShowAllFolders" /t reg_dword /d 0 /f
-REM 界面-资源管理器-配置当前用户桌面用户首选项掩码为 上次是9032078010000000（系统默认是9012038010000000）
-reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9030078010000000" /t reg_binary /f
-REM 界面-资源管理器-设置当前用户的资源管理器用户首选项掩码为 上次是9032078010000000（系统默认是9012038010000000）
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9030078010000000" /t reg_binary /f
+REM 界面-资源管理器-配置当前用户桌面用户首选项掩码为 上次是 9030078010000000（不能独立输入法） 再上次是 9032078010000000（系统默认是9012038010000000）
+reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9030078090000000" /t reg_binary /f
+REM 界面-资源管理器-设置当前用户的资源管理器用户首选项掩码为 上次是 9032078010000000（系统默认是 9012038010000000）
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9030078090000000" /t reg_binary /f
 
 REM 界面-应用程序-减少等待应用程序未响应的等待时间为3秒
 reg add "HKCU\Control Panel\Desktop" /v "HungAppTimeout" /t reg_sz /d 3000 /f
@@ -1640,6 +1652,14 @@ REM 软件-浏览器-Edge-允许安装外部扩展
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AllowExternalExtensions" /t REG_DWORD /d 1 /f
 REM 软件-浏览器-Edge-阻止从Microsoft Edge加载商店扩展
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "ExtensionsBlocklist" /t REG_SZ /d "microsoft-edge-extension://*" /f
+REM 软件-浏览器-Edge-禁用个性化广告、搜索、新闻和其它服务
+reg add "HKLM\Software\Policies\Microsoft\Edge" /v "PersonalizationReportingEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用来自本地供应商的建议
+reg add "HKLM\Software\Policies\Microsoft\Edge" /v "LocalProvidersEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用增强的拼写检查
+reg add "HKLM\Software\Policies\Microsoft\Edge" /v "MicrosoftEditorProofingEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用从IE到EDGE的自动重定向
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Ext\CLSID" /v "{1FD49718-1D00-4B19-AF5F-070AF6D5D54C}" /t REG_DWORD /d 0 /f
 
 REM 软件-浏览器-Chrome-下载前询问每个文件的保存位置
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "PromptForDownloadLocation" /t reg_dword /d 1 /f
@@ -2014,9 +2034,9 @@ REM 软件-输入法-人名输入 0 为禁用，1 为启用
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnablePeopleName" /t reg_dword /d 0 /f
 REM 软件-输入法-微软拼音候选词设置为9个
 reg add "HKCU\Software\Microsoft\InputMethod\Settings" /v "CandidateCount" /t reg_dword /d 9 /f
-REM 软件-输入法-禁用输入法切换提示
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell" /v "EnableCloudCandidate" /t reg_dword /d 0 /f
 REM 软件-输入法-禁用云候选词
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell" /v "EnableCloudCandidate" /t reg_dword /d 0 /f
+REM 软件-输入法-禁用输入法切换提示
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell" /v "EnableSwitchInputMethodHint" /t reg_dword /d 0 /f
 REM 软件-输入法-选项字体大小为“小”
 reg add "HKCU\Software\Microsoft\InputMethod\Settings" /v "CandidateFontSize" /t reg_dword /d 0 /f
