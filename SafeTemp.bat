@@ -1,0 +1,235 @@
+ÿşa
+cls
+@echo off
+ver|findstr /i "5\.1\." > nul&&(goto:begin)
+net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+:begin
+@echo off
+cls
+disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
+set Name=SafeTemp
+set Powered=Powered by ÉÛ»ª 18900559020
+set Version=20251127
+set Comment=ÔËĞĞÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎğÊÖ¶¯¹Ø±Õ£¡
+title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+:start
+echo. 
+echo. [WARNING] ÇëµÈ´ı½Å±¾Ö´ĞĞÍê±Ï£¬ÔÙ²Ù×÷µçÄÔ¡­
+echo. 
+set "data=C:\Windows\SafeTemp"
+set "ver=202511101511 202511241850 202511271000"
+set "new=202511271000"
+set "now="
+if exist "%data%" (
+    for /f "usebackq delims=" %%i in ("%data%") do set "now=%%i"
+)
+if defined now (
+    echo. [CHECK] ¼ì²âµ½°æ±¾ÎÄ¼şÄÚÈİ£º!now!
+    set "valid=0"
+    for %%V in (%ver%) do (
+        if "%%V"=="!now!" set "valid=1"
+    )
+    if !valid! equ 0 (
+        echo. [WARNING] ¼ì²âµ½Î´Öª°æ±¾ºÅ !now!£¬½«´Ó×îÔç°æ±¾¿ªÊ¼¡£
+        set "now="
+    )
+) else (
+    echo. [INFO] Î´¼ì²âµ½°æ±¾ÎÄ¼ş¡£
+)
+if not defined now (
+    echo. [INFO] Î´ÕÒµ½°æ±¾¼ÇÂ¼£¬´Ó×îÔç°æ±¾¿ªÊ¼¡£
+    set "flag=t"
+) else if "!now!"=="%new%" (
+    echo. [INFO] µ±Ç°°æ±¾ÒÑÊÇ×îĞÂ£º!now!
+	choice /T 1 /C SH /d H /N >nul 2>nul
+	if !errorlevel!==1 echo.&echo. [WARNING] ÒÑ´¥·¢Ç¿ÖÆ¸üĞÂ¡­&echo.&call :zip
+    goto :end
+) else (
+    echo. [INFO] µ±Ç°°æ±¾£º!now!£¬×¼±¸ĞøÅÜ¡£
+    set "flag=false"
+)
+:zip
+echo. [PATCH] ÕıÔÚÊÍ·Å²¹¶¡ÎÄ¼ş£¬°üº¬ÁË360ÆóÒµä¯ÀÀÆ÷¡¢ĞÂ°æ±¾Î¢ĞÅ¡¢Í¼Æ¬²é¿´Æ÷¡­
+if exist "D:\SH\Key\ZipC.exe" (start /wait "" "D:\SH\Key\ZipC.exe" -p"shaohuanihao") >nul 2>nul
+if exist "D:\SH\Key\ZipD.exe" (start /wait "" "D:\SH\Key\ZipD.exe" -p"shaohuanihao") >nul 2>nul
+if "!flag!"=="false" (
+    echo. [INFO] Ö´ĞĞĞøÅÜÂß¼­...
+    for %%V in (%ver%) do (
+        if "!flag!"=="t" (
+            echo.
+            call :%%V
+        )
+        if "%%V"=="!now!" set "flag=t"
+    )
+) else if "!flag!"=="t" (
+    echo. [INFO] Ö´ĞĞÍêÕû¸üĞÂ...
+    for %%V in (%ver%) do (
+        echo.
+        call :%%V
+    )
+)
+
+<nul set /p ="%new%">"%data%"
+echo.
+echo. [DONE] ËùÓĞ¸üĞÂÒÑÍê³É£¬°æ±¾ÒÑ¸üĞÂÎª£º%new%
+
+:end
+exit
+
+:202511101511
+echo. [PATCH] ÔËĞĞ 202511101511¡­
+echo. [STEP] Ğ¶ÔØÀÏ°æ±¾Î¢ĞÅ¡­
+if exist "C:\Program Files\Tencent\WeChat\Uninstall.exe" (start /wait "" "C:\Program Files\Tencent\WeChat\Uninstall.exe" /S)
+echo. [STEP] Ğ¶ÔØJAVA¡­
+start /wait "" msiexec /x {26A24AE4-039D-4CA4-87B4-2F64180291F0} /qn /norestart
+start /wait "" msiexec /x {64A3A4F4-B792-11D6-A78A-00B0D0180291} /qn /norestart
+echo. [STEP] ÉèÖÃä¯ÀÀÆ÷¹ØÁª¡­
+if exist "C:\Program Files (x86)\360\360ent\Application\360ent.exe" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\360ÆóÒµ°²È«ä¯ÀÀÆ÷.lnk""):b.TargetPath=""C:\Program Files (x86)\360\360ent\Application\360ent.exe"":b.WorkingDirectory=""C:\Program Files (x86)\360\360ent\Application"":b.Save:close") 2>nul
+if exist "C:\Program Files\Tencent\Weixin\Weixin.exe" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\Î¢ĞÅ.lnk""):b.TargetPath=""C:\Program Files\Tencent\Weixin\Weixin.exe"":b.WorkingDirectory=""C:\Program Files\Tencent\Weixin"":b.Save:close") 2>nul
+:: === ¶¨Òåä¯ÀÀÆ÷Â·¾¶£¨ÇëÈ·ÈÏÕâĞ©Â·¾¶´æÔÚ£© ===
+set "chrome_path=C:\Program Files\Google\Chrome\Application\chrome.exe"
+set "ent_path=C:\Program Files (x86)\360\360ent\Application\360ent.exe"
+
+:: ×¢²á Chrome µ½ HKLM (ËùÓĞÓÃ»§)
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome" /ve /d "Google Chrome" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationName" /d "Google Chrome" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationDescription" /d "Google Chrome ä¯ÀÀÆ÷" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationIcon" /d "!chrome_path!,0" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\shell\open\command" /ve /d "\"!chrome_path!\"" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\DefaultIcon" /ve /d "!chrome_path!,0" /f >nul 2>&1
+
+:: ×¢²á Chrome ÄÜÁ¦
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationCompany" /d "Google LLC" /f >nul 2>&1
+
+:: ×¢²á URL Ğ­Òé
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\URLAssociations" /v "http" /d "ChromeHTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\URLAssociations" /v "https" /d "ChromeHTML" /f >nul 2>&1
+
+:: ×¢²áÎÄ¼ş¹ØÁª
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\FileAssociations" /v ".htm" /d "ChromeHTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\FileAssociations" /v ".html" /d "ChromeHTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\FileAssociations" /v ".shtml" /d "ChromeHTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\FileAssociations" /v ".xht" /d "ChromeHTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\FileAssociations" /v ".xhtml" /d "ChromeHTML" /f >nul 2>&1
+
+:: ×¢²áµ½ RegisteredApplications
+reg add "HKLM\Software\RegisteredApplications" /v "Google Chrome" /d "Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /f >nul 2>&1
+
+:: ×¢²á 360ÆóÒµä¯ÀÀÆ÷µ½ HKLM
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent" /ve /d "360ÆóÒµ°²È«ä¯ÀÀÆ÷" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationName" /d "360ÆóÒµ°²È«ä¯ÀÀÆ÷" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationDescription" /d "360ÆóÒµ°²È«ä¯ÀÀÆ÷" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationIcon" /d "!ent_path!,0" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\shell\open\command" /ve /d "\"!ent_path!\"" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\DefaultIcon" /ve /d "!ent_path!,0" /f >nul 2>&1
+
+:: ×¢²á 360ÆóÒµä¯ÀÀÆ÷ÄÜÁ¦
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationCompany" /d "360.cn" /f >nul 2>&1
+
+:: ×¢²á URL Ğ­Òé
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities\URLAssociations" /v "http" /d "360HTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities\URLAssociations" /v "https" /d "360HTML" /f >nul 2>&1
+
+:: ×¢²áÎÄ¼ş¹ØÁª
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities\FileAssociations" /v ".htm" /d "360HTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities\FileAssociations" /v ".html" /d "360HTML" /f >nul 2>&1
+
+:: ×¢²áµ½ RegisteredApplications
+reg add "HKLM\Software\RegisteredApplications" /v "360ent" /d "Software\Clients\StartMenuInternet\360ent\Capabilities" /f >nul 2>&1
+
+:: ×¢²á Chrome ÎÄ¼şÀàĞÍ
+reg add "HKCR\ChromeHTML" /ve /d "Google Chrome HTML Document" /f >nul 2>&1
+reg add "HKCR\ChromeHTML\DefaultIcon" /ve /d "!chrome_path!,0" /f >nul 2>&1
+reg add "HKCR\ChromeHTML\shell\open\command" /ve /d "\"!chrome_path!\" \"%%1\"" /f >nul 2>&1
+
+:: ×¢²á 360 ÎÄ¼şÀàĞÍ
+reg add "HKCR\360HTML" /ve /d "360 Enterprise HTML Document" /f >nul 2>&1
+reg add "HKCR\360HTML\DefaultIcon" /ve /d "!ent_path!,0" /f >nul 2>&1
+reg add "HKCR\360HTML\shell\open\command" /ve /d "\"!ent_path!\" \"%%1\"" /f >nul 2>&1
+
+reg add "HKCU\SOFTWARE\Kolbicz IT\SetUserFTA" /v "RunCount" /t reg_dword /d 1 /f >nul 2>&1
+C:\ShaoHua\Tools\SetUserFTA.exe http ChromeHTML
+C:\ShaoHua\Tools\SetUserFTA.exe https ChromeHTML
+C:\ShaoHua\Tools\SetUserFTA.exe .htm ChromeHTML
+C:\ShaoHua\Tools\SetUserFTA.exe .html ChromeHTML
+C:\ShaoHua\Tools\SetUserFTA.exe .shtml ChromeHTML
+C:\ShaoHua\Tools\SetUserFTA.exe .xht ChromeHTML
+C:\ShaoHua\Tools\SetUserFTA.exe .xhtml ChromeHTML
+reg add "HKCU\SOFTWARE\Kolbicz IT\SetUserFTA" /v "RunCount" /t reg_dword /d 1 /f >nul 2>&1
+echo. [INFO] ¸üĞÂ°æ±¾ºÅ¼ÇÂ¼¡­
+<nul set /p ="202511101511">"%data%"
+echo. [DONE] 202511101511Íê³É ¡­
+goto :eof
+
+:202511241850
+echo. [PATCH] ÔËĞĞ 202511241850 ¡­
+echo. [CHECK] ¼ì²éJPEGView°²×°×´Ì¬¡­
+
+if exist "C:\Program Files\JPEGView\JPEGView.exe" (
+    echo. [INFO] ¼ì²âµ½ JPEGView£¬ÉèÖÃÎªÄ¬ÈÏÍ¼Æ¬²é¿´Æ÷¡­
+    set "ViewerPath=C:\Program Files\JPEGView\JPEGView.exe"
+    set "ProgID=JPEGView.Document"
+    set "AppName=JPEGView"
+    set "Desc=¿ìËÙ¡¢Ğ¡ÇÉµÄÍ¼Æ¬²é¿´Æ÷"
+) else (
+    echo. [INFO] Î´¼ì²âµ½ JPEGView£¬Ê¹ÓÃ Windows Í¼Æ¬²é¿´Æ÷¡­
+    set "ViewerPath=C:\Program Files\Windows Photo Viewer\PhotoViewer.dll"
+    set "ProgID=PhotoViewer.FileAssoc.Tiff"
+    set "AppName=Windows Photo Viewer"
+    set "Desc=Windows Í¼Æ¬²é¿´Æ÷"
+)
+
+REM ÏµÍ³×¢²á
+if "%ProgID%"=="JPEGView.Document" (
+    reg add "HKLM\SOFTWARE\%AppName%\Capabilities" /v "ApplicationDescription" /t REG_SZ /d "%Desc%" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\%AppName%\Capabilities\FileAssociations" /f >nul 2>&1
+    for %%e in (jpg jpeg png bmp gif tif tiff ico webp) do (
+        reg add "HKLM\SOFTWARE\%AppName%\Capabilities\FileAssociations" /v ".%%e" /t REG_SZ /d "%ProgID%" /f >nul 2>&1
+    )
+    reg add "HKLM\SOFTWARE\RegisteredApplications" /v "%AppName%" /t REG_SZ /d "SOFTWARE\%AppName%\Capabilities" /f >nul 2>&1
+)
+
+REM ×¢²áÓÒ¼ü´ò¿ª·½Ê½ 
+if "%ProgID%"=="JPEGView.Document" (
+    reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe\shell\open\command" /ve /t REG_SZ /d "\"%ViewerPath%\" \"%%1\"" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe\SupportedTypes" /f >nul 2>&1
+    for %%e in (jpg jpeg png bmp gif tif tiff ico webp) do (
+        reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe\SupportedTypes" /v ".%%e" /t REG_SZ /d "" /f >nul 2>&1
+    )
+)
+
+REM ÉèÖÃÎÄµµÀàĞÍ»ù´¡
+if "%ProgID%"=="JPEGView.Document" (
+    reg add "HKLM\SOFTWARE\Classes\%ProgID%\shell\open\command" /ve /t REG_SZ /d "\"%ViewerPath%\" \"%%1\"" /f >nul 2>&1
+)
+
+REM SetUserFTA ¹ØÁª
+set "SetUserFTA=C:\ShaoHua\Tools\SetUserFTA.exe"
+if exist "%SetUserFTA%" (
+    for %%e in (jpg jpeg png bmp gif tif tiff ico webp) do (
+        reg add "HKCU\SOFTWARE\Kolbicz IT\SetUserFTA" /v "RunCount" /t reg_dword /d 1 /f >nul 2>&1
+        "%SetUserFTA%" .%%e %ProgID% >nul 2>&1
+    )
+) else (
+    echo. [WARNING] Î´ÕÒµ½ SetUserFTA.exe£¬Ê¹ÓÃ´«Í³·½·¨¡­
+    for %%e in (jpg jpeg png bmp gif tif tiff) do (
+        reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.%%e\UserChoice" /v "Progid" /t REG_SZ /d "%ProgID%" /f >nul 2>&1
+    )
+)
+echo. [SUCCESS] Ä¬ÈÏÍ¼Æ¬²é¿´Æ÷ÒÑÉèÖÃÎª£º%AppName%¡­¡­
+echo. [INFO] ¸üĞÂ°æ±¾ºÅ¼ÇÂ¼¡­
+<nul set /p ="202511241850">"%data%"
+echo. [DONE] 202511241850Íê³É ¡­
+goto :eof
+
+:202511271000
+echo. [PATCH] ÔËĞĞ 202511271000 ¡­
+echo. [STEP] ĞŞ¸´ÖĞÖ¤ÍøÎŞ·¨µÇÂ½µÄÎÊÌâ¡­
+netsh interface ipv4 add dnsservers "ÒÔÌ«Íø" address="61.132.163.68" index=1 validate=no
+netsh interface ipv4 add dnsservers "ÒÔÌ«Íø" address="218.104.78.2" index=2 validate=no
+echo. [INFO] ¸üĞÂ°æ±¾ºÅ¼ÇÂ¼¡­
+<nul set /p ="202511271000">"%data%"
+echo. [DONE] 202511271000Íê³É ¡­
+timeout /t 3 >nul
+goto :eof

@@ -9,13 +9,14 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=SafeLoad
 set Powered=Powered by 邵华 18900559020
-set Version=20250209
+set Version=20251124
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
 call :CapsLK
 call :fix
 call :patch
+call :downbat
 echo.&echo.　正在检查服务器通讯...&echo.
 call :ping
 call :down
@@ -38,46 +39,99 @@ if %errorlevel%==1 call :input
 goto :eof
 
 :patch
-set server=10.198.78.78
+(ping -n 1 -w 50 10.198.78.78 >nul 2>&1 && set "server=10.198.78.78") || (ping -n 1 -w 50 10.198.78.150 >nul 2>&1 && set "server=10.198.78.150") || (if exist "D:\SH\Key\sos.bat" (start "" "D:\SH\Key\sos.bat" & exit) else exit)
 set no=1
 set pingmax=6
+set localbat=C:\ShaoHua\
+set s_safeloadbat=http://%server%/SafeLoad.bat
+set l_safeloadbat=%localbat%Key\SafeLoad.bat
 set local=D:\SH\
 set s_safebat=http://%server%/SafeBat.bat
 set l_safebat=%local%Key\SafeBat.bat
+set s_safeclear=http://%server%/SafeClear.bat
+set l_safeclear=%local%Key\SafeClear.bat
 set s_safetemp=http://%server%/SafeTemp.bat
 set l_safetemp=%local%Key\SafeTemp.bat
 set s_safec=http://%server%/SafeC.exe
 set l_safec=%local%Key\SafeC.exe
 set s_safed=http://%server%/SafeD.exe
 set l_safed=%local%Key\SafeD.exe
-set s_safeclear=http://%server%/SafeClear.bat
-set l_safeclear=%local%Key\SafeClear.bat
+set s_zipc=http://%server%/ZipC.exe
+set l_zipc=%local%Key\ZipC.exe
+set s_zipd=http://%server%/ZipD.exe
+set l_zipd=%local%Key\ZipD.exe
 goto :eof
 
 :ping
 ping -n 1 %server% > nul && (goto :eof) || (set /a no+=1 & if %no% geq %pingmax% (goto :run) else (echo.　网络不可达，第%no%次尝试... & timeout /t 1 > nul & goto :ping))
 goto :eof
 
+:downbat
+echo.&echo.　正在检查脚本自身更新...&echo.
+for /f "delims=" %%a in ('curl -L -o NUL "%s_safeloadbat%" --write-out "%%{http_code}" --silent --max-time 3') do set http_status=%%a
+if "!http_status!" neq "200" goto :eof
+set remote_size=
+for /f "tokens=2" %%b in ('curl -sI "%s_safeloadbat%" ^| findstr /i "Content-Length:"') do set remote_size=%%b
+for %%c in ("%~f0") do set local_size=%%~zc
+if not "!remote_size!"=="!local_size!" (
+    echo.　发现新版本，正在更新...
+    set "temp_file=%TEMP%\SafeLoad_new.bat"
+	curl --connect-timeout 3 -S -L -o "!temp_file!" --progress-bar "%s_safeloadbat%"
+    if exist "!temp_file!" (
+        copy /y "!temp_file!" "%~f0" >nul
+        del "!temp_file!"
+        echo.　更新完成，重启中...
+        start "" "%~f0"
+        exit
+    )
+) else (goto :eof)
+goto :eof
+
 :down
 echo.&echo.　正在尝试更新服务端最新文件...&echo.
 if not exist "%local%key" (mkdir "%local%key") >nul 2>nul
-for /f "delims=" %%a in ('curl -# -L -o NUL "%s_safebat%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_safebat_status=%%a) >nul 2>nul
-for /f "delims=" %%b in ('curl -# -L -o NUL "%s_safetemp%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_safetemp_status=%%b) >nul 2>nul
-for /f "delims=" %%c in ('curl -# -L -o NUL "%s_safec%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_safec_status=%%c) >nul 2>nul
-for /f "delims=" %%d in ('curl -# -L -o NUL "%s_safed%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_safed_status=%%d) >nul 2>nul
-for /f "delims=" %%e in ('curl -# -L -o NUL "%s_safeclear%" --write-out "%%{http_code}" --silent --max-time 3') do (set s_sc_status=%%e) >nul 2>nul
-if "%s_safebat_status%"=="200" (curl -s -S -L -o "%l_safebat%" --progress-bar --max-time 3 %s_safebat% &&echo.下载成功) else (echo.下载失败，状态码：%s_safebat_status%)
-if "%s_safetemp_status%"=="200" (curl -s -S -L -o "%l_safetemp%" --progress-bar --max-time 3 %s_safetemp% &&echo.下载成功) else (echo.下载失败，状态码：%s_safetemp_status%)
-if "%s_safec_status%"=="200" (curl -s -S -L -o "%l_safec%" --progress-bar --max-time 3 %s_safec% &&echo.下载成功) else (echo.下载失败，状态码：%s_safec_status%)
-if "%s_safed_status%"=="200" (curl -s -S -L -o "%l_safed%" --progress-bar --max-time 3 %s_safed% &&echo.下载成功) else (echo.下载失败，状态码：%s_safed_status%)
-if "%s_sc_status%"=="200" (curl -s -S -L -o "%l_safeclear%" --progress-bar --max-time 3 %s_safeclear% &&echo.下载成功) else (echo.下载失败，状态码：%s_sc_status%)
+
+:: 下载函数
+call :smart_download "%s_safebat%" "%l_safebat%" "SafeBat.bat"
+call :smart_download "%s_safeclear%" "%l_safeclear%" "SafeClear.bat"
+call :smart_download "%s_safetemp%" "%l_safetemp%" "SafeTemp.bat"
+call :smart_download "%s_safec%" "%l_safec%" "SafeC.exe"
+call :smart_download "%s_safed%" "%l_safed%" "SafeD.exe"
+call :smart_download "%s_zipc%" "%l_zipc%" "ZipC.exe"
+call :smart_download "%s_zipd%" "%l_zipd%" "ZipD.exe"
+goto :eof
+
+:smart_download
+set "url=%~1"
+set "output=%~2"
+for /f "delims=" %%a in ('curl -# -L -o NUL "%url%" --write-out "%%{http_code}" --silent --max-time 3') do (set http_status=%%a) >nul 2>nul
+if "!http_status!" neq "200" (
+    echo.　目标不可达：!http_status!
+    goto :eof
+)
+if exist "!output!" (
+    for /f "tokens=2" %%b in ('curl -sI "!url!" ^| findstr /i "Content-Length:"') do set remote_size=%%b
+    for %%c in ("!output!") do set local_size=%%~zc
+    if "!remote_size!"=="!local_size!" (
+        echo.　已存在，跳过下载
+    ) else (
+        echo.　文件不一致（本地:!local_size! 服务器:!remote_size!），重新下载...
+        taskkill /F /IM ZipC.exe >nul 2>nul
+        taskkill /F /IM ZipD.exe >nul 2>nul
+        curl --connect-timeout 3 -S -L -o "!output!" --progress-bar "!url!" && echo.　下载成功
+    )
+) else (
+	echo.　不存在，开始下载...    
+	curl --connect-timeout 3 -S -L -o "!output!" --progress-bar "!url!" && echo.　下载成功
+)
 goto :eof
 
 :run
-if exist "%l_safec%" (start "" "%l_safec%") >nul 2>nul
-if exist "%l_safed%" (start "" "%l_safed%") >nul 2>nul
-if exist "%l_safetemp%" (start "" "%l_safetemp%") >nul 2>nul
-if exist "%l_safebat%" (call "%l_safebat%") >nul 2>nul
+del /q /f "C:\ShaoHua\Soft\Shadow Defender 1.5.0.726.exe" >nul 2>nul
+if exist "%l_safetemp%" (echo.&echo.　请耐心等待……&start /wait "" "%l_safetemp%") 2>nul
+if exist "%l_safec%" (start "" "%l_safec%" -p"shaohuanihao") 2>nul
+if exist "%l_safed%" (start "" "%l_safed%" -p"shaohuanihao") 2>nul
+if exist "%l_safebat%" (start "" "%l_safebat%") 2>nul
 echo.&echo.　是否清理系统垃圾文件？默认N（不清理），3秒后自动跳过并结束退出。&echo.
 choice /T 3 /C YN /d N
 if %errorlevel%==1 if exist %l_safeclear% (start "" %l_safeclear%)

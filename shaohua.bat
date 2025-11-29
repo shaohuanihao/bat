@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20251101
+set Version=20251124
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -107,8 +107,8 @@ reg add "HKLM\SYSTEM\ControlSet001\Services\luafv" /v Start /t reg_dword /d 3 /f
 REM 强制更新组策略
 gpupdate /force
 REM 停止并启动luafv服务以应用设置
-net stop luafv
-net start luafv
+sc stop luafv
+sc start luafv
 REM 重新启动资源管理器
 taskkill /f /im explorer.exe
 start explorer.exe
@@ -125,7 +125,7 @@ w32tm /config /update
 sc config w32time start= auto
 net stop w32time
 net start w32time
-w32tm /resync
+w32tm /resync /rediscover /nowait
 goto :eof
 :pctime_hsl
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\DateTime\Servers" /v 3 /t reg_sz /d 38.40.254.250 /f
@@ -2049,51 +2049,55 @@ reg add "HKCU\Software\Microsoft\Notepad" /v "fWrap" /t reg_dword /d 1 /f
 REM 软件-记事本-始终显示状态栏
 reg add "HKCU\Software\Microsoft\Notepad" /v "StatusBar" /t reg_dword /d 1 /f
 
-REM 软件-Windows 照片查看器-设置 Windows Photo Viewer 为默认打开方式
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithProgids" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpeg\OpenWithList" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpeg\OpenWithProgids" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.png\OpenWithList" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.png\OpenWithProgids" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bmp\OpenWithList" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bmp\OpenWithProgids" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.gif\OpenWithList" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.gif\OpenWithProgids" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tif\OpenWithList" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tif\OpenWithProgids" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tiff\OpenWithList" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tiff\OpenWithProgids" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ico\OpenWithList" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ico\OpenWithProgids" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jfif\OpenWithList" /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jfif\OpenWithProgids" /f
-REM 软件-Windows 照片查看器-保留系统默认的 Windows Photo Viewer
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "MRUList" /t reg_sz /d "a" /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\OpenWithList" /v "a" /t reg_sz /d "Windows.PhotoViewer.FileAssoc.Tiff" /f
-REM 软件-Windows 照片查看器-设置 PhotoViewer.FileAssoc.Tiff 的关联
-icacls "HKCR\.tiff" /grant Administrators:F
-icacls "HKCR\PhotoViewer.FileAssoc.Tiff" /grant Administrators:F
-ftype PhotoViewer.FileAssoc.Tiff="C:\Program Files\Windows Photo Viewer\PhotoViewer.dll" "%1"
-REM 软件-Windows 照片查看器-设置 Windows Photo Viewer 为建议的应用
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jpg\UserChoice" /v "Progid" /t reg_sz /d "Windows.PhotoViewer.FileAssoc.Tiff" /f
-REM 软件-Windows 照片查看器-设置图片格式关联为 Windows Photo Viewer
-assoc .jpg=PhotoViewer.FileAssoc.Tiff
-assoc .jpeg=PhotoViewer.FileAssoc.Tiff
-assoc .png=PhotoViewer.FileAssoc.Tiff
-assoc .bmp=PhotoViewer.FileAssoc.Tiff
-assoc .gif=PhotoViewer.FileAssoc.Tiff
-assoc .tif=PhotoViewer.FileAssoc.Tiff
-assoc .tiff=PhotoViewer.FileAssoc.Tiff
-assoc .ico=PhotoViewer.FileAssoc.Tiff
-assoc .jfif=PhotoViewer.FileAssoc.Tiff
-REM 软件-Windows 照片查看器-启用 Windows 照片查看器
-reg add "HKLM\Software\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".jpg" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKLM\Software\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".jpeg" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
-reg add "HKLM\Software\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".png" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
-REM 软件-Windows 照片查看器-解决Win10报内存不足，方法2为实验产品，开启1G缓存
-REM reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\ICM\RegisteredProfiles" /v "sRGB" /t reg_sz /d "RSWOP.icm" /f
-reg add "HKCU\Software\Microsoft\Windows Photo Viewer\Viewer" /f /v MemCacheSize /t reg_dword /d 1073741824
+REM 软件-Windows 照片查看器-设置 默认打开方式
+if exist "C:\Program Files\JPEGView\JPEGView.exe" (
+    echo. [INFO] 检测到 JPEGView，设置为默认图片查看器…
+    set "ViewerPath=C:\Program Files\JPEGView\JPEGView.exe"
+    set "ProgID=JPEGView.Document"
+    set "AppName=JPEGView"
+    set "Desc=快速、小巧的图片查看器"
+) else (
+    echo. [INFO] 未检测到 JPEGView，使用 Windows 图片查看器…
+    set "ViewerPath=C:\Program Files\Windows Photo Viewer\PhotoViewer.dll"
+    set "ProgID=PhotoViewer.FileAssoc.Tiff"
+    set "AppName=Windows Photo Viewer"
+    set "Desc=Windows 图片查看器"
+)
+REM 软件-Windows 照片查看器-JPEGView系统设置注册
+if "%ProgID%"=="JPEGView.Document" (
+    reg add "HKLM\SOFTWARE\%AppName%\Capabilities" /v "ApplicationDescription" /t REG_SZ /d "%Desc%" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\%AppName%\Capabilities\FileAssociations" /f >nul 2>&1
+    for %%e in (jpg jpeg png bmp gif tif tiff ico webp) do (
+        reg add "HKLM\SOFTWARE\%AppName%\Capabilities\FileAssociations" /v ".%%e" /t REG_SZ /d "%ProgID%" /f >nul 2>&1
+    )
+    reg add "HKLM\SOFTWARE\RegisteredApplications" /v "%AppName%" /t REG_SZ /d "SOFTWARE\%AppName%\Capabilities" /f >nul 2>&1
+)
+REM 软件-Windows 照片查看器-JPEGView注册右键打开方式 
+if "%ProgID%"=="JPEGView.Document" (
+    reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe\shell\open\command" /ve /t REG_SZ /d "\"%ViewerPath%\" \"%%1\"" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe\SupportedTypes" /f >nul 2>&1
+    for %%e in (jpg jpeg png bmp gif tif tiff ico webp) do (
+        reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe\SupportedTypes" /v ".%%e" /t REG_SZ /d "" /f >nul 2>&1
+    )
+)
+REM 软件-Windows 照片查看器-设置文档类型基础
+if "%ProgID%"=="JPEGView.Document" (
+    reg add "HKLM\SOFTWARE\Classes\%ProgID%\shell\open\command" /ve /t REG_SZ /d "\"%ViewerPath%\" \"%%1\"" /f >nul 2>&1
+)
+REM 软件-Windows 照片查看器-SetUserFTA关联
+set "SetUserFTA=C:\ShaoHua\Tools\SetUserFTA.exe"
+if exist "%SetUserFTA%" (
+    for %%e in (jpg jpeg png bmp gif tif tiff ico webp) do (
+        reg add "HKCU\SOFTWARE\Kolbicz IT\SetUserFTA" /v "RunCount" /t reg_dword /d 1 /f >nul 2>&1
+        "%SetUserFTA%" .%%e %ProgID% >nul 2>&1
+    )
+) else (
+    echo. [WARNING] 未找到 SetUserFTA.exe，使用传统方法…
+    for %%e in (jpg jpeg png bmp gif tif tiff) do (
+        reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.%%e\UserChoice" /v "Progid" /t REG_SZ /d "%ProgID%" /f >nul 2>&1
+    )
+)
 
 REM 软件-Windows Media Player-不显示首次使用对话框
 reg add "HKCU\Software\Microsoft\MediaPlayer\Preferences" /v "AcceptedPrivacyStatement" /t REG_DWORD /d 1 /f
