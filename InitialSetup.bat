@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=InitialSetup脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20250209
+set Version=20251209
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -32,41 +32,41 @@ reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t reg_sz /d
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 REM UAC_Installer detection(安装程序检测)_禁用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableInstallerDetection" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableInstallerDetection" /t reg_dword /d 0 /f
 REM UAC_UAC 用户提示_提示输入凭据
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorUser" /t REG_DWORD /d 2 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorUser" /t reg_dword /d 2 /f
 REM UAC_UAC 管理员提示_不提示，直接提升
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorAdmin" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorAdmin" /t reg_dword /d 0 /f
 REM UAC_UIAccess 安全位置请求_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableSecureUIAPaths" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableSecureUIAPaths" /t reg_dword /d 1 /f
 REM UAC_UIAccess 开关_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableUIADesktopToggle" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableUIADesktopToggle" /t reg_dword /d 1 /f
 REM UAC_仅提升已签名的_禁用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ValidateAdminCodeSignatures" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ValidateAdminCodeSignatures" /t reg_dword /d 0 /f
 REM UAC_内置管理员帐户_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t reg_dword /d 1 /f
 REM UAC_启用 UAC-以管理员批准模式运行所有管理员(EnableLUA)_禁用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t reg_dword /d 0 /f
 REM UAC_安全桌面提示_禁用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t reg_dword /d 0 /f
 REM UAC_将文件和注册表写入错误虚拟化到每用户位置_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableVirtualization" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableVirtualization" /t reg_dword /d 1 /f
 REM UAC_允许以管理员身份运行的程序访问用户映射的网络驱动器_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLinkedConnections" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLinkedConnections" /t reg_dword /d 1 /f
 REM UAC_允许用户选择打开方式_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoInternetOpenWith" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoInternetOpenWith" /t reg_dword /d 0 /f
 REM UAC_计算机组策略异步应用_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SyschronousMachineGroupPolicy" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SyschronousMachineGroupPolicy" /t reg_dword /d 0 /f
 REM UAC_用户组策略异步应用_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SyschronousUserGroupPolicy" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SyschronousUserGroupPolicy" /t reg_dword /d 0 /f
 REM luafv服务设置为手动，禁用文件虚拟化
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\luafv" /v Start /t REG_DWORD /d 3 /f
-reg add "HKLM\SYSTEM\ControlSet001\Services\luafv" /v Start /t REG_DWORD /d 3 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\luafv" /v Start /t reg_dword /d 3 /f
+reg add "HKLM\SYSTEM\ControlSet001\Services\luafv" /v Start /t reg_dword /d 3 /f
 REM 强制更新组策略
 gpupdate /force
 REM 停止并启动luafv服务以应用设置
-net stop luafv
-net start luafv
+sc stop luafv
+sc start luafv
 REM 重新启动资源管理器
 taskkill /f /im explorer.exe
 start explorer.exe
@@ -93,12 +93,30 @@ del /q /f "C:\Sysprep\*"
 REM 删除用户开始菜单中的启动项
 del /q /f "%userprofile%\开始菜单\程序\启动\*"
 REM 删除多余的广告文件
-rd /s /q "C:\Users\Administrator\AppData\Local\360Chrome"
-rd /s /q "C:\Users\Administrator\AppData\Local\360ChromeX"
-rd /s /q "C:\Users\Administrator\AppData\Local\google"
-rd /s /q "C:\Users\Administrator\AppData\Local\Microsoft\Edge"
-rd /s /q "C:\Users\Administrator\AppData\Local\Sogou\SogouExplorer"
-rd /s /q "C:\Users\Administrator\AppData\Local\Tencent\QQBrowser"
+taskkill /F /IM 360pingbao.exe /T >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Roaming\360pingbao" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Roaming\greencore" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Roaming\GreenCore7z" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Roaming\360browser" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Roaming\SogouExplorer" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Local\360Chrome" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Local\360ChromeX" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Local\google" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Local\Microsoft\Edge" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Local\Sogou" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Local\Tencent\QQBrowser" >nul 2>&1
+rd /s /q "C:\Users\Administrator\AppData\Local\Tencent" >nul 2>&1
+del /q /f "C:\Users\Administrator\AppData\Local\config.ini" >nul 2>&1
+del /q /f "C:\Program Files (x86)\SysCeo\DrvCeo\Res\dcairbx86.dll" >nul 2>&1
+del /q /f "C:\Program Files (x86)\SysCeo\DrvCeo\Res\dcairbx86_ntf.dll" >nul 2>&1
+reg delete "HKCU\SOFTWARE\360" /f >nul 2>&1
+reg delete "HKCU\SOFTWARE\360Chrome" /f >nul 2>&1
+reg delete "HKCU\SOFTWARE\360ChromeX" /f >nul 2>&1
+reg delete "HKCU\SOFTWARE\360ent6" /f >nul 2>&1
+reg delete "HKCU\SOFTWARE\360SoftMgr" /f >nul 2>&1
+reg delete "HKCU\SOFTWARE\360ent6" /f >nul 2>&1
+reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\360pingbao" /f >nul 2>&1
+del /q /f /s "C:\Users\Administrator\AppData\Local\Temp\" >nul 2>&1
 REM 添加 ctfmon.exe 到用户启动项
 @reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "ctfmon" /t REG_SZ /d "C:\Windows\System32\ctfmon.exe" /f
 REM 检查并启动 ctfmon.exe 如果它未运行
@@ -113,11 +131,11 @@ rem IP
 RunDll32.exe shell32.dll,Control_RunDLL ncpa.cpl 2>nul
 rem 计算机名
 sysdm.cpl
-Reg delete "HKCU\Software\Kingsoft\Office\6.0\et" /f
-Reg delete "HKCU\Software\Kingsoft\Office\6.0\wps" /f
-Reg delete "HKCU\Software\Kingsoft\Office\6.0\wpp" /f
-Reg delete "HKCU\Software\kingsoft\Office\6.0\Common\AuthInfo" /f
-del /q /f "%allusersprofile%\Application Data\Kingsoft\office6\license2.dat"
-del /q /f "%programdata%\Kingsoft\office6\license2.dat"
-start "" "C:\Program Files (x86)\Kingsoft\WPS Office\11.8.2.12090\office6\ksomisc.exe" -addsn 26B4J-UDCM6-XR46L-DAVW9-WDACG
+Reg delete "HKCU\Software\Kingsoft\Office\6.0\et" /f >nul 2>&1
+Reg delete "HKCU\Software\Kingsoft\Office\6.0\wps" /f >nul 2>&1
+Reg delete "HKCU\Software\Kingsoft\Office\6.0\wpp" /f >nul 2>&1
+Reg delete "HKCU\Software\kingsoft\Office\6.0\Common\AuthInfo" /f >nul 2>&1
+del /q /f "%allusersprofile%\Application Data\Kingsoft\office6\license2.dat" >nul 2>&1
+del /q /f "%programdata%\Kingsoft\office6\license2.dat" >nul 2>&1
+start "" "C:\Program Files (x86)\Kingsoft\WPS Office\11.8.2.12316\office6\ksomisc.exe" -addsn 26B4J-UDCM6-XR46L-DAVW9-WDACG >nul 2>&1
 cls&echo.&echo.请确定已经完成 计算机名 和 IP地址 的设置！！！&echo.&echo.若已完成，请按下任意键重启电脑。&echo.&pause&cls&shutdown -r -t 10 -c "第一阶段已结束。10秒后，系统会自动重启，完成余下操作！"&del %0

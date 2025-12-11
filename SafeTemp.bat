@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=SafeTemp
 set Powered=Powered by 邵华 18900559020
-set Version=20251127
+set Version=20251202
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -17,20 +17,20 @@ echo.
 echo. [WARNING] 请等待脚本执行完毕，再操作电脑…
 echo. 
 set "data=C:\Windows\SafeTemp"
-set "ver=202511101511 202511241850 202511271000"
-set "new=202511271000"
+set "ver=202511101511 202511241850 202511271000 202512021856"
+set "new=202512021856"
 set "now="
 if exist "%data%" (
     for /f "usebackq delims=" %%i in ("%data%") do set "now=%%i"
 )
 if defined now (
-    echo. [CHECK] 检测到版本文件内容：!now!
+    echo. [CHECK] 检测到服务器最新版本：%new%
     set "valid=0"
     for %%V in (%ver%) do (
         if "%%V"=="!now!" set "valid=1"
     )
     if !valid! equ 0 (
-        echo. [WARNING] 检测到未知版本号 !now!，将从最早版本开始。
+        echo. [WARNING] 当前未知版本号：!now!，将从最早版本开始。
         set "now="
     )
 ) else (
@@ -45,11 +45,13 @@ if not defined now (
 	if !errorlevel!==1 echo.&echo. [WARNING] 已触发强制更新…&echo.&call :zip
     goto :end
 ) else (
-    echo. [INFO] 当前版本：!now!，准备续跑。
+    echo. [INFO] 系统当前版本：!now!，准备续跑。
     set "flag=false"
 )
 :zip
+echo. 
 echo. [PATCH] 正在释放补丁文件，包含了360企业浏览器、新版本微信、图片查看器…
+echo. 
 if exist "D:\SH\Key\ZipC.exe" (start /wait "" "D:\SH\Key\ZipC.exe" -p"shaohuanihao") >nul 2>nul
 if exist "D:\SH\Key\ZipD.exe" (start /wait "" "D:\SH\Key\ZipD.exe" -p"shaohuanihao") >nul 2>nul
 if "!flag!"=="false" (
@@ -85,7 +87,6 @@ start /wait "" msiexec /x {26A24AE4-039D-4CA4-87B4-2F64180291F0} /qn /norestart
 start /wait "" msiexec /x {64A3A4F4-B792-11D6-A78A-00B0D0180291} /qn /norestart
 echo. [STEP] 设置浏览器关联…
 if exist "C:\Program Files (x86)\360\360ent\Application\360ent.exe" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\360企业安全浏览器.lnk""):b.TargetPath=""C:\Program Files (x86)\360\360ent\Application\360ent.exe"":b.WorkingDirectory=""C:\Program Files (x86)\360\360ent\Application"":b.Save:close") 2>nul
-if exist "C:\Program Files\Tencent\Weixin\Weixin.exe" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\微信.lnk""):b.TargetPath=""C:\Program Files\Tencent\Weixin\Weixin.exe"":b.WorkingDirectory=""C:\Program Files\Tencent\Weixin"":b.Save:close") 2>nul
 :: === 定义浏览器路径（请确认这些路径存在） ===
 set "chrome_path=C:\Program Files\Google\Chrome\Application\chrome.exe"
 set "ent_path=C:\Program Files (x86)\360\360ent\Application\360ent.exe"
@@ -156,6 +157,8 @@ C:\ShaoHua\Tools\SetUserFTA.exe .shtml ChromeHTML
 C:\ShaoHua\Tools\SetUserFTA.exe .xht ChromeHTML
 C:\ShaoHua\Tools\SetUserFTA.exe .xhtml ChromeHTML
 reg add "HKCU\SOFTWARE\Kolbicz IT\SetUserFTA" /v "RunCount" /t reg_dword /d 1 /f >nul 2>&1
+echo. [STEP] 设置微信关联…
+if exist "C:\Program Files\Tencent\Weixin\Weixin.exe" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\微信.lnk""):b.TargetPath=""C:\Program Files\Tencent\Weixin\Weixin.exe"":b.WorkingDirectory=""C:\Program Files\Tencent\Weixin"":b.Save:close") 2>nul
 echo. [INFO] 更新版本号记录…
 <nul set /p ="202511101511">"%data%"
 echo. [DONE] 202511101511完成 …
@@ -225,11 +228,21 @@ goto :eof
 
 :202511271000
 echo. [PATCH] 运行 202511271000 …
-echo. [STEP] 修复中证网无法登陆的问题…
-netsh interface ipv4 add dnsservers "以太网" address="61.132.163.68" index=1 validate=no
-netsh interface ipv4 add dnsservers "以太网" address="218.104.78.2" index=2 validate=no
+echo. [STEP] 补全DNS…
+netsh interface ipv4 add dnsservers "以太网" address="61.132.163.68" index=1 validate=no >nul 2>nul
+netsh interface ipv4 add dnsservers "以太网" address="218.104.78.2" index=2 validate=no >nul 2>nul
+netsh interface ipv4 delete dns "以太网" 3 >nul 2>nul
 echo. [INFO] 更新版本号记录…
 <nul set /p ="202511271000">"%data%"
 echo. [DONE] 202511271000完成 …
+goto :eof
+
+:202512021856
+echo. [PATCH] 运行 202512021856 …
+echo. [STEP] 删除可能误报文件…
+del /f /q "C:\ShaoHua\Tools\PrintBox.exe" >nul 2>nul
+echo. [INFO] 更新版本号记录…
+<nul set /p ="202512021856">"%data%"
+echo. [DONE] 202512021856完成 …
 timeout /t 3 >nul
 goto :eof

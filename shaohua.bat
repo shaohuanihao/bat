@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20251124
+set Version=20251209
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -716,7 +716,7 @@ sc config diagsvc start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\diagsvc" /v "Start" /t reg_dword /d 4 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack" /v "Enabled" /t reg_dword /d 0 /f
 REM 系统-服务-数据移动应用程序推送服务设为手动启动，减少推送相关的资源占用
-sc config dmwappushservice start= disabled
+::sc config dmwappushservice start= disabled
 sc stop dmwappushservice
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\dmwappushservice" /v "Start" /t reg_dword /d 3 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\PushNotifications" /v "NoToastApplicationNotificationOnLockScreen" /t reg_dword /d 1 /f
@@ -746,6 +746,7 @@ sc stop WdiServiceHost
 sc config WdiServiceHost start= disabled
 sc config WdiSystemHost start= disabled
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting" /v "Disabled" /t reg_dword /d 1 /f
+
 REM 系统-服务-禁用程序兼容性助手，减少后台资源占用，但可能影响程序兼容性检查
 sc stop PcaSvc
 sc config PcaSvc start= disabled
@@ -1479,18 +1480,24 @@ reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http
 reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\DefaultIcon" /ve /d "%IE_Path32%,1" /f
 reg add "HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\ftp\DefaultIcon" /ve /d "%IE_Path32%,1" /f
 REM 软件-浏览器-IE-关联-禁用Edge干扰
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "BackgroundModeEnabled" /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "HideFirstRunExperience" /t REG_DWORD /d 1 /f
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SoftLandingEnabled" /t REG_DWORD /d 0 /f
 REM 软件-浏览器-IE-关联-修复开始菜单快捷方式
 set "LinkPath=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Internet Explorer.lnk"
 if not exist "%LinkPath%" (
     powershell -command "$s = (New-Object -ComObject WScript.Shell).CreateShortcut('%LinkPath%'); $s.TargetPath = '%IE_Path32%'; $s.WorkingDirectory = '%ProgramFiles(x86)%\Internet Explorer'; $s.Save()"
 )
+
+REM 软件-浏览器-Edge-禁用Edge后台运行
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "BackgroundModeEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁止Edge首次运行向导
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "HideFirstRunExperience" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-禁用Edge更新
+reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v "UpdateDefault" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v "AutoUpdateCheckPeriodMinutes" /t REG_DWORD /d 0 /f
 REM 软件-浏览器-Edge-禁用IE自动跳转到Edge浏览器
 reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "IE11DisableEdgeRedirect" /t REG_DWORD /d 1 /f
 REM 软件-浏览器-Edge-禁用Internet Explorer的第三方浏览器扩展
-reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "DisableThirdPartyExtensions" /t REG_DWORD /d 1 /f
+::reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "DisableThirdPartyExtensions" /t REG_DWORD /d 1 /f
 REM 软件-浏览器-Edge-禁用Internet Explorer在Microsoft Edge中打开网站的设置
 reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "InternetExplorerIntegration" /t REG_SZ /d "0" /f
 REM 软件-浏览器-Edge-禁止打开IE弹出EDGE
@@ -1532,7 +1539,7 @@ echo     ^<site url="38.19.19.157"^>
 echo         ^<compat-mode^>Default^</compat-mode^>
 echo         ^<open-in^>IE11^</open-in^>
 echo     ^</site^>
-echo     ^<site url"38.19.19.172"^>
+echo     ^<site url="38.19.19.172"^>
 echo         ^<compat-mode^>Default^</compat-mode^>
 echo         ^<open-in^>IE11^</open-in^>
 echo     ^</site^>
@@ -1582,6 +1589,7 @@ echo         ^<open-in^>IE11^</open-in^>
 echo     ^</site^>
 echo ^</site-list^>
 ) > C:\hsbankweb.xml
+attrib +h "C:\hsbankweb.xml"
 REM 软件-浏览器-Edge-设置IE集成模式级别
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "InternetExplorerIntegrationLevel" /t REG_DWORD /d 1 /f
 REM 软件-浏览器-Edge-配置IE模式站点列表路径
@@ -1664,7 +1672,7 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Ext\CLSID" /v "
 REM 软件-浏览器-Chrome-下载前询问每个文件的保存位置
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "PromptForDownloadLocation" /t reg_dword /d 1 /f
 REM 软件-浏览器-Chrome-禁用 WebRTC（减少网络延迟）
-reg add "HKCU\Software\Google\Chrome" /v EnableWebRTC /t reg_dword /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "WebRtcIpHandlingPolicy" /t reg_dword /d 2 /f
 REM 软件-浏览器-Chrome-允许运行过时的插件
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "AllowOutdatedPlugins" /t reg_dword /d 1 /f
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "RunAllFlashInAllowMode" /t reg_dword /d 1 /f
@@ -1678,8 +1686,8 @@ REM 软件-浏览器-Chrome-在Google Chrome关闭后继续运行后台应用_关闭
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "BackgroundModeEnabled" /t reg_dword /d 0 /f
 REM 软件-浏览器-Chrome-在工具栏上显示"主页"按钮
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "ShowHomeButton" /t reg_dword /d 1 /f
-REM 软件-浏览器-Chrome-关闭将 Google Chrome 设为默认浏览器
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultBrowserSettingEnabled" /t reg_dword /d 0 /f
+REM 软件-浏览器-Chrome-开启将 Google Chrome 设为默认浏览器
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultBrowserSettingEnabled" /t reg_dword /d 1 /f
 REM 软件-浏览器-Chrome-默认JavaScript设置_允许
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultJavaScriptSetting" /t reg_dword /d 1 /f
 REM 软件-浏览器-Chrome-默认Flash设置_允许
@@ -1723,8 +1731,8 @@ reg add "HKLM\Software\Policies\Google\Chrome" /v "PrintingBackgroundGraphicsDef
 
 REM 软件-驱动总裁-删除安装信息
 reg delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\DrvCeo2.0" /f
-del /q /f "%ProgramData%\Microsoft\Windows\Start Menu\驱动下载.lnk"
-del /q /f "%windir%\Help\dcold.exe"
+del /q /f "%ProgramData%\Microsoft\Windows\Start Menu\驱动下载.lnk" 2>nul
+del /q /f "%windir%\Help\dcold.exe" 2>nul
 call :better_llq%hs%
 goto :eof
 
@@ -2296,6 +2304,8 @@ REM 删除驱动文件
 if "%hs%" NEQ "_hsf" rd /q /s "C:\ShaoHua\Drv\Drvceo\" 2>nul
 if "%hs%" NEQ "_hsf" del /q /f /s "C:\ShaoHua\Drv\Drvceo\*" 2>nul
 call :finish%hs%
+call :chrome
+call :360ent
 REM 刷新桌面
 taskkill /f /im explorer.exe 2>nul
 RUNDLL32.EXE USER32.DLL,UpdatePerUserSystemParameters 1, True
@@ -2305,6 +2315,9 @@ REM 系统激活脚本
 if exist "C:\ShaoHua\Key\Activate.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\系统激活脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\Activate.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
 REM 垃圾清理脚本
 if exist "C:\ShaoHua\Key\ClearTemp.bat" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\垃圾清理脚本.lnk""):b.TargetPath=""C:\ShaoHua\Key\ClearTemp.bat"":b.WorkingDirectory=""C:\ShaoHua\Key"":b.Save:close") 2>nul
+REM 卸载JAVA
+start /wait "" msiexec /x {26A24AE4-039D-4CA4-87B4-2F64180291F0} /qn /norestart
+start /wait "" msiexec /x {64A3A4F4-B792-11D6-A78A-00B0D0180291} /qn /norestart
 REM 清理传递优化文件
 del /q /f /s "%localappdata%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\*"
 REM 清理缩略图缓存
@@ -2345,6 +2358,7 @@ rd /q /s "C:\ShaoHua\Soft\安装包" 2>nul
 del /q /f "C:\ShaoHua\Tools\Key\*.exe" 2>nul
 del /q /f "C:\ShaoHua\Tools\Office修复工具\Office启动一键修复.exe" 2>nul
 del /q /f "C:\ShaoHua\Tools\Office修复工具\打印任务一键清除.exe" 2>nul
+del /q /f "C:\ShaoHua\Tools\PrintBox.exe" 2>nul
 set "local=C:\ShaoHua" >nul 2>nul
 rd /q /s "%systemdrive%\sysprep\" 2>nul
 rd /q /s "C:\ShaoHua\Tools\Key" 2>nul
@@ -2399,9 +2413,66 @@ del /q /f /s "C:\Windows\Hsbank\*" 2>nul
 del /q /f "%USERPROFILE%\Desktop\360企业安全浏览器.lnk" 2>nul
 del /q /f "%PUBLIC%\Desktop\360企业安全浏览器.lnk" 2>nul
 rd /q /s "%ProgramFiles%\360\360ent" 2>nul
+del /q /f "C:\ShaoHua\Tools\PrintBox.exe" 2>nul
 goto :eof
 :finish_hsf
 call :finish_hso
+goto :eof
+:chrome
+:: === 定义浏览器路径（请确认这些路径存在） ===
+set "chrome_path=C:\Program Files\Google\Chrome\Application\chrome.exe"
+if not exist "%chrome_path%" goto :eof
+:: 注册 Chrome 到 HKLM (所有用户)
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome" /ve /d "Google Chrome" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationName" /d "Google Chrome" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationDescription" /d "Google Chrome 浏览器" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationIcon" /d "!chrome_path!,0" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\shell\open\command" /ve /d "\"!chrome_path!\"" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\DefaultIcon" /ve /d "!chrome_path!,0" /f >nul 2>&1
+:: 注册 Chrome 能力
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationCompany" /d "Google LLC" /f >nul 2>&1
+:: 注册 URL 协议
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\URLAssociations" /v "http" /d "ChromeHTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\URLAssociations" /v "https" /d "ChromeHTML" /f >nul 2>&1
+:: 注册文件关联
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\FileAssociations" /v ".htm" /d "ChromeHTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\FileAssociations" /v ".html" /d "ChromeHTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\FileAssociations" /v ".shtml" /d "ChromeHTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\FileAssociations" /v ".xht" /d "ChromeHTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\FileAssociations" /v ".xhtml" /d "ChromeHTML" /f >nul 2>&1
+:: 注册到 RegisteredApplications
+reg add "HKLM\Software\RegisteredApplications" /v "Google Chrome" /d "Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /f >nul 2>&1
+:: 注册 Chrome 文件类型
+reg add "HKCR\ChromeHTML" /ve /d "Google Chrome HTML Document" /f >nul 2>&1
+reg add "HKCR\ChromeHTML\DefaultIcon" /ve /d "!chrome_path!,0" /f >nul 2>&1
+reg add "HKCR\ChromeHTML\shell\open\command" /ve /d "\"!chrome_path!\" \"%%1\"" /f >nul 2>&1
+goto :eof
+:360ent
+:: === 定义浏览器路径（请确认这些路径存在） ===
+set "ent_path=C:\Program Files\360\360ent\Application\360ent.exe"
+if not exist "%ent_path%" goto :eof
+:: 注册 360企业浏览器到 HKLM
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent" /ve /d "360企业安全浏览器" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationName" /d "360企业安全浏览器" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationDescription" /d "360企业安全浏览器" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationIcon" /d "!ent_path!,0" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\shell\open\command" /ve /d "\"!ent_path!\"" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\DefaultIcon" /ve /d "!ent_path!,0" /f >nul 2>&1
+
+:: 注册 360企业浏览器能力
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationCompany" /d "360.cn" /f >nul 2>&1
+:: 注册 URL 协议
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities\URLAssociations" /v "http" /d "360HTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities\URLAssociations" /v "https" /d "360HTML" /f >nul 2>&1
+:: 注册文件关联
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities\FileAssociations" /v ".htm" /d "360HTML" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities\FileAssociations" /v ".html" /d "360HTML" /f >nul 2>&1
+:: 注册到 RegisteredApplications
+reg add "HKLM\Software\RegisteredApplications" /v "360ent" /d "Software\Clients\StartMenuInternet\360ent\Capabilities" /f >nul 2>&1
+:: 注册 360 文件类型
+reg add "HKCR\360HTML" /ve /d "360 Enterprise HTML Document" /f >nul 2>&1
+reg add "HKCR\360HTML\DefaultIcon" /ve /d "!ent_path!,0" /f >nul 2>&1
+reg add "HKCR\360HTML\shell\open\command" /ve /d "\"!ent_path!\" \"%%1\"" /f >nul 2>&1
 goto :eof
 :upan
 REM 安全U盘_v1_V2_V3_DEL
