@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20251214
+set Version=20260103
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -41,6 +41,7 @@ goto :eof
 :patch
 if "%PROCESSOR_ARCHITECTURE%"=="AMD64" call :patch64
 if "%PROCESSOR_ARCHITECTURE%"=="x86" call :patch32
+if not exist "%ProgramFiles(x86)%\Internet Explorer\iexplore.exe" if not exist "%ProgramFiles%\Internet Explorer\iexplore.exe" set IEIE=NO
 set IE_type="%IE_Path32%" "%%1"
 set IE_Domains=HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains
 set IE_Ranges=HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges
@@ -95,8 +96,6 @@ REM UAC_将文件和注册表写入错误虚拟化到每用户位置_启用
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableVirtualization" /t reg_dword /d 1 /f
 REM UAC_允许以管理员身份运行的程序访问用户映射的网络驱动器_启用
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLinkedConnections" /t reg_dword /d 1 /f
-REM UAC_允许用户选择打开方式_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoInternetOpenWith" /t reg_dword /d 0 /f
 REM UAC_计算机组策略异步应用_启用
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SyschronousMachineGroupPolicy" /t reg_dword /d 0 /f
 REM UAC_用户组策略异步应用_启用
@@ -258,7 +257,7 @@ powercfg -setacvalueindex 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 9596fb26-9850-41f
 echo 播放视频时，优化视频质量
 powercfg -setdcvalueindex 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 9596fb26-9850-41fd-ac3e-f7c3c00afd4b 34c7b99f-9a6d-4b3c-8dc7-b6693b78cef4 0
 powercfg -setacvalueindex 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 9596fb26-9850-41fd-ac3e-f7c3c00afd4b 34c7b99f-9a6d-4b3c-8dc7-b6693b78cef4 0
-REM 禁用 Core Parking（CPU核心停车）
+echo 禁用 Core Parking（CPU核心停车）
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\0cc5b647-c1df-4637-891a-dec35c318583" /v Attributes /t reg_dword /d 1 /f
 powercfg -setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 1
 powercfg -setdcvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 1
@@ -458,7 +457,7 @@ REM 系统-广告-禁止 Windows 收集联系人数据
 reg add "HKCU\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" /v "HarvestContacts" /t "reg_dword" /d "0" /f
 REM 系统-广告-将「传递最佳化」设定为关闭「允许从其他电脑下载」
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\DeliveryOptimization" /v "SystemSettingsDownloadMode" /t reg_dword /d 0 /f
-reg add "HKU\S-1-5-20\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Settings" /v "DownloadMode" /t "reg_dword" /d "0" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Settings" /v "DownloadMode" /t "reg_dword" /d "0" /f
 REM 系统-广告-关闭资讯和兴趣
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Feeds" /v "ShellFeedsTaskbarViewMode" /t reg_dword /d 2 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /v "EnableFeeds" /t reg_dword /d 0 /f
@@ -480,7 +479,6 @@ REM 系统-广告-禁用内容交付管理器的软着陆功能
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SoftLandingEnabled" /t reg_dword /d 0 /f
 REM 系统-广告-不允许在开始菜单显示建议
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SystemPaneSuggestionsEnabled" /t reg_dword /d 0 /f
-reg add "HKU\.DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SystemPaneSuggestionsEnabled" /t reg_dword /d 0 /f
 REM 系统-广告-关闭系统推荐的内容
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338389Enabled" /t reg_dword /d 0 /f
 REM 系统-广告-关闭用户界面上的建议和广告
@@ -568,6 +566,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Langu
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Language" /v "SettingsVersion" /d 3 /t reg_dword /f
 REM 系统-设置-关闭事件跟踪程序
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Reliability" /v "ShutdownReasonOn" /d 0 /t reg_dword /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Reliability" /v "ShutdownReasonUI" /d 0 /t reg_dword /f
 REM 系统-设置-禁用自动更新商店应用
 reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsStore" /v AutoDownload /t reg_dword /d 2 /f
 REM 系统-设置-禁用 Microsoft Store 后台访问应用程序
@@ -642,8 +641,12 @@ REM 系统-性能-启用GPU硬件加速
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t reg_dword /d 2 /f
 REM 系统-性能-强制卸载不再使用的DLL
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v AlwaysUnloadDLL /t REG_DWORD /d 1 /f
-REM 系统-性能-启用 StickyKeys 功能，使用户可以轻松按下多个键
+REM 系统-性能-禁用粘滞键功能
 reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v Flags /t reg_sz /d 506 /f
+REM 系统-性能-禁用粘滞键通过快捷键启动
+reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v "OnOff" /t REG_SZ /d "0" /f
+REM 系统-性能-禁用粘滞键声音提示
+reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v "UseSound" /t REG_SZ /d "0" /f
 REM 系统-性能-调整键盘响应速度和频率，以提升用户的键盘输入体验
 reg add "HKCU\Control Panel\Accessibility\Keyboard Response" /v Flags /t reg_sz /d 122 /f
 REM 系统-性能-启用 ToggleKeys 功能，在用户误按特定键时提供声音提示，帮助用户纠正按键错误
@@ -696,6 +699,14 @@ REM 系统-性能-禁用页面文件
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v DisablePagingExecutive /t reg_dword /d 1 /f
 )
 
+REM 系统-服务-禁用Windows Defender的6个服务（Sense/WdBoot/WdFilter/WdNisDrv/WdNisSvc/WinDefend）
+PowerShell -Command "Set-MpPreference -DisableRealtimeMonitoring $true"
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Sense" /v Start /t REG_DWORD /d 4 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdBoot" /v Start /t REG_DWORD /d 4 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdFilter" /v Start /t REG_DWORD /d 4 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdNisDrv" /v Start /t REG_DWORD /d 4 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdNisSvc" /v Start /t REG_DWORD /d 4 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\WinDefend" /v Start /t REG_DWORD /d 4 /f
 REM 系统-服务-关闭windows传递优化服务，减少网络和系统资源占用
 sc stop DoSvc
 sc config DoSvc start= disabled
@@ -736,7 +747,6 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess" /v "Start" /t reg_
 REM 系统-服务-关闭超级预读Superfetch，可释放部分内存资源，但可能影响系统启动速度优化
 sc stop SysMain
 sc config SysMain start= disabled
-sc stop SysMain
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SysMain" /v "Start" /t reg_dword /d 4 /f
 REM 系统-服务-关闭系统预读Prefetch，减少内存占用，但可能影响某些程序启动速度
 sc stop Prefetch
@@ -834,15 +844,12 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "NoI
 REM 系统-格式关联-关闭打开方式从应用商店选择其它应用
 reg add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v "NoUseStoreOpenWith" /t reg_dword /d 1 /f
 
-REM 系统-远程-禁用远程修改注册表
-reg add "HKLM\System\CurrentControlSet\Control\SecurePipeServers\Winreg" /v "RemoteRegAccess" /t reg_dword /d 0 /f
 REM 系统-远程-允许远程协助
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Remote Assistance" /v "fAllowToGetHelp" /t reg_dword /d 1 /f
 REM 系统-远程-允许远程桌面连接
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v "fDenyTSConnections" /t reg_dword /d 0 /f
 REM 系统-远程-禁止远程修改注册表
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurePipeServers\winreg" /v "RemoteAccess" /t reg_dword /d 0 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurePipeServers\winreg" /v "RemoteRegAccess" /t reg_dword /d 0 /f
 REM 系统-远程-不将远程桌面会话中的客户端打印机设置为默认打印机
 reg add "HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services" /v "fForceClientLptDef" /t reg_dword /d 1 /f
 REM 系统-远程-禁用RPC的隐私级别认证
@@ -923,14 +930,23 @@ REM 系统-安全设置-关闭账户锁定
 net accounts /lockoutthreshold:0
 net accounts /lockoutduration:0
 net accounts /lockoutwindow:0
-REM 系统-安全设置-设置密码永不过期
-net accounts /maxpwage:999
+REM 系统-安全设置-设置密码最小长度
 net accounts /minpwlen:0
+REM 系统-安全设置-设置密码最短使用期限
 net accounts /minpwage:0
-net accounts /uniquepw:0
-REM 系统-安全设置-将用户密码的最大有效期设置为永不过期
+REM 系统-安全设置-设置密码最长使用期限
+net accounts /maxpwage:999
+REM 系统-安全设置-或者设置为永不过期
 net accounts /maxpwage:unlimited
-wmic UserAccount where Name='administrator' set PasswordExpires=False
+REM 系统-安全设置-设置密码历史记录
+net accounts /uniquepw:0
+REM 系统-安全设置-禁用密码必须符合复杂性要求的GPO设置
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "PasswordComplexity" /t REG_DWORD /d 0 /f
+REM 系统-安全设置-将用户密码的最大有效期设置为永不过期
+net user %USERNAME% /expires:never
+REM 系统-安全设置-禁用关机事件跟踪器
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Reliability" /v "ShutdownReasonOn" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Reliability" /v "ShutdownReasonUI" /t REG_DWORD /d 0 /f
 REM 系统-安全设置-在本地计算机上设置允许不安全的访客身份验证（64位系统）
 reg add "HKLM\Software\Policies\Microsoft\Windows\LanmanWorkstation" /v "AllowInsecureGuestAuth" /d 1 /t reg_dword /f
 REM 系统-安全设置-在本地计算机上设置允许不安全的访客身份验证（32位系统）
@@ -1261,6 +1277,169 @@ reg add HKCR\Directory\shell\TakeOwnerShip\Command /f /ve /d "cmd.exe /c takeown
 goto :eof
 
 :better_llq
+
+REM 软件-浏览器-Edge-禁用Edge后台运行
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "BackgroundModeEnabled" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AllowBackgroundAppsToRun" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁止Edge首次运行向导
+reg add "HKCU\Software\Microsoft\Edge\FirstRun" /v "FirstRunExperience" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Edge\FirstRun" /v "LastFirstRunVersion" /t REG_DWORD /d 999999999 /f
+REM 软件-浏览器-Edge-禁用欢迎页面和导览
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "HideFirstRunExperience" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "HideFirstRunExperience" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-跳过默认浏览器提示
+reg add "HKCU\Software\Policies\Microsoft\Edge" /v "DefaultBrowserSettingEnabled" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Edge\FirstRun" /v "DefaultBrowserSettingShown" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-设置Edge首次运行标志
+reg add "HKCU\Software\Microsoft\Edge\FirstRun" /v "Finished" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Edge" /v "HasShownFirstRun" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-禁用Edge更新
+reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v "UpdateDefault" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v "AutoUpdateCheckPeriodMinutes" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用IE自动跳转到Edge浏览器
+reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "IE11DisableEdgeRedirect" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-禁用Internet Explorer的第三方浏览器扩展
+::reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "DisableThirdPartyExtensions" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-禁用Internet Explorer在Microsoft Edge中打开网站的设置
+reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "InternetExplorerIntegration" /t REG_SZ /d "0" /f
+REM 软件-浏览器-Edge-禁止打开IE弹出EDGE
+reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "Enable Browser Extensions" /t REG_SZ /d "no" /f
+REM 软件-浏览器-Edge-允许在IE模式下重新加载网站
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "InternetExplorerIntegrationReloadInIEModeAllowed" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-禁用从Internet Explorer跳转到Microsoft Edge
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "RedirectSitesFromInternetExplorerPreventBHO" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-阻止Microsoft Edge首次运行欢迎页面
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "PreventFirstRunPage" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-禁用Edge浏览器预启动
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AllowPrelaunch" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁止更新到Chromium版Edge
+reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v "DoNotUpdateToEdgeWithChromium" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-禁用启动加速功能
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "StartupBoostEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-开启Edge的开始按钮
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "ShowStartButton" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-开启Edge的首页按钮
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "ShowHomeButton" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-设置始终最大性能模式
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "PerformanceMode" /t REG_DWORD /d 2 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "PerformanceModePluggedIn" /t REG_DWORD /d 2 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "PerformanceModeBattery" /t REG_DWORD /d 2 /f
+REM 软件-浏览器-Edge-关闭开启与其他Windows功能共享浏览数据
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "WindowsFeaturesEnabled" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-启用硬件加速
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "HardwareAccelerationModeEnabled" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Edge" /v HardwareAccelerationModeEnabled /t reg_dword /d 1 /f
+REM 软件-浏览器-Edge-启用平滑滚动
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "SmoothScrollEnabled" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-设定主页及启动页
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "RestoreOnStartup" /t REG_DWORD /d 4 /f
+REM 软件-浏览器-Edge-设置下载限制策略（0=允许所有下载，1=阻止所有下载）
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "DownloadRestrictions" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁止自动打开下载的文件
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AlwaysOpenDownloaded" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用SmartScreen过滤器
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "SmartScreenEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用潜在不受欢迎程序检测
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "SmartScreenPuaEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用网络钓鱼过滤器
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge\PhishingFilter" /v "Enabled" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge\PhishingFilter" /v "SendSmartScreenFilter" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge\PhishingFilter" /v "EnabledV9" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用Windows SmartScreen
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\SmartScreen" /v "Enabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用安全增强功能
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "SecurityLevel" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-允许第三方Cookie
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "BlockThirdPartyCookies" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-允许过时的插件运行
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AllowOutdatedPlugins" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-设置默认JavaScript权限
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "DefaultJavaScriptSetting" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-关闭恐吓软件阻止程序
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "IntensiveWakeUpThrottlingEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用Copilot和AI功能
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "HubsSidebarEnabled" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AIFeaturesEnabled" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "EdgeDiscoverEnabled" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "CopilotEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用智能功能
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "SmartFeaturesEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-启用浏览器扩展
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "ExtensionsEnabled" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-允许安装外部扩展
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AllowExternalExtensions" /t REG_DWORD /d 1 /f
+REM 软件-浏览器-Edge-阻止从Microsoft Edge加载商店扩展
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "ExtensionsBlocklist" /t REG_SZ /d "microsoft-edge-extension://*" /f
+REM 软件-浏览器-Edge-禁用个性化广告、搜索、新闻和其它服务
+reg add "HKLM\Software\Policies\Microsoft\Edge" /v "PersonalizationReportingEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用来自本地供应商的建议
+reg add "HKLM\Software\Policies\Microsoft\Edge" /v "LocalProvidersEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用增强的拼写检查
+reg add "HKLM\Software\Policies\Microsoft\Edge" /v "MicrosoftEditorProofingEnabled" /t REG_DWORD /d 0 /f
+REM 软件-浏览器-Edge-禁用从IE到EDGE的自动重定向
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Ext\CLSID" /v "{1FD49718-1D00-4B19-AF5F-070AF6D5D54C}" /t REG_DWORD /d 0 /f
+
+REM 软件-浏览器-Chrome-下载前询问每个文件的保存位置
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "PromptForDownloadLocation" /t reg_dword /d 1 /f
+REM 软件-浏览器-Chrome-禁用 WebRTC（减少网络延迟）
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "WebRtcIpHandlingPolicy" /t reg_dword /d 2 /f
+REM 软件-浏览器-Chrome-允许运行过时的插件
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "AllowOutdatedPlugins" /t reg_dword /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "RunAllFlashInAllowMode" /t reg_dword /d 1 /f
+REM 软件-浏览器-Chrome-默认通知设置
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultNotificationsSetting" /t reg_dword /d 1 /f
+REM 软件-浏览器-Chrome-默认弹出窗口设置_允许
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultPopupsSetting" /t reg_dword /d 1 /f
+REM 软件-浏览器-Chrome-禁止加入高级保护计划的用户将下载内容发送给 Google 进行深度扫描
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "AdvancedProtectionDeepScanningEnabled" /t reg_dword /d 0 /f
+REM 软件-浏览器-Chrome-在Google Chrome关闭后继续运行后台应用_关闭
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "BackgroundModeEnabled" /t reg_dword /d 0 /f
+REM 软件-浏览器-Chrome-在工具栏上显示"主页"按钮
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "ShowHomeButton" /t reg_dword /d 1 /f
+REM 软件-浏览器-Chrome-开启将 Google Chrome 设为默认浏览器
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultBrowserSettingEnabled" /t reg_dword /d 1 /f
+REM 软件-浏览器-Chrome-默认JavaScript设置_允许
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultJavaScriptSetting" /t reg_dword /d 1 /f
+REM 软件-浏览器-Chrome-默认Flash设置_允许
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultPluginsSetting" /t reg_dword /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "HardwareAccelerationModeEnabled" /t reg_dword /d 1 /f
+reg add "HKCU\Software\Google\Chrome" /v HardwareAccelerationModeEnabled /t reg_dword /d 1 /f
+REM 软件-浏览器-Chrome-在这些网站上允许弹出窗口
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\PopupsAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\PopupsAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
+REM 软件-浏览器-Chrome-在这些网站上允许Flash插件
+reg add "HKCU\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
+reg add "HKCU\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
+reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /d "[*.]com" /t reg_sz /f
+reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /d "[*.]net" /t reg_sz /f
+reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "3" /d "[*.]org" /t reg_sz /f
+reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "4" /d "[*.]cn" /t reg_sz /f
+reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "5" /d "[*.]cc" /t reg_sz /f
+reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /d "[*.]com" /t reg_sz /f
+reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /d "[*.]net" /t reg_sz /f
+reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "3" /d "[*.]org" /t reg_sz /f
+reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "4" /d "[*.]cn" /t reg_sz /f
+reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "5" /d "[*.]cc" /t reg_sz /f
+REM 软件-浏览器-Chrome-允许这些网站上的不安全内容
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\InsecureContentAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\InsecureContentAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
+REM 软件-浏览器-Chrome-在这些网站上允许JavaScript
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\JavaScriptAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\JavaScriptAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
+REM 软件-浏览器-Chrome-允许在这些站点上生成密钥
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\KeygenAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\KeygenAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
+REM 软件-浏览器-Chrome-在这些站点上允许WebUSB
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\WebUsbAskForUrls" /v "1" /t reg_sz /d "https://*" /f
+reg add "HKLM\SOFTWARE\Policies\Google\Chrome\WebUsbAskForUrls" /v "2" /t reg_sz /d "http://*" /f
+REM 软件-浏览器-Chrome-禁止Chrome打印页眉和页脚
+reg add "HKLM\Software\Policies\Google\Chrome" /v "PrintHeaderFooter" /t reg_dword /d 0 /f
+REM 软件-浏览器-Chrome-开启Chrome默认背景图片打印模式
+reg add "HKLM\Software\Policies\Google\Chrome" /v "PrintingBackgroundGraphicsDefault" /t reg_dword /d 1 /f
+if "%IEIE%"=="NO" goto :eof
+
 REM 软件-浏览器-IE-清除可能的恶意锁定
 reg delete "HKCU\Software\Policies\Microsoft\Internet Explorer\Control Panel" /v "HomePage" /f 2>nul
 reg delete "HKLM\SOFTWARE\Policies\Microsoft\Internet Explorer\Control Panel" /v "HomePage" /f 2>nul
@@ -1498,161 +1677,6 @@ if not exist "%LinkPath%" (
 REM 软件-浏览器-IE-添加网址至信任站点
 reg add "%IE_Domains%\*" /v "http" /t reg_dword /d "2" /f
 reg add "%IE_Domains%\*" /v "https" /t reg_dword /d "2" /f
-
-REM 软件-浏览器-Edge-禁用Edge后台运行
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "BackgroundModeEnabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁止Edge首次运行向导
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "HideFirstRunExperience" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-禁用Edge更新
-reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v "UpdateDefault" /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v "AutoUpdateCheckPeriodMinutes" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用IE自动跳转到Edge浏览器
-reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "IE11DisableEdgeRedirect" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-禁用Internet Explorer的第三方浏览器扩展
-::reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "DisableThirdPartyExtensions" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-禁用Internet Explorer在Microsoft Edge中打开网站的设置
-reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "InternetExplorerIntegration" /t REG_SZ /d "0" /f
-REM 软件-浏览器-Edge-禁止打开IE弹出EDGE
-reg add "HKLM\SOFTWARE\Microsoft\Internet Explorer\Main" /v "Enable Browser Extensions" /t REG_SZ /d "no" /f
-REM 软件-浏览器-Edge-允许在IE模式下重新加载网站
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "InternetExplorerIntegrationReloadInIEModeAllowed" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-禁用从Internet Explorer跳转到Microsoft Edge
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "RedirectSitesFromInternetExplorerPreventBHO" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-阻止Microsoft Edge首次运行欢迎页面
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "PreventFirstRunPage" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-禁用Edge浏览器预启动
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AllowPrelaunch" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁止更新到Chromium版Edge
-reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v "DoNotUpdateToEdgeWithChromium" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-禁用启动加速功能
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "StartupBoostEnabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-开启Edge的开始按钮
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "ShowStartButton" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-开启Edge的首页按钮
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "ShowHomeButton" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-设置始终最大性能模式
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "PerformanceMode" /t REG_DWORD /d 2 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "PerformanceModePluggedIn" /t REG_DWORD /d 2 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "PerformanceModeBattery" /t REG_DWORD /d 2 /f
-REM 软件-浏览器-Edge-关闭开启与其他Windows功能共享浏览数据
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "WindowsFeaturesEnabled" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-启用硬件加速
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "HardwareAccelerationModeEnabled" /t REG_DWORD /d 1 /f
-reg add "HKCU\Software\Microsoft\Edge" /v HardwareAccelerationModeEnabled /t reg_dword /d 1 /f
-REM 软件-浏览器-Edge-启用平滑滚动
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "SmoothScrollEnabled" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-设定主页及启动页
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "RestoreOnStartup" /t REG_DWORD /d 4 /f
-REM 软件-浏览器-Edge-设置下载限制策略（0=允许所有下载，1=阻止所有下载）
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "DownloadRestrictions" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁止自动打开下载的文件
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AlwaysOpenDownloaded" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用SmartScreen过滤器
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "SmartScreenEnabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用潜在不受欢迎程序检测
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "SmartScreenPuaEnabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用网络钓鱼过滤器
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge\PhishingFilter" /v "Enabled" /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge\PhishingFilter" /v "SendSmartScreenFilter" /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge\PhishingFilter" /v "EnabledV9" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用Windows SmartScreen
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\SmartScreen" /v "Enabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用安全增强功能
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "SecurityLevel" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-允许第三方Cookie
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "BlockThirdPartyCookies" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-允许过时的插件运行
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AllowOutdatedPlugins" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-设置默认JavaScript权限
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "DefaultJavaScriptSetting" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-关闭恐吓软件阻止程序
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "IntensiveWakeUpThrottlingEnabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用Copilot和AI功能
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "HubsSidebarEnabled" /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AIFeaturesEnabled" /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "EdgeDiscoverEnabled" /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "CopilotEnabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用智能功能
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "SmartFeaturesEnabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-启用浏览器扩展
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "ExtensionsEnabled" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-允许安装外部扩展
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "AllowExternalExtensions" /t REG_DWORD /d 1 /f
-REM 软件-浏览器-Edge-阻止从Microsoft Edge加载商店扩展
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v "ExtensionsBlocklist" /t REG_SZ /d "microsoft-edge-extension://*" /f
-REM 软件-浏览器-Edge-禁用个性化广告、搜索、新闻和其它服务
-reg add "HKLM\Software\Policies\Microsoft\Edge" /v "PersonalizationReportingEnabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用来自本地供应商的建议
-reg add "HKLM\Software\Policies\Microsoft\Edge" /v "LocalProvidersEnabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用增强的拼写检查
-reg add "HKLM\Software\Policies\Microsoft\Edge" /v "MicrosoftEditorProofingEnabled" /t REG_DWORD /d 0 /f
-REM 软件-浏览器-Edge-禁用从IE到EDGE的自动重定向
-reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Ext\CLSID" /v "{1FD49718-1D00-4B19-AF5F-070AF6D5D54C}" /t REG_DWORD /d 0 /f
-
-REM 软件-浏览器-Chrome-下载前询问每个文件的保存位置
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "PromptForDownloadLocation" /t reg_dword /d 1 /f
-REM 软件-浏览器-Chrome-禁用 WebRTC（减少网络延迟）
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "WebRtcIpHandlingPolicy" /t reg_dword /d 2 /f
-REM 软件-浏览器-Chrome-允许运行过时的插件
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "AllowOutdatedPlugins" /t reg_dword /d 1 /f
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "RunAllFlashInAllowMode" /t reg_dword /d 1 /f
-REM 软件-浏览器-Chrome-默认通知设置
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultNotificationsSetting" /t reg_dword /d 1 /f
-REM 软件-浏览器-Chrome-默认弹出窗口设置_允许
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultPopupsSetting" /t reg_dword /d 1 /f
-REM 软件-浏览器-Chrome-禁止加入高级保护计划的用户将下载内容发送给 Google 进行深度扫描
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "AdvancedProtectionDeepScanningEnabled" /t reg_dword /d 0 /f
-REM 软件-浏览器-Chrome-在Google Chrome关闭后继续运行后台应用_关闭
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "BackgroundModeEnabled" /t reg_dword /d 0 /f
-REM 软件-浏览器-Chrome-在工具栏上显示"主页"按钮
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "ShowHomeButton" /t reg_dword /d 1 /f
-REM 软件-浏览器-Chrome-开启将 Google Chrome 设为默认浏览器
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultBrowserSettingEnabled" /t reg_dword /d 1 /f
-REM 软件-浏览器-Chrome-默认JavaScript设置_允许
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultJavaScriptSetting" /t reg_dword /d 1 /f
-REM 软件-浏览器-Chrome-默认Flash设置_允许
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "DefaultPluginsSetting" /t reg_dword /d 1 /f
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "HardwareAccelerationModeEnabled" /t reg_dword /d 1 /f
-reg add "HKCU\Software\Google\Chrome" /v HardwareAccelerationModeEnabled /t reg_dword /d 1 /f
-REM 软件-浏览器-Chrome-在这些网站上允许弹出窗口
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\PopupsAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\PopupsAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
-REM 软件-浏览器-Chrome-在这些网站上允许Flash插件
-reg add "HKCU\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
-reg add "HKCU\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
-reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /d "[*.]com" /t reg_sz /f
-reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /d "[*.]net" /t reg_sz /f
-reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "3" /d "[*.]org" /t reg_sz /f
-reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "4" /d "[*.]cn" /t reg_sz /f
-reg add "HKCU\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "5" /d "[*.]cc" /t reg_sz /f
-reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "1" /d "[*.]com" /t reg_sz /f
-reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "2" /d "[*.]net" /t reg_sz /f
-reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "3" /d "[*.]org" /t reg_sz /f
-reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "4" /d "[*.]cn" /t reg_sz /f
-reg add "HKLM\Software\Policies\Google\Chrome\PluginsAllowedForUrls" /v "5" /d "[*.]cc" /t reg_sz /f
-REM 软件-浏览器-Chrome-允许这些网站上的不安全内容
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\InsecureContentAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\InsecureContentAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
-REM 软件-浏览器-Chrome-在这些网站上允许JavaScript
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\JavaScriptAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\JavaScriptAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
-REM 软件-浏览器-Chrome-允许在这些站点上生成密钥
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\KeygenAllowedForUrls" /v "1" /t reg_sz /d "https://*" /f
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\KeygenAllowedForUrls" /v "2" /t reg_sz /d "http://*" /f
-REM 软件-浏览器-Chrome-在这些站点上允许WebUSB
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\WebUsbAskForUrls" /v "1" /t reg_sz /d "https://*" /f
-reg add "HKLM\SOFTWARE\Policies\Google\Chrome\WebUsbAskForUrls" /v "2" /t reg_sz /d "http://*" /f
-REM 软件-浏览器-Chrome-禁止Chrome打印页眉和页脚
-reg add "HKLM\Software\Policies\Google\Chrome" /v "PrintHeaderFooter" /t reg_dword /d 0 /f
-REM 软件-浏览器-Chrome-开启Chrome默认背景图片打印模式
-reg add "HKLM\Software\Policies\Google\Chrome" /v "PrintingBackgroundGraphicsDefault" /t reg_dword /d 1 /f
-
-REM 软件-驱动总裁-删除安装信息
-reg delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\DrvCeo2.0" /f
-del /q /f "%ProgramData%\Microsoft\Windows\Start Menu\驱动下载.lnk" 2>nul
-del /q /f "%windir%\Help\dcold.exe" 2>nul
 goto :eof
 
 :better_llq_kj
@@ -1935,11 +1959,16 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsMediaPlayer" /v "DisableAutoUpd
 REM 软件-Windows Media Player-完全禁用
 reg add "HKCU\SOFTWARE\Policies\Microsoft\WindowsMediaCenter" /v "MediaCenter" /t REG_DWORD /d 1 /f
 
+REM 软件-驱动总裁-删除安装信息
+reg delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\DrvCeo2.0" /f
+del /q /f "%ProgramData%\Microsoft\Windows\Start Menu\驱动下载.lnk" 2>nul
+del /q /f "%windir%\Help\dcold.exe" 2>nul
+
 REM 软件-WPS-关闭WPS Office的自动更新服务
 sc stop WPSUpdateService
 sc config WPSUpdateService start= disabled
 REM 软件-WPS-去除WPS云文档
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace{D426C8B3-0B26-4F0D-BA74-2EE212EDAC6D}" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{D426C8B3-0B26-4F0D-BA74-2EE212EDAC6D}" /f
 ::删除 WPS网盘
 reg delete "HKCR\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{7AE6DE87-C956-4B40-9C89-3D166C9841D3}" /f
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{7AE6DE87-C956-4B40-9C89-3D166C9841D3}" /f
