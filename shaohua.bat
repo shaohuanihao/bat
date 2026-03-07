@@ -2,14 +2,14 @@
 cls
 @echo off
 ver|findstr /i "5\.1\." > nul&&(goto:begin)
-net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+net sess>nul 2>&1||(cls&powershell Start-Process '%0' -Verb RunAs&exit)
 :begin
 @echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20260103
+set Version=20260307
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -19,6 +19,7 @@ cls&echo.&echo.
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　Ver%Version%&echo.&echo.&echo.&echo.&echo.&echo.&set /p pwd=　　　　　　　　　　　　　　　　　　　　　Password:
 if /i "%pwd%" neq "shaohua" goto :passwd
 call :patch
+if not defined Pc set Pc=Unknown
 title %Pc% ★ %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 cls
 call :cmd_admin
@@ -1377,7 +1378,11 @@ reg add "HKLM\Software\Policies\Microsoft\Edge" /v "LocalProvidersEnabled" /t RE
 REM 软件-浏览器-Edge-禁用增强的拼写检查
 reg add "HKLM\Software\Policies\Microsoft\Edge" /v "MicrosoftEditorProofingEnabled" /t REG_DWORD /d 0 /f
 REM 软件-浏览器-Edge-禁用从IE到EDGE的自动重定向
-reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Ext\CLSID" /v "{1FD49718-1D00-4B19-AF5F-070AF6D5D54C}" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Ext\CLSID" /v "{1FD49718-1D00-4B19-AF5F-070AF6D5D54C}" /t REG_SZ /d "0" /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Browser Helper Objects\{1FD49718-1D00-4B19-AF5F-070AF6D5D54C}" /f
+reg delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\Browser Helper Objects\{1FD49718-1D00-4B19-AF5F-070AF6D5D54C}" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Ext\CLSID" /v "{1FD49718-1D00-4B19-AF5F-070AF6D5D54C}" /t REG_SZ /d "0" /f
+reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Policies\Ext\CLSID" /v "{1FD49718-1D00-4B19-AF5F-070AF6D5D54C}" /t REG_SZ /d "0" /f
 
 REM 软件-浏览器-Chrome-下载前询问每个文件的保存位置
 reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v "PromptForDownloadLocation" /t reg_dword /d 1 /f
@@ -2478,9 +2483,9 @@ if not exist "%chrome_path%" goto :eof
 reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome" /ve /d "Google Chrome" /f >nul 2>&1
 reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationName" /d "Google Chrome" /f >nul 2>&1
 reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationDescription" /d "Google Chrome 浏览器" /f >nul 2>&1
-reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationIcon" /d "!chrome_path!,0" /f >nul 2>&1
-reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\shell\open\command" /ve /d "\"!chrome_path!\"" /f >nul 2>&1
-reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\DefaultIcon" /ve /d "!chrome_path!,0" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationIcon" /d "%chrome_path%,0" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\shell\open\command" /ve /d "\"%chrome_path%\"" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\DefaultIcon" /ve /d "%chrome_path%,0" /f >nul 2>&1
 :: 注册 Chrome 能力
 reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /v "ApplicationCompany" /d "Google LLC" /f >nul 2>&1
 :: 注册 URL 协议
@@ -2496,8 +2501,8 @@ reg add "HKLM\Software\Clients\StartMenuInternet\Google Chrome\Capabilities\File
 reg add "HKLM\Software\RegisteredApplications" /v "Google Chrome" /d "Software\Clients\StartMenuInternet\Google Chrome\Capabilities" /f >nul 2>&1
 :: 注册 Chrome 文件类型
 reg add "HKCR\ChromeHTML" /ve /d "Google Chrome HTML Document" /f >nul 2>&1
-reg add "HKCR\ChromeHTML\DefaultIcon" /ve /d "!chrome_path!,0" /f >nul 2>&1
-reg add "HKCR\ChromeHTML\shell\open\command" /ve /d "\"!chrome_path!\" \"%%1\"" /f >nul 2>&1
+reg add "HKCR\ChromeHTML\DefaultIcon" /ve /d "%chrome_path%,0" /f >nul 2>&1
+reg add "HKCR\ChromeHTML\shell\open\command" /ve /d "\"%chrome_path%\" \"%%1\"" /f >nul 2>&1
 goto :eof
 :360ent
 set "ent_path=C:\Program Files\360ent\Application\360ent.exe"
@@ -2506,9 +2511,9 @@ if not exist "%ent_path%" goto :eof
 reg add "HKLM\Software\Clients\StartMenuInternet\360ent" /ve /d "360企业安全浏览器" /f >nul 2>&1
 reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationName" /d "360企业安全浏览器" /f >nul 2>&1
 reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationDescription" /d "360企业安全浏览器" /f >nul 2>&1
-reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationIcon" /d "!ent_path!,0" /f >nul 2>&1
-reg add "HKLM\Software\Clients\StartMenuInternet\360ent\shell\open\command" /ve /d "\"!ent_path!\"" /f >nul 2>&1
-reg add "HKLM\Software\Clients\StartMenuInternet\360ent\DefaultIcon" /ve /d "!ent_path!,0" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationIcon" /d "%ent_path%,0" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\shell\open\command" /ve /d "\"%ent_path%\"" /f >nul 2>&1
+reg add "HKLM\Software\Clients\StartMenuInternet\360ent\DefaultIcon" /ve /d "%ent_path%,0" /f >nul 2>&1
 
 :: 注册 360企业浏览器能力
 reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities" /v "ApplicationCompany" /d "360.cn" /f >nul 2>&1
@@ -2522,8 +2527,8 @@ reg add "HKLM\Software\Clients\StartMenuInternet\360ent\Capabilities\FileAssocia
 reg add "HKLM\Software\RegisteredApplications" /v "360ent" /d "Software\Clients\StartMenuInternet\360ent\Capabilities" /f >nul 2>&1
 :: 注册 360 文件类型
 reg add "HKCR\360HTML" /ve /d "360 Enterprise HTML Document" /f >nul 2>&1
-reg add "HKCR\360HTML\DefaultIcon" /ve /d "!ent_path!,0" /f >nul 2>&1
-reg add "HKCR\360HTML\shell\open\command" /ve /d "\"!ent_path!\" \"%%1\"" /f >nul 2>&1
+reg add "HKCR\360HTML\DefaultIcon" /ve /d "%ent_path%,0" /f >nul 2>&1
+reg add "HKCR\360HTML\shell\open\command" /ve /d "\"%ent_path%\" \"%%1\"" /f >nul 2>&1
 goto :eof
 :upan
 REM 安全U盘_v1_V2_V3_DEL

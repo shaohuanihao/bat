@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=ClearTemp脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20250209
+set Version=20260306
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -25,7 +25,7 @@ echo.　　　　　　　A4): 清理 系统 Temp 临时 文件
 echo.　　　　　　　A5): 清理 打印自动保存记录 文件
 echo.　　　　　　　A6): 清理 各种主流浏览器 缓存 文件
 echo.　　　　　　　A7): 清理 Windows 升级临时 文件
-echo.　　　　　　　A8): 清理 系统垃圾格式及记录文件 文件
+echo.　　　　　　　A8): 清理 系统垃圾格式及记录文件及深层垃圾 文件
 echo.　　　　　　　A9): 启动 磁盘清理程序 自动清理&echo.
 echo.　垃圾清理速度取决于众多因素：硬盘的读写速度、CPU及内存的占用、电脑文件的数量、杀毒及管控软件的后台监控等…&echo.
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　%Version%　邵华　18900559020
@@ -85,11 +85,39 @@ cls&echo.&echo.　是否确认清除 【微信自动保存的文档 ^& 图片 ^& 视频 ^& 聊天记录等
 call :xuanze
 if %errorlevel%==2 goto :eof
 call :tishi
-for /f "tokens=1,2,*" %%i in ('REG QUERY HKCU\Software\Tencent\WeChat /v FileSavePath') do set "regvalue=%%k"
+
+rem 关闭微信进程
+wmic process where "name like '%WeChat%'" delete
+taskkill /f /t /im WeChat.exe 2>nul
+taskkill /f /t /im Weixin.exe 2>nul
+taskkill /f /t /im WechatBrowser.exe 2>nul
+taskkill /f /t /im WechatAppLauncher.exe 2>nul
+taskkill /f /t /im WeChatExt.exe 2>nul
+
+rem 从注册表读取微信文件保存路径
+for /f "tokens=1,2,*" %%i in ('REG QUERY HKCU\Software\Tencent\WeChat /v FileSavePath 2^>nul') do set "regvalue=%%k"
 if defined regvalue (
-    del /f /s /q "%regvalue%\WeChat Files\*"
+    rem 清理注册表中指定的路径
+    del /f /s /q "%regvalue%\*" 2>nul
+    rd /s /q "%regvalue%" 2>nul
 )
+
+rem 清理用户文档目录下的微信文件
 del /f /s /q "%userprofile%\Documents\WeChat Files\*" 2>nul
+rd /s /q "%userprofile%\Documents\WeChat Files" 2>nul
+del /f /s /q "%userprofile%\Documents\Weixin Files\*" 2>nul
+rd /s /q "%userprofile%\Documents\Weixin Files" 2>nul
+
+rem 清理 AppData 目录下的微信缓存
+del /f /s /q "%localappdata%\Tencent\WeChat\*" 2>nul
+rd /s /q "%localappdata%\Tencent\WeChat" 2>nul
+del /f /s /q "%localappdata%\Tencent\Weixin\*" 2>nul
+rd /s /q "%localappdata%\Tencent\Weixin" 2>nul
+
+rem 清理微信默认安装目录
+del /f /s /q "%programfiles%\Tencent\WeChat\*" 2>nul
+del /f /s /q "%programfiles(x86)%\Tencent\WeChat\*" 2>nul
+
 goto :eof
 :l4
 rem Clear temp and temp cache directories
@@ -152,8 +180,8 @@ rd /s /q %windir%$Windows.~BT
 rd /s /q %windir%\servicing\Packages
 goto :eof
 :l8
-rem Delete symptom files
-cls&echo.&echo.　是否确认清除　【系统垃圾格式及记录文件】　？
+rem Delete symptom files and system encapsulation garbage
+cls&echo.&echo.　是否确认清除　【系统垃圾格式及记录文件及深层垃圾】　？
 call :xuanze
 if %errorlevel%==2 goto :eof
 call :tishi
@@ -170,7 +198,7 @@ rem del /f /s /q %systemdrive%\*.chk
 rem 临时备份文件
 rem del /f /s /q %systemdrive%\*.old
 rem 回收站文件
-del /f /s /q "%systemdrive%\recycled\*"
+rem del /f /s /q "%systemdrive%\$Recycle.Bin\*"
 rem 备份文件
 rem del /f /s /q %windir%\*.bak
 rem 预读文件
@@ -181,6 +209,73 @@ rem 最近访问文件的纪录
 del /f /s /q "%userprofile%\recent\*"
 del /f /s /q "%userprofile%\Local Settings\Temporary Internet Files\*"
 del /f /s /q "%userprofile%\Local Settings\Temp\*"
+rem 系统日志文件
+del /f /s /q "%windir%\System32\Winevt\Logs\*"
+rem 事件查看器日志
+del /f /s /q "%windir%\System32\config\*.evt"
+del /f /s /q "%windir%\System32\config\*.evtx"
+rem 系统更新残留（新增）
+rd /s /q "%windir%$Windows.~WS"
+rem 驱动安装残留
+rd /s /q "%windir%\inf\setupapi.dev.log"
+rem 应用程序缓存（新增）
+del /f /s /q "%localappdata%\Microsoft\Windows\History\*"
+rem 系统错误报告
+del /f /s /q "%localappdata%\Microsoft\Windows\WER\*"
+rem 内存转储文件
+del /f /s /q "%windir%\memory.dmp"
+del /f /s /q "%windir%\minidump\*"
+del /f /q /s "C:\Windows\LiveKernelReports\*.dmp"
+del /f /q /s "C:\Windows\Minidump\*.dmp"
+rem 系统还原点（谨慎使用，会删除所有还原点）
+rem vssadmin delete shadows /all /quiet
+rem 临时安装文件
+del /f /s /q "%windir%\Installer\$PatchCache$\*"
+rem 系统休眠文件（谨慎使用，会删除休眠文件）
+rem powercfg -h off
+rem del /f /s /q "%systemdrive%\hiberfil.sys"
+rem 系统诊断日志
+del /f /s /q "%localappdata%\Diagnostics\*"
+del /f /s /q "%localappdata%\Microsoft\Windows\Diagnostics\*"
+rem 应用程序日志
+del /f /s /q "%localappdata%\Microsoft\Windows\AppCache\*"
+rem Cortana 缓存
+del /f /s /q "%localappdata%\Microsoft\Windows\Cortana\*"
+rem 搜索历史
+del /f /s /q "%localappdata%\Microsoft\Windows\Explorer\RecentApps\*"
+rem OneDrive 缓存
+del /f /s /q "%localappdata%\Microsoft\OneDrive\*"
+rem 清理用户临时文件（新增）
+del /f /s /q "%userprofile%\AppData\Local\Temp\*"
+rem 清理系统服务日志
+del /f /s /q "%windir%\System32\LogFiles\*"
+rem 清理 Windows Defender 日志
+del /f /s /q "%programdata%\Microsoft\Windows Defender\*"
+rem 清理 Windows Update 日志
+del /f /s /q "%windir%\WindowsUpdate.log"
+del /f /s /q "%windir%\Logs\WindowsUpdate\*"
+rem 深层清理项目
+rem 系统备份：清理注册表备份目录
+del /f /s /q "%windir%\System32\config\RegBack\*"
+rem 设备驱动备份：清理旧驱动
+del /f /s /q "%windir%\System32\DriverStore\FileRepository\*"
+rem Microsoft Store 缓存：清理临时文件
+del /f /s /q "%localappdata%\Packages\*"
+rem Office 缓存：清理缓存文件
+del /f /s /q "%localappdata%\Microsoft\Office\*"
+rem 网络缓存：清理网络快捷方式
+del /f /s /q "%localappdata%\Microsoft\Windows\NetworkShortcuts\*"
+rem 日志文件：清理系统日志目录
+del /f /s /q "%windir%\Logs\*"
+rem 调试符号：清理调试符号目录
+del /f /s /q "%windir%\symbols\*"
+rem 字体缓存：清理字体缓存
+del /f /s /q "%localappdata%\Microsoft\Windows\Fonts\*"
+rem 用户历史记录：清理自动目标
+del /f /s /q "%userprofile%\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\*"
+rem 用户搜索历史：清理最近应用
+del /f /s /q "%userprofile%\AppData\Local\Microsoft\Windows\Explorer\RecentApps\*"
+
 goto :eof
 :l9
 rem Run disk cleanup tool by Sageset id 60
