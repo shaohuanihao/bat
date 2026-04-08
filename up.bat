@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=Upgrade脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20251124
+set Version=20260408
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -18,7 +18,7 @@ choice /T 1 /C SH /d H /N >nul 2>nul
 if %errorlevel%==1 echo on
 set "local=C:\ShaoHua" >nul 2>nul
 md %local%\Key >nul 2>nul
-set error=下载遇到了问题，请检查是否网络不可达或者杀毒软件在拦截？
+set error=　　　下载失败，请检查是否网络不可达或被杀毒软件等拦截？
 set urllan=http://38.40.12.180/sh
 set urlwan=http://10.198.78.78/sh
 set urlother=https://gitee.com/shaohuanihao
@@ -48,9 +48,8 @@ set softwan=/%soft%
 set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /q "%SystemRoot%\%soft%" >nul 2>nul
-echo. Downloading %soft%
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%SystemRoot%\%soft%" -L %net%) || (echo.%error%)
+echo.　正在下载 %soft%
+curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (del /f /q "%SystemRoot%\%soft%" >nul 2>nul&curl -s --connect-timeout 5 --max-time 30 -o "%SystemRoot%\%soft%" -L %net% 2>nul&echo.&echo.　　下载完成。) || (echo.&echo.%error%)
 goto :eof
 :list2
 rem InitialSetup
@@ -60,9 +59,8 @@ set softwan=/%soft%
 set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /q "%SystemRoot%\%soft%" >nul 2>nul
-echo. Downloading %soft%
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%SystemRoot%\%soft%" -L %net%) || (echo.%error%)
+echo.　正在下载 %soft%
+curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (del /f /q "%SystemRoot%\%soft%" >nul 2>nul&curl -s --connect-timeout 5 --max-time 30 -o "%SystemRoot%\%soft%" -L %net% 2>nul&echo.&echo.　　下载完成。) || (echo.&echo.%error%)
 goto :eof
 :list3
 rem Activate
@@ -72,9 +70,8 @@ set softwan=/%soft%
 set softother=/bat/raw/main/KMS_VL_ALL_AIO.cmd
 call :make
 call :net
-del /f /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading %soft%
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
+echo.　正在下载 %soft%
+curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (del /f /q "%local%\Key\%soft%" >nul 2>nul&curl -s --connect-timeout 5 --max-time 30 -o "%local%\Key\%soft%" -L %net% 2>nul&echo.&echo.　　下载完成。) || (echo.&echo.%error%)
 goto :eof
 :list4
 rem ClearTemp
@@ -84,9 +81,8 @@ set softwan=/%soft%
 set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading %soft%
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
+echo.　正在下载 %soft%
+curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (del /f /q "%local%\Key\%soft%" >nul 2>nul&curl -s --connect-timeout 5 --max-time 30 -o "%local%\Key\%soft%" -L %net% 2>nul&echo.&echo.　　下载完成。) || (echo.&echo.%error%)
 goto :eof
 :list5
 rem DNS
@@ -96,9 +92,8 @@ set softwan=/%soft%
 set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading %soft%
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
+echo.　正在下载 %soft%
+curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (del /f /q "%local%\Key\%soft%" >nul 2>nul&curl -s --connect-timeout 5 --max-time 30 -o "%local%\Key\%soft%" -L %net% 2>nul&echo.&echo.　　下载完成。) || (echo.&echo.%error%)
 goto :eof
 :list6
 rem EnableRDC
@@ -108,9 +103,8 @@ set softwan=/%soft%
 set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading %soft%
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
+echo.　正在下载 %soft%
+curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (del /f /q "%local%\Key\%soft%" >nul 2>nul&curl -s --connect-timeout 5 --max-time 30 -o "%local%\Key\%soft%" -L %net% 2>nul&echo.&echo.　　下载完成。) || (echo.&echo.%error%)
 goto :eof
 :list7
 rem FixPrint
@@ -120,9 +114,8 @@ set softwan=/%soft%
 set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading %soft%
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
+echo.　正在下载 %soft%
+curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (del /f /q "%local%\Key\%soft%" >nul 2>nul&curl -s --connect-timeout 5 --max-time 30 -o "%local%\Key\%soft%" -L %net% 2>nul&echo.&echo.　　下载完成。) || (echo.&echo.%error%)
 goto :eof
 :list8
 rem SecureUdisk
@@ -132,9 +125,8 @@ set softwan=/%soft%
 set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading %soft%
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
+echo.　正在下载 %soft%
+curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (del /f /q "%local%\Key\%soft%" >nul 2>nul&curl -s --connect-timeout 5 --max-time 30 -o "%local%\Key\%soft%" -L %net% 2>nul&echo.&echo.　　下载完成。) || (echo.&echo.%error%)
 goto :eof
 :list9
 rem WinShare
@@ -144,13 +136,12 @@ set softwan=/%soft%
 set softother=/bat/raw/main/%soft%
 call :make
 call :net
-del /f /q "%local%\Key\%soft%" >nul 2>nul
-echo. Downloading %soft%
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\Key\%soft%" -L %net%) || (echo.%error%)
+echo.　正在下载 %soft%
+curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (del /f /q "%local%\Key\%soft%" >nul 2>nul&curl -s --connect-timeout 5 --max-time 30 -o "%local%\Key\%soft%" -L %net% 2>nul&echo.&echo.　　下载完成。) || (echo.&echo.%error%)
 goto :eof
 :curl
 set soft=curl.exe
-echo. Downloading curl.Just keep waiting no matter how long it takes.
+echo.　下载 curl 请耐心等待…
 set wgetlan=/curl.exe
 set wgetwan=/curl.exe
 set wgetother=/bat/raw/main/curl.exe
@@ -163,32 +154,32 @@ title Downloading curl.Just keep waiting no matter how long it takes.
 bitsadmin /transfer curl %net% %SystemRoot%\System32\curl.exe
 goto :eof
 :up
-echo. Updating the script. Please be patient, no matter how long it takes.
+echo.&echo.　请耐心等待…
 set softlan=/up.bat
 set softwan=/up.bat
 set softother=/bat/raw/main/up.bat
 call :make
 call :net
-curl -# -I %net% > up.txt && findstr "200 OK" up.txt > nul && (curl -# -o "%local%\up.bat" -L %net%) || (echo.%error%)
+curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (curl -s --connect-timeout 5 --max-time 30 -o "%local%\up.bat" -L %net% 2>nul&echo.&echo.　　下载完成。) || (echo.&echo.%error%)
 echo %~dp0|find /i "shaohua"&&(cls&echo.&goto :eof)||(cls&echo.&start "" %local%\up.bat&del %0&del %~dp0%~nx0&exit)
 goto :eof
 :clear
-echo. Cleaning up files that may trigger false-positive virus alerts from antivirus software. Please be patient, no matter how long it takes.
-del /f /q "%local%\up.txt"
-rd "%systemdrive%\sysprep\" /s /q
-rd "%local%\Tools\Key\" /s /q
-rd "%local%\Tools\DNS\" /s /q
-rd "%local%\Tools\局域网共享\" /s /q
-rd "%local%\Tools\Key\" /s /q
-del /f /s /q "%local%\*一键*"
-del /f /s /q "%local%\*共享*"
-del /f /s /q "%local%\*KMS_VL*"
-del /f /s /q "%local%\*oem7*"
-del /f /s /q "%local%\*office2007*"
-del /f /s /q "%local%\tools\*dns*"
-del /f /s /q "%local%\tools\*Share*"
-del /f /s /q "%systemdrive%\sysprep\*"
-rd "C:\ShaoHua\Drv\Drvceo\" /s /q
+echo.　清理可能触发杀毒软件误报病毒警报的文件…
+del /f /q "%local%\up.txt" 2>nul
+rd "%systemdrive%\sysprep\" /s /q 2>nul
+rd "%local%\Tools\Key\" /s /q 2>nul
+rd "%local%\Tools\DNS\" /s /q 2>nul
+rd "%local%\Tools\局域网共享\" /s /q 2>nul
+rd "%local%\Tools\Key\" /s /q 2>nul
+del /f /s /q "%local%\*一键*" 2>nul
+del /f /s /q "%local%\*共享*" 2>nul
+del /f /s /q "%local%\*KMS_VL*" 2>nul
+del /f /s /q "%local%\*oem7*" 2>nul
+del /f /s /q "%local%\*office2007*" 2>nul
+del /f /s /q "%local%\tools\*dns*" 2>nul
+del /f /s /q "%local%\tools\*Share*" 2>nul
+del /f /s /q "%systemdrive%\sysprep\*" 2>nul
+rd "C:\ShaoHua\Drv\Drvceo\" /s /q 2>nul
 goto :eof
 :make
 set L=&set W=&set O=

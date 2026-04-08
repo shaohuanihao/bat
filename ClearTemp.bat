@@ -9,15 +9,16 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=ClearTemp脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20260306
+set Version=20260408
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
 set userInput=
 call :CapsLK
+arp -a|findstr /i "10.198." >nul && (set dxql=　【 C 】定向清理) || set dxql=
 cls&for /f "tokens=2 delims=()" %%i in ('fsutil volume diskfree c:^|find /i "可用"') do set myvar=%%i&cls&echo.
-echo.　当前C盘可用容量为%myvar%。&echo.
-echo.　　【 A 默认】自动化下列操作　　　　　 【 C 】定向清理　　　　　 【 U 】更新脚本　　　　　 【 Q 】退出脚本&echo.
+echo.　当前 C 盘可用容量为【  %myvar% 】。&echo.
+echo.　　【 A 】自动化操作　【 M 默认】手动选择操作%dxql%　【 U 】更新脚本　【 Q 】退出脚本&echo.
 echo.　　　　　　　A1): 强制关闭 微信 进程
 echo.　　　　　　　A2): 强制关闭 各种主流浏览器 进程
 echo.　　　　　　　A3): 清理 微信 自动保存的 文档 ^& 图片 ^& 视频 ^& 聊天记录 一切 文件
@@ -29,13 +30,15 @@ echo.　　　　　　　A8): 清理 系统垃圾格式及记录文件及深层垃圾 文件
 echo.　　　　　　　A9): 启动 磁盘清理程序 自动清理&echo.
 echo.　垃圾清理速度取决于众多因素：硬盘的读写速度、CPU及内存的占用、电脑文件的数量、杀毒及管控软件的后台监控等…&echo.
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　%Version%　邵华　18900559020
-choice /T 6 /C ACUQ /d A /n /m "　脚本6秒后默认选A，请选择："
-if %errorlevel%==1 goto :auto
-if %errorlevel%==2 goto :clear
-if %errorlevel%==3 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.缺少核心文件，如您想使用全部功能，请联系邵华18900559020。&&timeout /t 3)
-if %errorlevel%==4 exit
+choice /T 6 /C AMCUQ /d M /n /m "　脚本6秒后默认选 M ，请选择："
+if %errorlevel%==1 set key=auto&goto :auto
+if %errorlevel%==2 set key=&goto :auto
+if %errorlevel%==3 goto :clear
+if %errorlevel%==4 if exist "C:\ShaoHua\up.bat" (call "C:\ShaoHua\up.bat") else (echo.缺少核心文件，如您想使用全部功能，请联系邵华18900559020。&&timeout /t 3)
+if %errorlevel%==5 exit
 :auto
-cls&echo.&echo.　自动清理中，请稍后...&echo.
+set start_time=%time%
+cls&echo.&echo.　自动清理中，请稍后…&echo.
 call :l1
 call :l2
 call :l3
@@ -51,101 +54,83 @@ for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i
 goto :eof
 :l1
 cls&echo.
-wmic process where "name like '%WeChat%'" delete
-taskkill /f /t /im WeChat.exe 2>nul
-taskkill /f /t /im WechatBrowser.exe 2>nul
-taskkill /f /t /im WechatAppLauncher.exe 2>nul
-taskkill /f /t /im WeChatExt.exe 2>nul
+for %%i in (WechatBrowser WechatAppLauncher WeChatAppEx WeChatExt crashpad_handler WeChat Weixin) do @taskkill /f /t /im "%%i.exe" 2>nul
 goto :eof
 :l2
 cls&echo.
-taskkill /f /t /im iexplore.exe 2>nul
-taskkill /f /t /im chrome.exe 2>nul
-taskkill /f /t /im firefox.exe 2>nul
-taskkill /f /t /im 360se.exe 2>nul
-taskkill /f /t /im sesvc.exe 2>nul
-taskkill /f /t /im msedge.exe 2>nul
-taskkill /f /t /im msedgewebview.exe 2>nul
-taskkill /f /t /im 360EntBrowser.exe 2>nul
-taskkill /f /t /im 360se6.exe 2>nul
-taskkill /f /t /im 360chrome.exe 2>nul
-taskkill /f /t /im opera.exe 2>nul
-taskkill /f /t /im opera_stable.exe 2>nul
-taskkill /f /t /im safari.exe 2>nul
-taskkill /f /t /im qqbrowser.exe 2>nul
-taskkill /f /t /im ucbrowser.exe 2>nul
-taskkill /f /t /im firefox-updater.exe 2>nul
-taskkill /f /t /im googleupdate.exe 2>nul
-taskkill /f /t /im googledrivefs.exe 2>nul
-taskkill /f /t /im edgeupdater.exe 2>nul
+for %%i in (iexplore MicrosoftEdge chrome firefox 360se 360ent 360chrome sesvc OneDrive wpsoffice FRMI Lcserver) do @taskkill /f /t /im "%%i.exe" 2>nul
 goto :eof
 :l3
-rem Delete WeChat Files directory
+rem 删除微信文档
 cls&echo.&echo.　是否确认清除 【微信自动保存的文档 ^& 图片 ^& 视频 ^& 聊天记录等一切文件】？
 call :xuanze
 if %errorlevel%==2 goto :eof
 call :tishi
-
-rem 关闭微信进程
-wmic process where "name like '%WeChat%'" delete
-taskkill /f /t /im WeChat.exe 2>nul
-taskkill /f /t /im Weixin.exe 2>nul
-taskkill /f /t /im WechatBrowser.exe 2>nul
-taskkill /f /t /im WechatAppLauncher.exe 2>nul
-taskkill /f /t /im WeChatExt.exe 2>nul
-
-rem 从注册表读取微信文件保存路径
-for /f "tokens=1,2,*" %%i in ('REG QUERY HKCU\Software\Tencent\WeChat /v FileSavePath 2^>nul') do set "regvalue=%%k"
-if defined regvalue (
-    rem 清理注册表中指定的路径
-    del /f /s /q "%regvalue%\*" 2>nul
-    rd /s /q "%regvalue%" 2>nul
+rem 获取真实文档路径
+set "MyDocs="
+for /f "tokens=2*" %%a in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v Personal 2^>nul') do set "MyDocs=%%b"
+if not defined MyDocs (
+    echo.　错误：无法获取文档路径。
+    goto :eof
 )
-
-rem 清理用户文档目录下的微信文件
-del /f /s /q "%userprofile%\Documents\WeChat Files\*" 2>nul
-rd /s /q "%userprofile%\Documents\WeChat Files" 2>nul
-del /f /s /q "%userprofile%\Documents\Weixin Files\*" 2>nul
-rd /s /q "%userprofile%\Documents\Weixin Files" 2>nul
-
-rem 清理 AppData 目录下的微信缓存
-del /f /s /q "%localappdata%\Tencent\WeChat\*" 2>nul
-rd /s /q "%localappdata%\Tencent\WeChat" 2>nul
-del /f /s /q "%localappdata%\Tencent\Weixin\*" 2>nul
-rd /s /q "%localappdata%\Tencent\Weixin" 2>nul
-
-rem 清理微信默认安装目录
-del /f /s /q "%programfiles%\Tencent\WeChat\*" 2>nul
-del /f /s /q "%programfiles(x86)%\Tencent\WeChat\*" 2>nul
-
+echo.　文档根目录: %MyDocs%
+rem 删除默认微信数据目录
+set "oldDir=%MyDocs%\WeChat Files"
+set "newDir=%MyDocs%\xwechat_files"
+if exist "%oldDir%" (
+    echo.　删除旧版目录: %oldDir%
+    rd /s /q "%oldDir%" 2>nul
+)
+if exist "%newDir%" (
+    echo.　删除新版目录: %newDir%
+    rd /s /q "%newDir%" 2>nul
+)
+rem 清理 AppData 缓存
+rd /s /q "%localappdata%\Tencent\WeChat"
+rd /s /q "%localappdata%\Tencent\Weixin"
 goto :eof
 :l4
-rem Clear temp and temp cache directories
+rem 清理系统 Temp 临时文件
 cls
 echo.&echo.　是否确认清除 【系统 Temp 临时文件】？
-call :xuanze
-if %errorlevel%==2 goto :eof
+set "continue=1"
+if not "%key%"=="auto" call :xuanze
+if "!continue!"=="0" goto :eof
 call :tishi
 del /f /s /q "%temp%\*.tmp" 2>nul
 del /f /s /q "%tmp%\*.tmp" 2>nul
+rem ProgramData 临时目录
+del /f /s /q "C:\ProgramData\Temp\*"
 goto :eof
 :l5
-rem Delete print task history files
+rem 清理打印自动保存记录文件
 cls&echo.&echo.　是否确认清除　【打印自动保存记录文件】　？
-call :xuanze
-if %errorlevel%==2 goto :eof
+set "continue=1"
+if not "%key%"=="auto" call :xuanze
+if "!continue!"=="0" goto :eof
 call :tishi
+net stop Spooler /y
+timeout /t 2 /nobreak
 del /f /s /q "C:\Windows\System32\spool\PRINTERS\*"
+net start Spooler
 goto :eof
 :l6
-rem Delete browser cache files
+rem 清理浏览器缓存文件
 cls&echo.&echo.　是否确认清除　【Internet Explorer ^& 360XX ^& Google Chrome ^& 火狐 ^& Edge 浏览器缓存文件】　？
-call :xuanze
-if %errorlevel%==2 goto :eof
+set "continue=1"
+if not "%key%"=="auto" call :xuanze
+if "!continue!"=="0" goto :eof
 call :tishi
+del /f /s /q "%LocalAppData%\Google\Chrome\User Data\*\Cache\*"
+del /f /s /q "%LocalAppData%\Google\Chrome\User Data\*\Code Cache\*"
+del /f /s /q "%LocalAppData%\Google\Chrome\User Data\*\GPUCache\*"
+del /f /s /q "%LocalAppData%\Microsoft\Edge\User Data\*\Cache\*"
+del /f /s /q "%LocalAppData%\Microsoft\Edge\User Data\*\Code Cache\*"
+del /f /s /q "%LocalAppData%\Microsoft\Edge\User Data\*\GPUCache\*"
 del /f /s /q "%userprofile%\AppData\Local\Microsoft\Windows\INetCache\*"
 del /f /s /q "%userprofile%\AppData\Local\Google\Chrome\User Data\Default\Cache\*"
 del /f /s /q "%userprofile%\AppData\Local\Google\User Data\Default\Media Cache\*"
+del /f /s /q "%userprofile%\AppData\Local\Google\Chrome\User Data\Default\Media Cache\*"
 del /f /s /q "%userprofile%\AppData\Local\360Chrome\User Data\Default\Cache\*"
 del /f /s /q "%userprofile%\AppData\Local\360Chrome\User Data\Default\Media Cache\*"
 del /f /s /q "%userprofile%\AppData\roaming\360se\User Data\Default\Cache\*"
@@ -163,27 +148,42 @@ del /f /s /q "%userprofile%\AppData\Local\360SpeedBrowser\User Data\Default\Medi
 del /f /s /q "%userprofile%\AppData\Local\360SecureBrowser\User Data\Default\Cache\*"
 del /f /s /q "%userprofile%\AppData\Local\360SecureBrowser\User Data\Default\Media Cache\*"
 del /f /s /q "%userprofile%\AppData\Local\Microsoft\Edge\User Data\Default\Cache\*"
-del /f /s /q "%userprofile%\AppData\Local\Microsoft\Edge\User Data\Default\Cache\*"
 del /f /s /q "%userprofile%\AppData\Local\Microsoft\Edge\User Data\Default\Media Cache\*"
 del /f /s /q "%appdata%\Mozilla\Firefox\Profiles\*\cache2\entries\*"
 del /f /s /q "%appdata%\Opera Software\Opera Stable\Cache\*"
 del /f /s /q "%userprofile%\Library\Caches\com.apple.Safari\Cache.db"
 goto :eof
 :l7
-rem Remove Windows upgrade files
+rem 清理Windows升级临时文件
 cls&echo.&echo.　是否确认清除　【Windows升级临时文件】　？
-call :xuanze
-if %errorlevel%==2 goto :eof
+set "continue=1"
+if not "%key%"=="auto" call :xuanze
+if "!continue!"=="0" goto :eof
 call :tishi
+rem 系统升级残留
+rd /s /q "%systemdrive%\Windows.old"
+rd /s /q "%systemdrive%\Windows10Upgrade"
 rd /s /q %windir%\SoftwareDistribution\Download
-rd /s /q %windir%$Windows.~BT
-rd /s /q %windir%\servicing\Packages
+rd /s /q "%systemdrive%\$Windows.~BT"
+rem rd /s /q %windir%\servicing\Packages
+rd /s /q "%windir%\WinRE\WinREAgent"
+rd /s /q "%systemdrive%\$WinREAgent"
+rem 更新签名缓存（会自动重建）
+rd /s /q "%windir%\System32\catroot2"
+rem 最新累积更新备份
+rd /s /q "%windir%\servicing\LCU"
+rem 传递优化缓存
+del /f /s /q "C:\ProgramData\Microsoft\Windows\DeliveryOptimization\Cache\*"
+rem 清理升级助手日志
+rd /s /q "%windir%\Panther\UnattendGC"
+del /f /s /q "%windir%\Panther\setup*.log"
 goto :eof
 :l8
-rem Delete symptom files and system encapsulation garbage
+rem 清理系统垃圾格式及记录文件及深层垃圾
 cls&echo.&echo.　是否确认清除　【系统垃圾格式及记录文件及深层垃圾】　？
-call :xuanze
-if %errorlevel%==2 goto :eof
+set "continue=1"
+if not "%key%"=="auto" call :xuanze
+if "!continue!"=="0" goto :eof
 call :tishi
 rem 临时文件
 rem del /f /s /q %systemdrive%\*.tmp
@@ -202,7 +202,33 @@ rem del /f /s /q "%systemdrive%\$Recycle.Bin\*"
 rem 备份文件
 rem del /f /s /q %windir%\*.bak
 rem 预读文件
-rem del /f /s /q %windir%\prefetch\*.*
+rem del /f /s /q "%windir%\prefetch\*.*"
+rem 删除缩略图缓存数据库
+del /f /s /q "%userprofile%\AppData\Local\Microsoft\Windows\Explorer\thumbcache_*.db"
+del /f /s /q "%localappdata%\Microsoft\Windows\Explorer\thumbcache_*.db"
+rem 删除系统级缩略图缓存
+del /f /s /q "%systemdrive%\Users\*\AppData\Local\Microsoft\Windows\Explorer\thumbcache_*.db"
+rem 清理文件历史记录配置和缓存
+rd /s /q "%localappdata%\Microsoft\Windows\FileHistory"
+rd /s /q "%userprofile%\AppData\Local\Microsoft\Windows\FileHistory"
+rem 清理文件历史记录数据库
+del /f /s /q "%localappdata%\Microsoft\Windows\FileHistory\*.edb"
+del /f /s /q "%localappdata%\Microsoft\Windows\FileHistory\*.log"
+rem 系统休眠文件 hiberfil.sys
+powercfg /hibernate off
+del /f /a /q "%systemdrive%\hiberfil.sys"
+rem 清理 CBS 日志（Component Based Servicing）
+del /f /s /q "%windir%\Logs\CBS\*.log"
+del /f /s /q "%windir%\Logs\CBS\*.cab"
+rem WMI 追踪日志
+del /f /s /q "%windir%\System32\LogFiles\WMI\*.etl"
+rem Windows 诊断日志
+del /f /s /q "%windir%\System32\WDI\*.etl"
+rem WinSxS 临时缓存 / 备份
+del /f /s /q "%windir%\WinSxS\Temp\*"
+del /f /s /q "%windir%\WinSxS\Cleanup\*"
+rem 搜索索引数据库缓存
+del /f /s /q "%programdata%\Microsoft\Search\Data\Temp\*"
 rem 临时目录
 del /f /s /q "%windir%\temp\*"
 rem 最近访问文件的纪录
@@ -215,13 +241,15 @@ rem 事件查看器日志
 del /f /s /q "%windir%\System32\config\*.evt"
 del /f /s /q "%windir%\System32\config\*.evtx"
 rem 系统更新残留（新增）
-rd /s /q "%windir%$Windows.~WS"
+rd /s /q "%systemdrive%\$Windows.~WS"
 rem 驱动安装残留
-rd /s /q "%windir%\inf\setupapi.dev.log"
+del /f /q "%windir%\inf\setupapi.dev.log"
 rem 应用程序缓存（新增）
 del /f /s /q "%localappdata%\Microsoft\Windows\History\*"
 rem 系统错误报告
 del /f /s /q "%localappdata%\Microsoft\Windows\WER\*"
+del /f /s /q "%programdata%\Microsoft\Windows\WER\ReportArchive\*"
+del /f /s /q "%programdata%\Microsoft\Windows\WER\ReportQueue\*"
 rem 内存转储文件
 del /f /s /q "%windir%\memory.dmp"
 del /f /s /q "%windir%\minidump\*"
@@ -231,8 +259,11 @@ rem 系统还原点（谨慎使用，会删除所有还原点）
 rem vssadmin delete shadows /all /quiet
 rem 临时安装文件
 del /f /s /q "%windir%\Installer\$PatchCache$\*"
-rem 系统休眠文件（谨慎使用，会删除休眠文件）
-rem powercfg -h off
+rem 清理安装程序日志
+del /f /s /q "%windir%\Setup.log"
+del /f /s /q "%windir%\Setup*.log"
+del /f /s /q "%windir%\Panther\*.log"
+del /f /s /q "%windir%\Panther\*.etl"
 rem del /f /s /q "%systemdrive%\hiberfil.sys"
 rem 系统诊断日志
 del /f /s /q "%localappdata%\Diagnostics\*"
@@ -252,13 +283,16 @@ del /f /s /q "%windir%\System32\LogFiles\*"
 rem 清理 Windows Defender 日志
 del /f /s /q "%programdata%\Microsoft\Windows Defender\*"
 rem 清理 Windows Update 日志
+del /f /s /q "%windir%\Logs\WindowsUpdate\*.etl"
+del /f /s /q "%windir%\Logs\WindowsUpdate\*.log"
 del /f /s /q "%windir%\WindowsUpdate.log"
-del /f /s /q "%windir%\Logs\WindowsUpdate\*"
+rem 清理 DISM 日志
+del /f /s /q "%windir%\Logs\DISM\*.log"
 rem 深层清理项目
 rem 系统备份：清理注册表备份目录
 del /f /s /q "%windir%\System32\config\RegBack\*"
 rem 设备驱动备份：清理旧驱动
-del /f /s /q "%windir%\System32\DriverStore\FileRepository\*"
+rem del /f /s /q "%windir%\System32\DriverStore\FileRepository\*"
 rem Microsoft Store 缓存：清理临时文件
 del /f /s /q "%localappdata%\Packages\*"
 rem Office 缓存：清理缓存文件
@@ -275,13 +309,58 @@ rem 用户历史记录：清理自动目标
 del /f /s /q "%userprofile%\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\*"
 rem 用户搜索历史：清理最近应用
 del /f /s /q "%userprofile%\AppData\Local\Microsoft\Windows\Explorer\RecentApps\*"
-
+rem 系统更新补丁卸载缓存
+rd /s /q "%windir%\SoftwareDistribution\DataStore\Logs"
+rd /s /q "%windir%\SoftwareDistribution\DataStore\Download"
+del /f /s /q "%windir%\SoftwareDistribution\DataStore\*.edb"
+del /f /s /q "%windir%\SoftwareDistribution\*.log"
+del /f /s /q "%windir%\SoftwareDistribution\*.jfm"
+rem 安装程序临时缓存（显卡 / 驱动 / 运行库里）
+del /f /s /q "%systemdrive%\MSOCache\*"
+rd /s /q "%systemdrive%\MSOCache"
+del /f /s /q "%systemdrive%\Installer\*.tmp"
+del /f /s /q "%systemdrive%\Installer\*.log"
+rem 应用程序崩溃转储
+rd /s /q "%localappdata%\CrashDumps"
+rem WER 临时文件
+rd /s /q "%programdata%\Microsoft\Windows\WER\Temp"
+rem NVIDIA 显卡缓存
+rd /s /q "%localappdata%\NVIDIA\DXCache"
+rd /s /q "%localappdata%\NVIDIA\GLCache"
+rd /s /q "%localappdata%\NVIDIA Corporation\NV_Cache"
+rem AMD 显卡缓存
+rd /s /q "%localappdata%\AMD\DxCache"
+rd /s /q "%localappdata%\AMD\GLCache"
+rd /s /q "%localappdata%\AMD\CN"
+rem Intel 显卡缓存
+rd /s /q "%localappdata%\Intel\ShaderCache"
+rd /s /q "%localappdata%\Intel\D3DSCache"
+rem 通用 DirectX 缓存
+rd /s /q "%localappdata%\D3DSCache"
+rd /s /q "%localappdata%\DirectX Shader Cache"
+rem 驱动安装残留
+rd /s /q "C:\NVIDIA"
+rd /s /q "C:\AMD"
+rd /s /q "C:\Intel"
+rd /s /q "C:\ProgramData\NVIDIA Corporation\Downloader"
+rem 升级/重置残留
+rd /s /q "C:\$GetCurrent"
+rd /s /q "C:\$SysReset"
+rd /s /q "C:\ESD"
+rem 现代待机诊断日志
+del /f /s /q "%windir%\System32\SleepStudy\*.etl"
+rem 系统重置平台备份
+rd /s /q "%windir%\System32\SystemResetPlatform"
+rem 网络服务临时文件
+del /f /s /q "%windir%\ServiceProfiles\NetworkService\AppData\Local\Temp\*"
+del /f /s /q "%windir%\ServiceProfiles\LocalService\AppData\Local\Temp\*"
 goto :eof
 :l9
 rem Run disk cleanup tool by Sageset id 60
 cls&echo.&echo.　是否确认启动　【磁盘清理程序】　完成最后的手动清理？
-call :xuanze
-if %errorlevel%==2 goto :eof
+set "continue=1"
+if not "%key%"=="auto" call :xuanze
+if "!continue!"=="0" goto :eof
 call :tishi
 rem Cleanmgr.exe /sageset:60
 rem Cleanmgr.exe /sagerun:60
@@ -289,21 +368,24 @@ start "" cleanmgr.exe /VERYLOWDISK
 goto :eof
 :clear
 if exist "D:\SH\Key\SafeClear.bat" call "D:\SH\Key\SafeClear.bat" 2>nul
-echo.&echo.　[定向清理]　操作完成...　脚本即将返回主菜单...&timeout /t 3 >nul&goto :start
+echo.&echo.　[定向清理]　操作完成…　脚本即将返回主菜单…&timeout /t 3 >nul&goto :start
 :xuanze
+set "continue=1"
 echo.&echo.　按【Y】继续，按【N】跳过。&echo.&echo.　请确认！&echo.&echo.　3秒后，将视为Y继续。
 choice /T 3 /C YN /d Y /N >nul 2>nul
+if %errorlevel%==2 set "continue=0"
 goto :eof
 :tishi
-cls&echo.&if %errorlevel%==1 echo.　如果光标在闪动，说明程序正在运行，老电脑可能会“假死”，请耐心等待……&echo.
+cls&echo.&if %errorlevel%==1 echo.　如果光标在闪动，说明程序正在运行，老电脑可能会“假死”，请耐心等待…&echo.
 goto :eof
 :up
-cls&echo.&if %errorlevel%==1 echo.　如果光标在闪动，说明程序正在运行，老电脑可能会“假死”，请耐心等待……&echo.
+cls&echo.&if %errorlevel%==1 echo.　如果光标在闪动，说明程序正在运行，老电脑可能会“假死”，请耐心等待…&echo.
 goto :eof
 :exit
+set end_time=%time%
 cls&for /f "tokens=2 delims=()" %%i in ('fsutil volume diskfree c:^|find /i "可用"') do set myvar=%%i&echo.
-echo.&echo.　操作完成,当前C盘可用容量为%myvar%...&echo.&echo.&echo.&echo.&echo.&echo.
+echo.&echo.　操作完成，清理用时：%start_time% - %end_time%&echo.&echo.　当前 C 盘可用容量为【 %myvar% 】…&echo.&echo.&echo.&echo.
 echo.　　　　　　　　　　　　　　　　　　　　　　　聚散终有时　再见亦有期&echo.&echo.&echo.&echo.&echo.&echo.
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 邵华
 echo.　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　18900559020&echo.
-echo.　如果还有问题就打我电话吧...&timeout /t 3 >nul&exit
+echo.　如果还有问题就打我电话吧…&timeout /t 5 >nul&exit
