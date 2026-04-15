@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20260408
+set Version=20260415
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -64,46 +64,57 @@ goto :eof
 
 :cmd_admin
 for /F "tokens=1" %%a in ('wmic os get localdatetime ^| find "."') do (set date=%%a&set day=!date:~0,8!)&for /F "tokens=3" %%b in ('reg query "HKCR\.ShaoHua" /v "InitialSetup" 2^>nul ^| find "InitialSetup"') do (if "!day!" EQU "%%b" (goto :eof))
-REM 开启cmd_admin
-reg add "HKLM\SOFTWARE\Sysinternals" /v "PsExecAccept" /t reg_dword /d 1 /f
+REM 批处理右键管理员默认命令
 reg add "HKCR\cmdfile\shell\runas\command" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
-reg add "HKCR\ConsoleHost\command\runas" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
+REM CMD 32+64位 强制默认以管理员运行
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\cmd.exe" /t reg_sz /d RUNASADMIN /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\cmd.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKCR\ConsoleHost\command\runas" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
+REM conhost控制台窗口强制管理员（无害可选）
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\conhost.exe" /t reg_sz /d RUNASADMIN /f
+REM PowerShell脚本右键以管理员运行（自动绕过策略）
 reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t reg_sz /d "PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File \"%1\"" /f
+REM PowerShell 32+64位 强制默认管理员
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
-REM UAC_Installer detection(安装程序检测)_禁用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableInstallerDetection" /t reg_dword /d 0 /f
-REM UAC_UAC 用户提示_提示输入凭据
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorUser" /t reg_dword /d 2 /f
-REM UAC_UAC 管理员提示_不提示，直接提升
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorAdmin" /t reg_dword /d 0 /f
-REM UAC_UIAccess 安全位置请求_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableSecureUIAPaths" /t reg_dword /d 1 /f
-REM UAC_UIAccess 开关_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableUIADesktopToggle" /t reg_dword /d 1 /f
-REM UAC_仅提升已签名的_禁用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ValidateAdminCodeSignatures" /t reg_dword /d 0 /f
-REM UAC_内置管理员帐户_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t reg_dword /d 1 /f
-REM UAC_启用 UAC-以管理员批准模式运行所有管理员(EnableLUA)_禁用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t reg_dword /d 0 /f
-REM UAC_安全桌面提示_禁用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t reg_dword /d 0 /f
-REM UAC_将文件和注册表写入错误虚拟化到每用户位置_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableVirtualization" /t reg_dword /d 1 /f
-REM UAC_允许以管理员身份运行的程序访问用户映射的网络驱动器_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLinkedConnections" /t reg_dword /d 1 /f
-REM UAC_计算机组策略异步应用_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SynchronousMachineGroupPolicy" /t reg_dword /d 0 /f
-REM UAC_用户组策略异步应用_启用
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SynchronousUserGroupPolicy" /t reg_dword /d 0 /f
-REM luafv服务设置为手动，禁用文件虚拟化
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\luafv" /v Start /t reg_dword /d 3 /f
-reg add "HKLM\SYSTEM\ControlSet001\Services\luafv" /v Start /t reg_dword /d 3 /f
+REM UAC_启用管理员批准模式（必须开启才能正常使用UAC）
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 1 /f
+REM UAC_管理员提升权限：不提示，直接允许提升
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorAdmin" /t REG_DWORD /d 0 /f
+REM UAC_标准用户提升权限：提示输入管理员凭据
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorUser" /t REG_DWORD /d 3 /f
+REM UAC_权限提示时不切换到安全桌面
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t REG_DWORD /d 0 /f
+REM UAC_关闭内置管理员账户(Administrator)启用管理员批准模式
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t REG_DWORD /d 0 /f
+REM UAC_不强制验证可执行文件数字签名
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ValidateAdminCodeSignatures" /t REG_DWORD /d 0 /f
+REM UAC_不限制UIAccess程序仅从安全位置启动
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableSecureUIAPaths" /t REG_DWORD /d 0 /f
+REM UAC_不允许UIAccess程序绕过安全桌面
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableUIADesktopToggle" /t REG_DWORD /d 0 /f
+REM UAC_关闭应用安装包自动检测与权限提示
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableInstallerDetection" /t REG_DWORD /d 0 /f
+REM UAC_关闭文件/注册表写入虚拟化（旧软件可能出现权限不足）
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableVirtualization" /t REG_DWORD /d 0 /f
+REM UAC_关闭远程UAC限制（局域网共享/远程操作权限全开）
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d 1 /f
+REM 系统_禁用更新后自动重启并自动登录
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "DisableAutomaticRestartSignOn" /t REG_DWORD /d 1 /f
+REM 系统_允许标准用户安装打印机驱动
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LimitPrintDriverInstall" /t REG_DWORD /d 0 /f
+REM 系统_旧版虚拟化开关（与EnableVirtualization作用相近，一并关闭）
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "VirtualizationEnabled" /t REG_DWORD /d 0 /f
+REM 系统_管理员权限程序可访问用户映射的网络驱动器
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLinkedConnections" /t REG_DWORD /d 1 /f
+REM 组策略_计算机策略异步应用（不等待同步加载，加快开机）
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SynchronousMachineGroupPolicy" /t REG_DWORD /d 0 /f
+REM 组策略_用户策略异步应用（不等待同步加载，加快登录）
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SynchronousUserGroupPolicy" /t REG_DWORD /d 0 /f
+REM 打印服务_允许非管理员安装打印机驱动
+reg add "HKLM\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /t REG_DWORD /d 0 /f
+REM luafv服务_设置为自动启动（保留UAC文件虚拟化兼容层）
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\luafv" /v Start /t REG_DWORD /d 2 /f
+reg add "HKLM\SYSTEM\ControlSet001\Services\luafv" /v Start /t REG_DWORD /d 2 /f
 REM 强制更新组策略
 gpupdate /force
 REM 停止并启动luafv服务以应用设置
@@ -410,8 +421,9 @@ REM 系统-广告-关闭广告标识符
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t reg_dword /d 0 /f
 REM 系统-广告-禁用硬件清单收集
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisableInventory" /t REG_DWORD /d 1 /f
-REM 系统-广告-禁用是0，基本是1，遥测。实测1更好
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t reg_dword /d 1 /f
+REM 系统-广告-禁用是0，基本是1，遥测。实测1更好，atelas，20260410改成0
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t reg_dword /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowDeviceNameInTelemetry" /t reg_dword /d 0 /f
 REM 系统-广告-清空商业 ID
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "CommercialId" /t REG_SZ /d "" /f
 REM 系统-广告-关闭应用程序影响遥测
@@ -475,8 +487,14 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" 
 REM 系统-广告-关闭“启用来自 Microsoft 和合作伙伴在整个 Windows 中的促销内容订阅”
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SubscribedContentEnabled /t REG_DWORD /d 0 /f
 REM 界面-广告-禁用开始菜单的应用推荐磁贴
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-202914Enabled" /t reg_dword /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-280810Enabled" /t reg_dword /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-280811Enabled" /t reg_dword /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-280815Enabled" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310094Enabled " /t reg_dword /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310094Enabled" /t reg_dword /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-314559Enabled" /t reg_dword /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-314563Enabled" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338387Enabled" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338388Enabled" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338389Enabled" /t reg_dword /d 0 /f
@@ -484,6 +502,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" 
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353694Enabled" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353696Enabled" /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353698Enabled" /t reg_dword /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-88000326Enabled" /t reg_dword /d 0 /f
 REM 系统-广告-关闭向导和推荐相关的内容
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "DisableSoftLanding" /t reg_dword /d 1 /f
 REM 系统-广告-启用Windows聚光灯功能，1是禁用，0是启用
@@ -509,6 +528,16 @@ REM 系统-广告-禁用讲述人快捷键（Win+Ctrl+Enter）
 reg add "HKCU\Control Panel\Accessibility\Narrator" /v "AllowShortcut" /t REG_DWORD /d 0 /f
 REM 系统-广告-禁用登录时自动启动讲述人
 reg add "HKCU\Software\Microsoft\Narrator" /v "AutoStart" /t REG_DWORD /d 0 /f
+REM 系统-广告-禁用讲述人自动启动
+reg add "HKCU\SOFTWARE\Microsoft\Narrator\NarratorHome" /v "AutoStart" /t REG_DWORD /d 0 /f
+REM 系统-广告-设置讲述人最小化类型
+reg add "HKCU\SOFTWARE\Microsoft\Narrator\NarratorHome" /v "MinimizeType" /t REG_DWORD /d 0 /f
+REM 系统-广告-禁用讲述人在线服务
+reg add "HKCU\SOFTWARE\Microsoft\Narrator\NoRoam" /v "OnlineServicesEnabled" /t REG_DWORD /d 0 /f
+REM 系统-广告-禁用通过Win+Enter启动讲述人
+reg add "HKCU\SOFTWARE\Microsoft\Narrator\NoRoam" /v "WinEnterLaunchEnabled" /t REG_DWORD /d 0 /f
+REM 系统-广告-禁用讲述人详细反馈
+reg add "HKCU\SOFTWARE\Microsoft\Narrator\NoRoam" /v "DetailedFeedback" /t REG_DWORD /d 0 /f
 REM 系统-广告-关闭文件资源管理器中的 OneDrive/同步通知
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowSyncProviderNotifications" /t REG_DWORD /d 0 /f
 REM 系统-广告-禁用任务栏搜索中的必应搜索建议和网页结果
@@ -569,6 +598,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
 
 REM 系统-设置-关闭Windowsink
 reg add "HKLM\Software\Microsoft\Windows\WindowsInkWorkspace" /v "AllowWindowsInkWorkspace" /t reg_dword /d 0 /f
+reg add "HKLM\Software\Policies\Microsoft\WindowsInkWorkspace" /v "AllowWindowsInkWorkspace" /t reg_dword /d 0 /f
 REM 系统-设置-关闭MS Teams自动安装
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications" /v ConfigureChatAutoInstall /t reg_dword /d 0 /f
 REM 系统-设置-关闭小娜
@@ -610,8 +640,6 @@ REM 系统-设置-禁用组件服务日志
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing" /v "EnableLog" /t reg_dword /d 0 /f
 REM 系统-设置-禁用更新解压模块DPX日志
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing" /v "EnableDpxLog" /t reg_dword /d 0 /f
-REM 系统-设置-开启系统日志（by Windows 10优化辅助工具）
-reg add "HKLM\Software\Policies\Microsoft\Windows\Windows Error Reporting" /v "LoggingDisabled" /t reg_dword /d 0 /f
 REM 系统-设置-VHD启动时不要将VHD动态文件扩展到最大（以节省空间）
 reg add "HKLM\SYSTEM\CurrentControlSet\services\FsDepends\Parameters" /v "VirtualDiskExpandOnMount" /t reg_dword /d 4 /f
 REM 系统-设置-关闭「改进手写笔记与键入」设定
@@ -642,8 +670,6 @@ REM 系统-设置-关闭程序兼容性引擎
 reg add "HKLM\Software\Policies\Microsoft\Windows\AppCompat" /v "DisableEngine" /t REG_DWORD /d 1 /f
 REM 系统-设置-关闭修复数据库
 reg add "HKLM\Software\Policies\Microsoft\Windows\AppCompat" /v "SbEnable" /t REG_DWORD /d 1 /f
-REM 系统-设置-关闭程序兼容性助手
-reg add "HKLM\Software\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /t REG_DWORD /d 1 /f
 REM 系统-设置-禁用家庭组
 reg add "HKLM\Software\Policies\Microsoft\Windows\HomeGroup" /v "DisableHomeGroup" /t REG_DWORD /d 1 /f
 REM 系统-设置-禁用Microsoft兼容性评估任务
@@ -651,9 +677,11 @@ schtasks /change /TN "Microsoft\Windows\Application Experience\Microsoft Compati
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe" /v "Debugger" /t reg_sz /d "%windir%\System32\taskkill.exe" /f
 REM 系统-设置-禁用 Windows 更新保留的存储空间
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v "ReservedStorage" /t reg_dword /d 0 /f
+REM 系统-设置-关闭设备搜索历史记录
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings" /v "IsDeviceSearchHistoryEnabled" /t REG_DWORD /d 0 /f
 
-REM 系统-性能-启用GPU硬件加速
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t reg_dword /d 2 /f
+REM 系统-性能-GPU硬件加速关闭
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t reg_dword /d 1 /f
 REM 系统-性能-强制卸载不再使用的DLL
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v AlwaysUnloadDLL /t REG_DWORD /d 1 /f
 REM 系统-性能-禁用粘滞键快捷键（按5次Shift）
@@ -668,18 +696,25 @@ REM 系统-性能-禁用高对比度快捷键（左Alt+左Shift+PrintScreen）
 reg add "HKCU\Control Panel\Accessibility\HighContrast" /v "Flags" /t REG_SZ /d "122" /f
 REM 系统-性能-调整键盘响应速度和频率，以提升用户的键盘输入体验
 reg add "HKCU\Control Panel\Accessibility\Keyboard Response" /v Flags /t reg_sz /d 122 /f
-REM 系统-性能-启用 ToggleKeys 功能，在用户误按特定键时提供声音提示，帮助用户纠正按键错误
-reg add "HKCU\Control Panel\Accessibility\ToggleKeys" /v Flags /t reg_sz /d 58 /f
+REM 系统-性能-禁用警告音效
+reg add "HKCU\Control Panel\Accessibility" /v "Warning Sounds" /t REG_DWORD /d 0 /f
+REM 系统-性能-禁用激活时播放音效
+reg add "HKCU\Control Panel\Accessibility" /v "Sound on Activation" /t REG_DWORD /d 0 /f
+REM 系统-性能-设置键盘重复延迟（0表示无延迟）
+reg add "HKCU\Control Panel\Accessibility\Keyboard Response" /v "AutoRepeatDelay" /t REG_SZ /d "0" /f
+REM 系统-性能-设置键盘重复速率（0表示最慢/关闭）
+reg add "HKCU\Control Panel\Accessibility\Keyboard Response" /v "AutoRepeatRate" /t REG_SZ /d "0" /f
+REM 系统-性能-设置按键接受前的延迟
+reg add "HKCU\Control Panel\Accessibility\Keyboard Response" /v "DelayBeforeAcceptance" /t REG_SZ /d "0" /f
+REM 系统-性能-设置切换键功能标志（Caps Lock、Num Lock等提示音）
+reg add "HKCU\Control Panel\Accessibility\ToggleKeys" /v "Flags" /t REG_SZ /d "34" /f
 REM 系统-性能-关闭win10快速用户切换功能
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "HideFastUserSwitching" /t reg_dword /d 1 /f
 REM 系统-性能-登录windows开启数字键
 reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t "reg_sz" /d "2" /f
 reg add "HKU\.DEFAULT\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t reg_sz /d "2" /f
-REM 系统-性能-禁用NTFS最后访问更新时间
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v NtfsDisableLastAccessUpdate /t REG_DWORD /d 1 /f
-REM 系统-性能-用NTFS文件系统的"最后访问时间"更新功能
-reg add "HKLM\SYSTEM\ControlSet001\Control\Session Manager" /v "NtfsDisableLastAccessUpdate" /d 1 /t reg_dword /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager" /v "NtfsDisableLastAccessUpdate" /d 1 /t reg_dword /f
+REM 系统-性能-启用NTFS最后访问更新时间
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v NtfsDisableLastAccessUpdate /t REG_DWORD /d 0 /f
 REM 系统-性能-禁用NTFS8.3 格式的文件名
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v NtfsDisable8dot3NameCreation /t reg_dword /d 1 /f
 REM 系统-性能-系统自我修复时间
@@ -749,6 +784,21 @@ sc config wisvc start= disabled
 REM 电话服务 (Phone Service)
 sc stop PhoneSvc 2>nul
 sc config PhoneSvc start= disabled
+REM 用户体验与数据收集服务 (Spectrum)
+sc stop Spectrum 2>nul
+sc config Spectrum start= disabled
+REM Windows 混合现实服务 (SharedRealitySvc)
+sc stop SharedRealitySvc 2>nul
+sc config SharedRealitySvc start= disabled
+REM 内置即时通讯消息服务 (MessagingService)
+sc stop MessagingService 2>nul
+sc config MessagingService start= disabled
+REM 地理位置服务 (lfsvc)
+sc stop lfsvc 2>nul
+sc config lfsvc start= disabled
+REM 个人数据索引维护服务 (PimIndexMaintenanceSvc)
+sc stop PimIndexMaintenanceSvc 2>nul
+sc config PimIndexMaintenanceSvc start= disabled
 REM Microsoft Windows SMS 路由器服务
 sc stop SmsRouter 2>nul
 sc config SmsRouter start= disabled
@@ -760,7 +810,6 @@ sc stop NfcAppletHostService 2>nul
 sc config NfcAppletHostService start= disabled
 sc stop PaymentManager 2>nul
 sc config PaymentManager start= disabled
-REM 第四部分：Xbox/游戏相关服务
 REM Xbox Live 网络服务
 sc stop XboxNetApiSvc 2>nul
 sc config XboxNetApiSvc start= disabled
@@ -802,9 +851,7 @@ REM 程序兼容性助手 (PcaSvc)
 sc stop PcaSvc 2>nul
 sc config PcaSvc start= disabled
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /t reg_dword /d 1 /f
-REM Program Compatibility Assistant Service
-sc stop "Program Compatibility Assistant Service" 2>nul
-sc config "Program Compatibility Assistant Service" start= disabled
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "DisablePCA" /t REG_DWORD /d 1 /f
 REM 禁用Windows Defender实时保护
 PowerShell -Command "Set-MpPreference -DisableRealtimeMonitoring $true" 2>nul
 REM Windows Defender驱动和服务
@@ -813,6 +860,8 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdBoot" /v Start /t REG_DWORD /d
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdFilter" /v Start /t REG_DWORD /d 4 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdNisDrv" /v Start /t REG_DWORD /d 4 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdNisSvc" /v Start /t REG_DWORD /d 4 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\MDCoreSvc" /v  "start" /t reg_dword /d "4" /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "SecurityHealth" /f
 sc stop WdNisSvc 2>nul
 sc config WdNisSvc start= disabled
 REM Windows Defender服务 (WinDefend)
@@ -821,9 +870,7 @@ sc config WinDefend start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\WinDefend" /v Start /t REG_DWORD /d 4 /f
 REM Windows Defender安全中心服务
 sc stop SecurityHealthService 2>nul
-sc config SecurityHealthService start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t reg_dword /d 4 /f
-reg add "HKLM\SYSTEM\ControlSet001\Services\SecurityHealthService" /v "Start" /t reg_dword /d 4 /f
+sc config SecurityHealthService start= demand
 REM 禁用Windows Defender组策略
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t reg_dword /d 1 /f
 REM 关闭Windows传递优化服务
@@ -831,9 +878,10 @@ sc stop DoSvc 2>nul
 sc config DoSvc start= disabled
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DoSvc" /v "Start" /t reg_dword /d 4 /f
 REM 关闭Windows防火墙
-sc stop MpsSvc 2>nul
+sc stop MpsSvc
 sc config MpsSvc start= disabled
 netsh advfirewall set allprofiles state off
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess" /v "Start" /t reg_dword /d 4 /f
 REM 禁用远程修改注册表
 sc stop RemoteRegistry 2>nul
 sc config RemoteRegistry start= disabled
@@ -877,6 +925,8 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\WSearch" /v "Start" /t reg_dword
 REM 禁用家庭组
 sc stop HomeGroupProvider 2>nul
 sc config HomeGroupProvider start= disabled
+sc stop HomeGroupListener 2>nul
+sc config HomeGroupListener start= disabled
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\HomeGroup\Services" /v "HomeGroupProvider" /t reg_dword /d 4 /f
 REM 设置NTFS链接跟踪服务为手动
 sc stop TrkWks 2>nul
@@ -915,6 +965,7 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoUp
 REM 禁用Windows更新医疗服务
 sc stop WaaSMedicSvc 2>nul
 sc config WaaSMedicSvc start= disabled
+
 REM 禁用更新协调服务
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\UsoSvc" /v "start" /t reg_dword /d 4 /f
 REM 禁用Windows更新访问
@@ -939,8 +990,6 @@ REM 系统-远程-不将远程桌面会话中的客户端打印机设置为默认打印机
 reg add "HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services" /v "fForceClientLptDef" /t reg_dword /d 1 /f
 REM 系统-远程-禁用RPC的隐私级别认证
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print" /v "RpcAuthnLevelPrivacyEnabled" /t reg_dword /d 0 /f
-REM 系统-远程-允许添加驱动非管理员身份运行
-reg add "HKLM\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /d "0" /t reg_dword /f
 REM 系统-远程-禁用客户端打印机重定向
 reg add "HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services" /v "fDisableCpm" /t reg_dword /d 1 /f
 REM 系统-远程-设置远程桌面连接优先使用TCP连接
@@ -1044,7 +1093,7 @@ REM 系统-安全设置-禁止运行计算机自动维护计划
 reg add "HKLM\Software\Policies\Microsoft\Windows\ScheduledDiagnostics" /v "EnabledExecution" /t reg_dword /d 0 /f
 REM 系统-安全设置-完全停止windows的自动维护
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /v "MaintenanceDisabled" /t reg_dword /d 1 /f
-REM 系统-安全设置-允许直接运行来自网络的exebat
+REM 系统-安全设置-允许直接运行来自网络的exebat,这个没有20260410
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Associations" /v "LowRiskFileTypes" /t reg_sz /d ".exe;.reg.;.bat.;.vbs;.cmd;.ps1;.zip;.rar;.msi;.msu;.lnk;.7z;.tar.gz;.doc;.docx;.pdf;" /f
 REM 系统-安全设置-允许直接运行来自网络的exebat
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Associations" /v "ModRiskFileTypes" /t reg_sz /d ".bat;.exe;.reg;.vbs;.chm;.msi;.js;.cmd;.zip;.rar;.7z" /f
@@ -1108,12 +1157,12 @@ REM 界面-任务栏-关闭显示“任务视图”按钮
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MultitaskingView" /v "ShowTaskViewButton" /t reg_dword /d 0 /f
 REM 界面-任务栏-关闭在任务栏显示人脉
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People" /v "PeopleBand" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t reg_dword /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v PeopleBand /t reg_dword /d 0 /f
+REM 界面-任务栏-关闭在任务栏显示 Windows lnk 工作区
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t reg_dword /d 0 /f
 REM 界面-任务栏-删除在任务栏新闻和兴趣小部件
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v "AllowNewsAndInterests" /t reg_dword /d 0 /f
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Feeds" /v "EnShellFeedsTaskbarViewMode" /t reg_dword /d 883378425 /f
-
 REM 界面-任务栏-按钮显示图标和文本
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "IconsOnly" /d 0 /t reg_dword /f
 REM 界面-任务栏-屏幕键盘不挡任务栏
@@ -1228,7 +1277,7 @@ REM 界面-主题与背景-设置分组依据为类型
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Grouping" /t reg_sz /d "Type" /f
 REM 界面-主题与背景-禁用桌面图标自动排列功能、自动对齐网络、按名称排序
 reg add "HKCU\Software\Microsoft\Windows\Shell\Bags\1\Desktop" /v "FFlags" /t reg_dword /d 1075839524 /f
-REM 界面-主题与背景-修改资源管理器布局的视图模式窗格状态、文件夹设置的排序和排列顺序排序和排列顺序、组设置和窗口位置和大小的上次打开位置、窗口最大化、最小化及位置
+REM 界面-主题与背景-修改资源管理器全显模式，隐藏文件 / 系统文件 / 扩展名全都显示
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v ShellState /t reg_binary /d 240000003EA8000000000000000000000000000001000000130000000000000073000000 /f
 REM 界面-主题与背景-禁用视觉效果
 REM reg add "HKCU\Control Panel\Desktop" /v "VisualFX" /d "0" /t reg_sz /f
@@ -1237,6 +1286,10 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" 
 REM 界面-主题与背景-禁用系统视觉动画
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "TurnOffSPIAnimations" /d 1 /t reg_dword /f
 
+REM 界面-资源管理器-配置当前用户桌面用户首选项掩码为 上次是 9030078010000000（不能独立输入法） 再上次是 9032078010000000（系统默认是9012038010000000）
+reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9030078090000000" /t reg_binary /f
+REM 界面-资源管理器-设置当前用户的资源管理器用户首选项掩码为 上次是 9032078010000000（系统默认是 9012038010000000）
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9030078090000000" /t reg_binary /f
 REM 界面-资源管理器-“此电脑”默认展开
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v NavPaneExpandToThisPC /t reg_dword /d 1 /f
 REM 界面-资源管理器-将启动延迟时间设置为 0 毫秒，以加快 Windows Explorer 的启动速度
@@ -1288,13 +1341,16 @@ REM 界面-资源管理器-关闭显示所有文件扩展名
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t reg_dword /d 1 /f
 REM 界面-资源管理器-关闭显示所有隐藏文件
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Hidden" /t reg_dword /d 2 /f
+REM 界面-资源管理器-关闭预览窗格
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowSuperHidden" /t reg_dword /d 0 /f
 REM 界面-资源管理器-取消显示所有文件夹
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "NavPaneShowAllFolders" /t reg_dword /d 0 /f
-REM 界面-资源管理器-配置当前用户桌面用户首选项掩码为 上次是 9030078010000000（不能独立输入法） 再上次是 9032078010000000（系统默认是9012038010000000）
-reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9030078090000000" /t reg_binary /f
-REM 界面-资源管理器-设置当前用户的资源管理器用户首选项掩码为 上次是 9032078010000000（系统默认是 9012038010000000）
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9030078090000000" /t reg_binary /f
+REM 界面-资源管理器-关闭自动展开到当前文件夹，不跟随目录跳转
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "NavPaneExpandToCurrentFolder" /t REG_DWORD /d 0 /f
+REM 界面-资源管理器-移除独立显示所有驱动器（含本地固定盘、U 盘、移动硬盘）
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\DelegateFolders\{F5FB2C77-0E2F-4A16-A381-3E560C68BC83}" /f
+REM 界面-资源管理器-移除独立显示所有驱动器64位（含本地固定盘、U 盘、移动硬盘）
+reg delete "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\DelegateFolders\{F5FB2C77-0E2F-4A16-A381-3E560C68BC83}" /f
 REM 界面-资源管理器-重新读取用户设置
 rundll32.exe user32.dll,UpdatePerUserSystemParameters
 
@@ -1333,7 +1389,7 @@ REM 界面-桌面-加大桌面图标缓存
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v "Max Cached Icons" /t REG_SZ /d 2000 /f
 REM 界面-桌面-快捷方式不添加快捷方式的文字
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v link /t reg_binary /d 00000000 /f
-REM 界面-桌面-桌面壁纸质量调整为
+REM 界面-桌面-桌面壁纸质量调整为,atlas是100，20260410
 reg add "HKCU\Control Panel\Desktop" /v "JPEGImportQuality" /t reg_dword /d 256 /f
 REM 界面-桌面-禁用所有窗口动画
 reg add "HKCU\Control Panel\Desktop" /v "WindowAnimation" /t reg_dword /d 0 /f
@@ -1949,6 +2005,20 @@ goto :eof
 REM 软件-禁用在未分配的文件扩展名上启用文件关联WEB服务
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoInternetOpenWith" /t reg_dword /d 1 /f
 
+REM 软件-输入法-强制启用旧版Win32微软拼音
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableLegacyIME" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v UseLegacyIME /t REG_DWORD /d 1 /f
+REM 软件-输入法-切换旧版输入法
+reg add "HKCU\SOFTWARE\Microsoft\Input\TSF\Tsf3Override\{81d4e9c9-1d3b-41bc-9e6c-4b40bf79e35e}" /v "NoTsf3Override2" /t REG_DWORD /d 1 /f
+reg add "HKCU\SOFTWARE\Microsoft\CTF\TIP\{81D4E9C9-1D3B-41BC-9E6C-4B40BF79E35E}" /v "DummyValue" /t REG_DWORD /d 1 /f
+REM 软件-输入法-关闭微软拼音候选栏的【符号视图按钮】
+reg add "HKCU\SOFTWARE\Microsoft\InputMethod\CandidateWindow\CHS\1" /v "ShowSymbolViewActionButton" /t REG_DWORD /d 0 /f
+REM 软件-输入法-关闭微软拼音【简繁输出切换】功能
+reg add "HKCU\SOFTWARE\Microsoft\InputMethod\Settings\CHS" /v "EnableSimplifiedTraditionalOutputSwitch" /t REG_DWORD /d 0 /f
+REM 软件-输入法-关闭微软拼音【打开表情符号视图】功能
+reg add "HKCU\SOFTWARE\Microsoft\InputMethod\Settings\CHS" /v "EnableOpenEmoticonSymbolView" /t REG_DWORD /d 0 /f
+REM 软件-输入法-关闭微软拼音【动态贴纸】功能
+reg add "HKCU\SOFTWARE\Microsoft\InputMethod\Settings\CHS" /v "EnableLiveSticker" /t REG_DWORD /d 0 /f
 REM 软件-输入法-默认语言 0 中文，1 英文，肯定正确！
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
 reg add "HKLM\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
@@ -1988,6 +2058,28 @@ reg add "HKCU\Software\Microsoft\InputMethod\Settings" /v "CandidateFontSize" /t
 REM 软件-输入法-搜狗输入法服务禁用
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SogouSvc" /v "Start" /t reg_dword /d 3 /f
 reg add "HKLM\SYSTEM\ControlSet001\Services\SogouSvc" /v "Start" /t reg_dword /d 3 /f
+REM 软件-输入法-关闭 自动拼音纠错
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnablePinyinCorrection" /t REG_DWORD /d 0 /f
+REM 软件-输入法-关闭 超级简拼
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableSuperShortPinyin" /t REG_DWORD /d 0 /f
+REM 软件-输入法-关闭 智能模糊拼音
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableFuzzyPinyin" /t REG_DWORD /d 0 /f
+REM 软件-输入法-关闭 简体/繁体切换功能
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableSimplifiedTraditionalSwitch" /t REG_DWORD /d 0 /f
+REM 软件-输入法-关闭 自学习（用户词典、输入习惯学习）
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableUserLearning" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableCloudPrediction" /t REG_DWORD /d 0 /f
+REM 软件-输入法-关闭 人名输入模式
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableNameMode" /t REG_DWORD /d 0 /f
+REM 软件-输入法-关闭 V模式输入（v+命令/符号）
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableVMode" /t REG_DWORD /d 0 /f
+REM 软件-输入法-关闭 候选框后面的 Emoji 表情面板
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "EnableEmojiSuggestion" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "ShowEmojiButton" /t REG_DWORD /d 0 /f
+REM 软件-输入法-彻底关闭输入法表情、GIF、符号面板
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "EnableEmojiPanel" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "DisableEmojiPanel" /t REG_DWORD /d 1 /f
+
 
 REM 软件-记事本-自动换行
 reg add "HKCU\Software\Microsoft\Notepad" /v "fWrap" /t reg_dword /d 1 /f
@@ -2069,8 +2161,6 @@ reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\Name
 reg delete "HKCR\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
 reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
-reg delete "HKCR\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" /va /f
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" /va /f
 ::删除 WPS网盘
 reg delete "HKCR\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
 reg delete "HKCU\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
@@ -2091,6 +2181,48 @@ REM 软件-WPS-设置WPS Office的默认字体为Arial
 reg add "HKCU\Software\Kingsoft\WPS\kui" /v "FontName" /t reg_sz /d "Arial" /f
 REM 软件-WPS-设置WPS Office的默认字体大小为12
 reg add "HKCU\Software\Kingsoft\WPS\kui" /v "FontSize" /t reg_dword /d 12 /f
+REM 软件-WPS-关闭 WPS 自动上传（uploadfile=false）
+reg add "HKCU\SOFTWARE\Kingsoft\WPSCloud" /v "uploadfile" /t REG_SZ /d "false" /f
+reg add "HKCU\SOFTWARE\Kingsoft\WPSCloud" /v "fileTransfer" /t REG_SZ /d "false" /f
+reg add "HKCU\SOFTWARE\Kingsoft\WPSCloud" /v "shareFile" /t REG_SZ /d "false" /f
+reg add "HKCU\SOFTWARE\Kingsoft\WPSCloud" /v "DesktopSync" /t REG_SZ /d "false" /f
+REM 软件-WPS-禁用 WPS 云同步
+reg add "HKCU\Software\Kingsoft\Office\12.0\Cloud" /v DisableSync /t REG_DWORD /d 1 /f
+REM 软件-WPS-禁用 WPS 右键云菜单
+reg add "HKCR\*\shellex\ContextMenuHandlers\WPSCloudMenu" /v LegacyDisable /t REG_SZ /d "" /f
+reg add "HKCR\Directory\shellex\ContextMenuHandlers\WPSCloudMenu" /v LegacyDisable /t REG_SZ /d "" /f
+REM 软件-WPS-关闭 WPS 云服务自启动
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run\WPS Cloud" /f
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run\WPS Cloud" /f
+REM 软件-WPS-关闭 WPS 自动升级
+reg add "HKCU\Software\Kingsoft\Office\AutoUpdate" /v EnableAutoUpdate /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\WPS\Office\6.0\Common\Update" /v AutoUpdate /t REG_DWORD /d 0 /f
+REM 软件-WPS-不使用代理
+reg add "HKCU\Software\Kingsoft\Office\Common\Network" /v ProxyEnable /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Kingsoft\Office\Common\Network" /v ProxyServer /t REG_SZ /d "" /f
+reg add "HKCU\Software\Kingsoft\Office\Common\Network" /v ProxyOverride /t REG_SZ /d "" /f
+REM 软件-WPS-WPS 硬件图形加速（解决卡顿）
+reg add "HKCU\Software\Kingsoft\Office\12.0\Common\Graphics" /v DisableHardwareAcceleration /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Kingsoft\Office\12.0\Common\Graphics" /v UseCPUEmulation /t REG_DWORD /d 1 /f
+REM 软件-WPS-禁用 发送到 → WPS云文档传输助手
+del /f /q "%APPDATA%\Microsoft\Windows\SendTo\WPS云文档传输助手.lnk"
+reg add "HKCR\*\shellex\ContextMenuHandlers\WpsSendToCloud" /v LegacyDisable /t REG_SZ /d "" /f
+reg add "HKCR\Directory\shellex\ContextMenuHandlers\WpsSendToCloud" /v LegacyDisable /t REG_SZ /d "" /f
+REM 软件-WPS-禁用 通过WPS云文档 分享、协作、上传
+reg add "HKCR\*\shell\WpsCloudShare" /v LegacyDisable /t REG_SZ /d "" /f
+reg add "HKCR\Directory\shell\WpsCloudShare" /v LegacyDisable /t REG_SZ /d "" /f
+reg add "HKCR\*\shellex\ContextMenuHandlers\WpsCloudShare" /v LegacyDisable /t REG_SZ /d "" /f
+reg add "HKCR\Directory\shellex\ContextMenuHandlers\WpsCloudShare" /v LegacyDisable /t REG_SZ /d "" /f
+reg add "HKCR\*\shellex\ContextMenuHandlers\UploadToWpsCloud" /v LegacyDisable /t REG_SZ /d "" /f
+reg add "HKCR\Directory\shellex\ContextMenuHandlers\UploadToWpsCloud" /v LegacyDisable /t REG_SZ /d "" /f
+REM 软件-WPS-关闭 WPS 同步桌面所有文件（桌面云同步）
+reg add "HKCU\Software\Kingsoft\WPSCloud\DesktopSync" /v EnableDesktopSync /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Kingsoft\WPSCloud\DesktopSync" /v SyncDesktop /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Kingsoft\WPSCloud\DesktopSync" /v AutoSync /t REG_DWORD /d 0 /f
+REM 软件-WPS-彻底禁用 WPS 云盘同步服务（防止后台复活）
+reg add "HKCU\Software\Kingsoft\Office\12.0\Cloud" /v DisableCloudService /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Kingsoft\WPSCloud" /v DisableFileSync /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Kingsoft\WPSCloud" /v DisableDesktopSync /t REG_DWORD /d 1 /f
 
 REM 软件-Office-禁用Office 16 Excel的动画
 reg add "HKCU\Software\Microsoft\Office\16.0\Excel\options" /v "EnableAnimations" /t reg_dword /d 0 /f
@@ -2539,6 +2671,7 @@ rd /q /s "C:\ShaoHua\Hsbank\" 2>nul
 del /q /f /s "C:\Windows\Hsbank\*" 2>nul
 del /q /f "C:\ShaoHua\Tools\PrintBox.exe" 2>nul
 rd /q /s "C:\ShaoHua\Drv\Scan" 2>nul
+rd /q /s "C:\ShaoHua\Drv\Glenfly" 2>nul
 rd /q /s "C:\ShaoHua\Drv\KeyBoard" 2>nul
 if "%hs%"=="_hsw" goto :eof
 if exist "C:\ShaoHua\Tools\SetUserFTA.exe" "C:\ShaoHua\Tools\SetUserFTA.exe" http MSEdgeHTM
@@ -2555,7 +2688,6 @@ del /q /f "C:\ShaoHua\Soft\WeChatSetup.exe" 2>nul
 del /q /f "C:\ShaoHua\Softprep.exe" 2>nul
 del /q /f "C:\ShaoHua\Softprep.ini" 2>nul
 rd /q /s "C:\ShaoHua\Soft\安装包" 2>nul
-rd /q /s "C:\ShaoHua\Drv\Glenfly" 2>nul
 rd /q /s "C:\ShaoHua\Drv\Printer\Icsp" 2>nul
 rd /q /s "C:\ShaoHua\Drv\Printer\Brother" 2>nul
 rd /q /s "C:\ShaoHua\Drv\Printer\Sharp" 2>nul
