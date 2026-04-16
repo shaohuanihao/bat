@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20260415
+set Version=20260416
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -256,10 +256,6 @@ powercfg -setacvalueindex 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 9596fb26-9850-41f
 echo 播放视频时，优化视频质量
 powercfg -setdcvalueindex 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 9596fb26-9850-41fd-ac3e-f7c3c00afd4b 34c7b99f-9a6d-4b3c-8dc7-b6693b78cef4 0
 powercfg -setacvalueindex 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 9596fb26-9850-41fd-ac3e-f7c3c00afd4b 34c7b99f-9a6d-4b3c-8dc7-b6693b78cef4 0
-echo 禁用 Core Parking（CPU核心停车）
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\0cc5b647-c1df-4637-891a-dec35c318583" /v Attributes /t reg_dword /d 1 /f
-powercfg -setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 1
-powercfg -setdcvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 1
 echo 禁用睡眠按钮
 powercfg /setacvalueindex scheme_current sub_buttons "sbuttonaction" 0
 powercfg /setdcvalueindex scheme_current sub_buttons "sbuttonaction" 0
@@ -680,7 +676,7 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Updat
 REM 系统-设置-关闭设备搜索历史记录
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings" /v "IsDeviceSearchHistoryEnabled" /t REG_DWORD /d 0 /f
 
-REM 系统-性能-GPU硬件加速关闭
+REM 系统-性能-GPU硬件加速开启
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t reg_dword /d 1 /f
 REM 系统-性能-强制卸载不再使用的DLL
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v AlwaysUnloadDLL /t REG_DWORD /d 1 /f
@@ -2148,9 +2144,6 @@ reg delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall
 del /q /f "%ProgramData%\Microsoft\Windows\Start Menu\驱动下载.lnk" 2>nul
 del /q /f "%windir%\Help\dcold.exe" 2>nul
 
-REM 软件-WPS-关闭WPS Office的自动更新服务
-sc stop WPSUpdateService
-sc config WPSUpdateService start= disabled
 REM 软件-WPS-去除WPS云文档
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{D426C8B3-0B26-4F0D-BA74-2EE212EDAC6D}" /f
 ::删除 WPS网盘
@@ -2167,7 +2160,7 @@ reg delete "HKCU\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\
 reg delete "HKLM\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{5FCD4425-CA3A-48F4-A57C-B8A75C32ACB1}" /f
 REM 软件-WPS-禁用WPS Office的启动画面
 reg add "HKCU\Software\Kingsoft\WPS\kui" /v "Startup" /t reg_dword /d 0 /f
-REM 软件-WPS-设置WPS Office的界面语言为英文
+REM 软件-WPS-设置WPS Office的界面语言为1033英文，2052中文
 reg add "HKCU\Software\Kingsoft\WPS\kui" /v "Lang" /t reg_dword /d 2052 /f
 REM 软件-WPS-设置WPS Office的默认保存格式为docx
 reg add "HKCU\Software\Kingsoft\WPS\kxe" /v "SaveType" /t reg_sz /d "docx" /f
@@ -2197,13 +2190,24 @@ reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run\WPS Cloud" /f
 REM 软件-WPS-关闭 WPS 自动升级
 reg add "HKCU\Software\Kingsoft\Office\AutoUpdate" /v EnableAutoUpdate /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\WPS\Office\6.0\Common\Update" /v AutoUpdate /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Kingsoft\Office\6.0\Common\updateinfo" /v "UpdateMode" /t REG_SZ /d "manual" /f
 REM 软件-WPS-不使用代理
 reg add "HKCU\Software\Kingsoft\Office\Common\Network" /v ProxyEnable /t REG_DWORD /d 0 /f
 reg add "HKCU\Software\Kingsoft\Office\Common\Network" /v ProxyServer /t REG_SZ /d "" /f
 reg add "HKCU\Software\Kingsoft\Office\Common\Network" /v ProxyOverride /t REG_SZ /d "" /f
+reg add "HKCU\SOFTWARE\Kingsoft\Office\6.0\Common\proxyinfo" /v "proxytype" /t REG_DWORD /d 0 /f
+REM 软件-WPS-设置TDR恢复计数为0（禁用超时检测和恢复）
+reg add "HKCU\SOFTWARE\Kingsoft\Office\6.0\wpp\Application Settings" /v "TdrRecoveryCount" /t REG_DWORD /d 0 /f
+REM 软件-WPS-设置兼容模式类型为1（启用兼容模式）
+reg add "HKCU\SOFTWARE\Kingsoft\Office\6.0\Common" /v "compatible_type" /t REG_DWORD /d 1 /f
 REM 软件-WPS-WPS 硬件图形加速（解决卡顿）
 reg add "HKCU\Software\Kingsoft\Office\12.0\Common\Graphics" /v DisableHardwareAcceleration /t REG_DWORD /d 1 /f
 reg add "HKCU\Software\Kingsoft\Office\12.0\Common\Graphics" /v UseCPUEmulation /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Kingsoft\Office\6.0\Common\Graphics" /v DisableHardwareAcceleration /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Kingsoft\Office\6.0\Common\Graphics" /v UseCPUEmulation /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Kingsoft\Office\6.0\Common" /v DisableHWAcceleration /t REG_DWORD /d 1 /f
+reg add "HKCU\SOFTWARE\Kingsoft\Office\6.0\wpp\Application Settings" /v "HardwareAccelerated" /t REG_SZ /d "AccelerationNone" /f
+reg add "HKCU\SOFTWARE\Kingsoft\Office\6.0\wpp\Application Settings" /v "EnableUseHardWare" /t REG_DWORD /d 0 /f
 REM 软件-WPS-禁用 发送到 → WPS云文档传输助手
 del /f /q "%APPDATA%\Microsoft\Windows\SendTo\WPS云文档传输助手.lnk"
 reg add "HKCR\*\shellex\ContextMenuHandlers\WpsSendToCloud" /v LegacyDisable /t REG_SZ /d "" /f
@@ -2259,23 +2263,42 @@ reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "Default
 REM 软件-福昕阅读器-设置福昕阅读器的图标大小为中等
 reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "ToolbarIconSize" /t reg_dword /d 1 /f
 
-REM 软件-服务-开始禁用并停止 wps网盘服务
+REM 软件-服务-Asus-关闭Asus的自动更新服务
+sc stop AsusUpdateCheck
+sc config AsusUpdateCheck start=disabled
+sc stop edgeupdatem
+sc config edgeupdatem start=disabled
+REM 软件-服务-福昕阅读器-关闭福昕阅读器的自动更新服务
+sc stop FoxitReaderUpdateService
+sc config FoxitReaderUpdateService start=disabled
+REM 软件-服务-WPS-关闭WPS Office的自动更新服务
+sc stop WPSUpdateService
+sc config WPSUpdateService start= disabled
 net stop wpscloudsvr
 sc config wpscloudsvr start=disabled
-::sc delete wpscloudsvr
-REM 软件-服务-开始禁用并停止并删除edge服务
+REM 软件-服务-禁用并停止PDF服务
+net stop FoxitPhantomPDFUpdateService
+sc config FoxitPhantomPDFUpdateService start=disabled
+REM 软件-服务-Edge-关闭Edge的自动更新服务
 net stop MicrosoftEdgeElevationService
 sc config MicrosoftEdgeElevationService start=disabled
-sc delete MicrosoftEdgeElevationService
 net stop edgeupdate
 sc config edgeupdate start=disabled
 sc delete edgeupdate
 net stop edgeupdatem
 sc config edgeupdatem start=disabled
-sc delete edgeupdatem
-REM 软件-服务-开始禁用并停止PDF服务
-net stop FoxitPhantomPDFUpdateService
-sc config FoxitPhantomPDFUpdateService start=disabled
+net stop MicrosoftEdgeElevationService
+sc config MicrosoftEdgeElevationService start=disabled
+REM 软件-服务-停止并禁用旧版Google更新服务（Chrome 78-122左右使用的服务名）
+sc stop gupdate
+sc config gupdate start= disabled
+sc stop gupdatem
+sc config gupdatem start= disabled
+REM 2. 停止并禁用新版Google更新服务（Chrome 123及以上版本引入的新服务名）
+sc stop GoogleUpdater InternalService
+sc config "GoogleUpdater InternalService" start= disabled
+sc stop "GoogleUpdater Service"
+sc config "GoogleUpdater Service" start= disabled
 
 REM 软件-软件启动项-禁用 OneDrive 同步客户端
 reg add "HKLM\Software\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSyncNGSC" /t reg_dword /d 1 /f
@@ -2283,6 +2306,12 @@ REM 软件-软件启动项-删除OneDrive的启动项
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "OneDrive" /f
 REM 软件-软件启动项-禁用OneDrive的系统服务
 sc config OneSyncSvc start= disabled
+
+REM 软件-计划任务-各类浏览器计划任务删除
+del /f/s/q "C:\Windows\System32\Tasks\*edge*"
+del /f/s/q "C:\Windows\System32\Tasks\*firefox*"
+del /f/s/q "C:\Windows\System32\Tasks\*google*"
+
 goto :eof
 
 :better_wl
