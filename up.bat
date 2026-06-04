@@ -1,15 +1,15 @@
 ÿşa
 cls
-@echo off
+@echo on
 ver|findstr /i "5\.1\." > nul&&(goto:begin)
 net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
 :begin
-@echo off
+@echo on
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=Upgrade½Å±¾
 set Powered=Powered by ÉÛ»ª 18900559020
-set Version=20260408
+set Version=20260604
 set Comment=ÔËĞĞÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎğÊÖ¶¯¹Ø±Õ£¡
 title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
 :start
@@ -21,7 +21,7 @@ md %local%\Key >nul 2>nul
 set error=¡¡¡¡¡¡ÏÂÔØÊ§°Ü£¬Çë¼ì²éÊÇ·ñÍøÂç²»¿É´ï»ò±»É±¶¾Èí¼şµÈÀ¹½Ø£¿
 set urllan=http://38.40.12.180/sh
 set urlwan=http://10.198.78.78/sh
-set urlother=https://gitee.com/shaohuanihao
+set urlother=https://raw.giteeusercontent.com/shaohuanihao
 cls
 if not exist %SystemRoot%\System32\curl.exe call :curl
 if exist %SystemRoot%\System32\curl.exe call :up
@@ -161,7 +161,7 @@ set softother=/bat/raw/main/up.bat
 call :make
 call :net
 curl -s -I %net% > up.txt 2>nul && findstr "200 OK" up.txt > nul && (curl -s --connect-timeout 5 --max-time 30 -o "%local%\up.bat" -L %net% 2>nul&echo.&echo.¡¡¡¡ÏÂÔØÍê³É¡£) || (echo.&echo.%error%)
-echo %~dp0|find /i "shaohua"&&(cls&echo.&goto :eof)||(cls&echo.&start "" %local%\up.bat&del %0&del %~dp0%~nx0&exit)
+echo %~dp0 | find /i "shaohua"&&(cls&echo.&goto :eof)||(cls&echo.&start "" %local%\up.bat&del %0&del %~dp0%~nx0&exit)
 goto :eof
 :clear
 echo.¡¡ÇåÀí¿ÉÄÜ´¥·¢É±¶¾Èí¼şÎó±¨²¡¶¾¾¯±¨µÄÎÄ¼ş¡­
