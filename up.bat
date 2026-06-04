@@ -1,10 +1,10 @@
 ÿþa
 cls
-@echo on
+@echo off
 ver|findstr /i "5\.1\." > nul&&(goto:begin)
 net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
 :begin
-@echo on
+@echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=Upgrade½Å±¾
