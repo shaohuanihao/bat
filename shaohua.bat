@@ -2,14 +2,14 @@
 cls
 @echo off
 ver|findstr /i "5\.1\." > nul&&(goto:begin)
-net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+net session>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
 :begin
 @echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20260505
+set Version=20260623
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -1369,16 +1369,16 @@ reg delete "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\
 REM 界面-资源管理器-重新读取用户设置
 rundll32.exe user32.dll,UpdatePerUserSystemParameters
 
-REM 界面-应用程序-减少等待应用程序未响应的等待时间为3秒
-reg add "HKCU\Control Panel\Desktop" /v "HungAppTimeout" /t reg_sz /d 3000 /f
+REM 界面-应用程序-自动结束任务
+reg add "HKCU\Control Panel\Desktop" /v AutoEndTasks /t REG_SZ /d 1 /f
+REM 界面-应用程序-减少等待应用程序未响应的等待时间为2秒
+reg add "HKCU\Control Panel\Desktop" /v "HungAppTimeout" /t reg_sz /d 2000 /f
 REM 界面-应用程序-减少应用程序关闭的等待时间为3秒
 reg add "HKCU\Control Panel\Desktop" /v "WaitToKillAppTimeout" /t reg_sz /d "3000" /f
 REM 界面-应用程序-减少服务关闭时的等待时间为3秒
 reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v "WaitToKillServiceTimeout" /t reg_dword /d 3000 /f
 REM 界面-应用程序-优化处理低级别钩子时的超时时间，更快的相应无相应的程序
 reg add "HKCU\Control Panel\Desktop" /v "LowLevelHooksTimeout" /t reg_dword /d 400 /f
-REM 界面-应用程序-禁用win11小工具在后台运行并使用CPU和互联网跟加载内容
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v "AllowNewsAndInterests" /t reg_dword /d 0 /f
 
 REM 界面-桌面-显示"我的电脑"图标
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" /t reg_dword /d 0 /f
@@ -2441,7 +2441,7 @@ call :chrome
 call :finish%hs%
 REM 刷新桌面
 taskkill /f /im explorer.exe 2>nul
-RUNDLL32.EXE USER32.DLL,UpdatePerUserSystemParameters 1, True
+RUNDLL32.EXE USER32.DLL,UpdatePerUserSystemParameters
 start "" explorer
 if "%hs%"=="_hsf" goto :eof
 REM 系统激活脚本
