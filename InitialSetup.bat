@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=InitialSetup脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20260414
+set Version=20260427
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -20,63 +20,63 @@ call :clear
 call :out
 exit
 :cmd_admin
-REM 批处理右键管理员默认命令
-reg add "HKCR\cmdfile\shell\runas\command" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
-REM CMD 32+64位 强制默认以管理员运行
-reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\cmd.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\cmd.exe" /t reg_sz /d RUNASADMIN /f
-REM conhost控制台窗口强制管理员（无害可选）
-reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\conhost.exe" /t reg_sz /d RUNASADMIN /f
-REM PowerShell脚本右键以管理员运行（自动绕过策略）
-reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t reg_sz /d "PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File \"%1\"" /f
-REM PowerShell 32+64位 强制默认管理员
-reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
-reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
-REM UAC_启用管理员批准模式（必须开启才能正常使用UAC）
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 1 /f
-REM UAC_管理员提升权限：不提示，直接允许提升
+REM UAC_禁用LUA核心权限架构
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f
+REM UAC_关闭内置管理员隔离，完全豁免UAC管控
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "BuiltInAdminIsolation" /t REG_DWORD /d 0 /f
+REM UAC_管理员账户提权行为：无弹窗、自动直接批准提升
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorAdmin" /t REG_DWORD /d 0 /f
-REM UAC_标准用户提升权限：提示输入管理员凭据
+REM UAC_标准用户提权行为：必须输入管理员凭据才可提权
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorUser" /t REG_DWORD /d 3 /f
-REM UAC_权限提示时不切换到安全桌面
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t REG_DWORD /d 0 /f
-REM UAC_关闭内置管理员账户(Administrator)启用管理员批准模式
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t REG_DWORD /d 0 /f
-REM UAC_不强制验证可执行文件数字签名
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ValidateAdminCodeSignatures" /t REG_DWORD /d 0 /f
-REM UAC_不限制UIAccess程序仅从安全位置启动
+REM UAC_取消UIAccess程序强制安全路径限制
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableSecureUIAPaths" /t REG_DWORD /d 0 /f
-REM UAC_不允许UIAccess程序绕过安全桌面
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableUIADesktopToggle" /t REG_DWORD /d 0 /f
-REM UAC_关闭应用安装包自动检测与权限提示
+REM UAC_允许UIAccess程序切换至非安全桌面运行
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableUIADesktopToggle" /t REG_DWORD /d 1 /f
+REM UAC_安装程序检测关闭
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableInstallerDetection" /t REG_DWORD /d 0 /f
-REM UAC_关闭文件/注册表写入虚拟化（旧软件可能出现权限不足）
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableVirtualization" /t REG_DWORD /d 0 /f
-REM UAC_关闭远程UAC限制（局域网共享/远程操作权限全开）
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d 1 /f
-REM 系统_禁用更新后自动重启并自动登录
+REM UAC_开启文件/注册表虚拟化兼容层
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableVirtualization" /t REG_DWORD /d 1 /f
+REM UAC_取消内置管理员账户的UAC批准模式限制
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t REG_DWORD /d 0 /f
+REM UAC_禁用安全桌面
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t REG_DWORD /d 0 /f
+REM UAC_关闭管理员强制签名验证
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ValidateAdminCodeSignatures" /t REG_DWORD /d 0 /f
+REM UAC_旧版虚拟化机制
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "VirtualizationEnabled" /t REG_DWORD /d 1 /f
+REM 安全_阻止不信任字体拦截
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Config" /v "UntrustedFontBlocking" /t REG_DWORD /d 0 /f
+REM 策略_放宽AppLocker软限制
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppLocker" /v "AllowSoftRestrictions" /t REG_DWORD /d 1 /f
+REM 设备_解除全局设备安装禁止策略
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeviceInstall\Restrictions" /v "DenyDeviceInstallation" /t REG_DWORD /d 0 /f
+REM 系统_阻止更新后自动重启
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "DisableAutomaticRestartSignOn" /t REG_DWORD /d 1 /f
-REM 系统_允许标准用户安装打印机驱动
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LimitPrintDriverInstall" /t REG_DWORD /d 0 /f
-REM 系统_旧版虚拟化开关（与EnableVirtualization作用相近，一并关闭）
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "VirtualizationEnabled" /t REG_DWORD /d 0 /f
-REM 系统_管理员权限程序可访问用户映射的网络驱动器
+REM 系统_管理员与用户网络驱动器互通
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLinkedConnections" /t REG_DWORD /d 1 /f
-REM 组策略_计算机策略异步应用（不等待同步加载，加快开机）
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SynchronousMachineGroupPolicy" /t REG_DWORD /d 0 /f
-REM 组策略_用户策略异步应用（不等待同步加载，加快登录）
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "SynchronousUserGroupPolicy" /t REG_DWORD /d 0 /f
-REM 打印服务_允许非管理员安装打印机驱动
+REM 系统_解除远程本地账户UAC限制
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d 1 /f
+REM 系统_取消标准用户打印机驱动安装限制
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LimitPrintDriverInstall" /t REG_DWORD /d 0 /f
+REM 打印_允许普通用户安装打印机驱动
 reg add "HKLM\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /t REG_DWORD /d 0 /f
-REM luafv服务_设置为自动启动（保留UAC文件虚拟化兼容层）
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\luafv" /v Start /t REG_DWORD /d 2 /f
-reg add "HKLM\SYSTEM\ControlSet001\Services\luafv" /v Start /t REG_DWORD /d 2 /f
+REM 批处理右键「以管理员身份运行」命令修复
+reg add "HKCR\cmdfile\shell\runas\command" /ve /t reg_sz /d "cmd.exe /C \"%1\" %*" /f
+REM 强制 64位 CMD 默认管理员
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\cmd.exe" /t reg_sz /d RUNASADMIN /f
+REM 强制 32位 CMD 默认管理员
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\cmd.exe" /t reg_sz /d RUNASADMIN /f
+REM 强制 conhost 管理员运行
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\system32\conhost.exe" /t reg_sz /d RUNASADMIN /f
+REM PS脚本右键管理员运行绕过策略
+reg add "HKCR\Microsoft.PowerShellScript.1\Shell\runas\command" /ve /t reg_sz /d "PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File \"%1\"" /f
+REM 64位 PowerShell 默认管理员
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
+REM 32位 PowerShell 默认管理员
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 REM 强制更新组策略
 gpupdate /force
-REM 停止并启动luafv服务以应用设置
-sc stop luafv
-sc start luafv
-REM 重新启动资源管理器
+REM 重启资源管理器生效全部UI&权限
 taskkill /f /im explorer.exe
 start explorer.exe
 goto :eof
@@ -132,6 +132,14 @@ REM 检查并启动 ctfmon.exe 如果它未运行
 tasklist /FI "IMAGENAME eq ctfmon.exe" | find /I "ctfmon.exe" >nul || start "" "C:\WINDOWS\system32\ctfmon.exe"
 goto :eof
 :out
+REM WPS修复
+Reg delete "HKCU\Software\Kingsoft\Office\6.0\et" /f >nul 2>&1
+Reg delete "HKCU\Software\Kingsoft\Office\6.0\wps" /f >nul 2>&1
+Reg delete "HKCU\Software\Kingsoft\Office\6.0\wpp" /f >nul 2>&1
+Reg delete "HKCU\Software\kingsoft\Office\6.0\Common\AuthInfo" /f >nul 2>&1
+del /q /f "%allusersprofile%\Application Data\Kingsoft\office6\license2.dat" >nul 2>&1
+del /q /f "%programdata%\Kingsoft\office6\license2.dat" >nul 2>&1
+start "" "C:\Program Files (x86)\Kingsoft\WPS Office\11.8.2.12316\office6\ksomisc.exe" -addsn 26B4J-UDCM6-XR46L-DAVW9-WDACG >nul 2>&1
 REM shaohua
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "ShaoHua" /t REG_SZ /d "C:\Windows\shaohua.bat" /f
 rem NAME
@@ -140,11 +148,4 @@ rem IP
 RunDll32.exe shell32.dll,Control_RunDLL ncpa.cpl 2>nul
 rem 计算机名
 sysdm.cpl
-Reg delete "HKCU\Software\Kingsoft\Office\6.0\et" /f >nul 2>&1
-Reg delete "HKCU\Software\Kingsoft\Office\6.0\wps" /f >nul 2>&1
-Reg delete "HKCU\Software\Kingsoft\Office\6.0\wpp" /f >nul 2>&1
-Reg delete "HKCU\Software\kingsoft\Office\6.0\Common\AuthInfo" /f >nul 2>&1
-del /q /f "%allusersprofile%\Application Data\Kingsoft\office6\license2.dat" >nul 2>&1
-del /q /f "%programdata%\Kingsoft\office6\license2.dat" >nul 2>&1
-start "" "C:\Program Files (x86)\Kingsoft\WPS Office\11.8.2.12316\office6\ksomisc.exe" -addsn 26B4J-UDCM6-XR46L-DAVW9-WDACG >nul 2>&1
 cls&echo.&echo.请确定已经完成 计算机名 和 IP地址 的设置！！！&echo.&echo.若已完成，请按下任意键重启电脑。&echo.&pause&cls&shutdown -r -t 10 -c "第一阶段已结束。10秒后，系统会自动重启，完成余下操作！"&del %0

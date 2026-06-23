@@ -1,0 +1,48 @@
+ÿþa
+cls
+@echo off
+cls
+disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
+set Name=Upatch
+set Powered=Powered by ÉÛ»ª 18900559020
+set Version=20260505
+set Comment=ÔËÐÐÍê±Ïºó½Å±¾»á×Ô¶¯¹Ø±Õ£¬ÇëÎðÊÖ¶¯¹Ø±Õ£¡
+title %Name% ¡ï %Powered% ¡ï Ver%Version% ¡ï %Comment%
+
+call :EnableLUA
+call :powercfg
+call :find
+call :DisableSR
+if defined patch (
+    call "%patch%"
+)
+del /f /q "%~f0" >nul 2>nul
+endlocal
+exit /b
+
+:EnableLUA
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f
+goto :eof
+
+:powercfg
+powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 >nul 2>&1
+powercfg -setactive e9a42b02-d5df-448d-aa00-03f14749eb61 >nul 2>&1
+goto :eof
+
+:find
+for /f "skip=1 tokens=1" %%D in ('wmic logicaldisk get deviceid ^| find ":"') do (
+    if exist "%%D\patch.bat" (
+        findstr /C:":shaohua" "%%D\patch.bat" >nul 2>nul
+        if !errorlevel! equ 0 (
+            set "patch=%%D\patch.bat"
+            set "U=%%D"
+            goto :eof
+        )
+    )
+)
+goto :eof
+
+:DisableSR
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v RPSessionInterval /t REG_DWORD /d 0 /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v DisableSR /t REG_DWORD /d 1 /f >nul 2>&1
+goto :eof

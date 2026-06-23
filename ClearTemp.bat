@@ -9,13 +9,13 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=ClearTemp脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20260408
+set Version=20260423
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
 set userInput=
 call :CapsLK
-arp -a|findstr /i "10.198." >nul && (set dxql=　【 C 】定向清理) || set dxql=
+if exist "C:\Program Files\Shadow Defender\" (set "dxql=　【 C 】定向清理") || set "dxql="
 cls&for /f "tokens=2 delims=()" %%i in ('fsutil volume diskfree c:^|find /i "可用"') do set myvar=%%i&cls&echo.
 echo.　当前 C 盘可用容量为【  %myvar% 】。&echo.
 echo.　　【 A 】自动化操作　【 M 默认】手动选择操作%dxql%　【 U 】更新脚本　【 Q 】退出脚本&echo.
