@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20260623
+set Version=20260705
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -489,22 +489,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" 
 REM 系统-广告-关闭“启用来自 Microsoft 和合作伙伴在整个 Windows 中的促销内容订阅”
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SubscribedContentEnabled /t REG_DWORD /d 0 /f
 REM 界面-广告-禁用开始菜单的应用推荐磁贴
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-202914Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-280810Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-280811Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-280815Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310094Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-314559Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-314563Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338387Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338388Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338389Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338393Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353694Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353696Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353698Enabled" /t reg_dword /d 0 /f
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-88000326Enabled" /t reg_dword /d 0 /f
+for %%a in (202914 280810 280811 280815 310093 310094 314559 314563 338387 338388 338389 338393 353694 353696 353698 88000326) do reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-%%aEnabled" /t reg_dword /d 0 /f
 REM 系统-广告-关闭向导和推荐相关的内容
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "DisableSoftLanding" /t reg_dword /d 1 /f
 REM 系统-广告-启用Windows聚光灯功能，1是禁用，0是启用
@@ -743,235 +728,123 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "N
 REM 系统-性能-关闭win10让windows管理默认打印机
 reg add "HKCU\Software\Microsoft\Windows NT\CurrentVersion\Windows" /v "LegacyDefaultPrinterMode" /t reg_dword /d 1 /f
 REM 系统-性能-修改“如果回收站中的文件存在超过以下时长，请将其删除”选项，修改为“从不”
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\BitBucket" /v NukeOnDelete /t reg_dword /d 0 /f
+REM 系统-性能-设置全局全屏优化行为模式：2=全局禁用全屏优化，强制使用传统独占全屏模式
+reg add "HKCU\System\GameConfigStore" /v GameDVR_FSEBehaviorMode /t REG_DWORD /d 2 /f
+REM 系统-性能-启用遵从用户自定义的FSE策略：1=启用上方FSEBehaviorMode全局配置，0=忽略自定义策略使用系统默认
+reg add "HKCU\System\GameConfigStore" /v GameDVR_HonorUserFSEBehaviorMode /t REG_DWORD /d 1 /f
+REM 系统-性能-GameDVR全屏运行管控策略：2=限制游戏栏后台占用，避免录屏抓帧造成游戏帧率波动、输入延迟
+reg add "HKCU\System\GameConfigStore" /v GameDVR_FSEBehavior /t REG_DWORD /d 2 /f
+REM 系统-性能-允许DXGI识别并尊重独占全屏标识：1=程序进入独占全屏后，游戏栏停止强制画面捕获，减少切屏、录屏、撕裂异常
+reg add "HKCU\System\GameConfigStore" /v GameDVR_DXGIHonorFSEWindowsCompatible /t REG_DWORD /d 1 /f
 REM 系统-性能-禁用磁盘碎片整理
 schtasks /change /tn "Microsoft\Windows\Defrag\ScheduledDefrag" /disable
 REM 系统-性能-判断是否为SSD并执行专属优化
-set "TRIM="
-for /f "tokens=2 delims==" %%i in ('fsutil behavior query DisableDeleteNotify ^| find /i "NTFS"') do set "TRIM=%%i"
-if not defined TRIM for /f "tokens=2 delims==" %%i in ('fsutil behavior query DisableDeleteNotify ^| find /i "DisableDeleteNotify"') do set "TRIM=%%i"
-for /f "tokens=1" %%i in ("!TRIM!") do set "TRIM=%%i"
-if "!TRIM!"=="0" (
-REM 系统-性能-判断是否为SSD并执行专属优化-禁用传统磁盘碎片整理计划任务
-schtasks /change /tn "Microsoft\Windows\Defrag\ScheduledDefrag" /disable
-REM 禁用 Prefetch / SuperFetch（Win7有效）
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v EnablePrefetcher /t reg_dword /d 0 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v EnableSuperfetch /t reg_dword /d 0 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Prefetch" /v "EnableSuperfetch" /t REG_DWORD /d 0 /f
-sc stop SysMain
-sc config SysMain start= disabled
-sc config defragsvc start= disabled
-net stop defragsvc
-set mem=0
-for /f "tokens=2 delims==" %%i in ('wmic ComputerSystem get TotalPhysicalMemory /value ^| find "="') do set mem=%%i
-set "mem=!mem: =!"
-REM 系统-性能-判断是否为SSD并执行专属优化-仅在内存大于等于 8GB 时启用
-if not "!mem!"=="0" if !mem! GEQ 8589934592 (
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v DisablePagingExecutive /t reg_dword /d 1 /f
-)
-REM 系统-性能-判断是否为SSD并执行专属优化-确保 TRIM 开启
-fsutil behavior set DisableDeleteNotify 0
-REM 系统-性能-判断是否为SSD并执行专属优化-禁用开机磁盘自动优化
-reg add "HKLM\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction" /v Enable /t REG_SZ /d N /f
-REM 系统-性能-判断是否为SSD并执行专属优化-关闭磁盘优化服务 (defragsvc)
-sc config defragsvc start= disabled
-net stop defragsvc
-REM 系统-性能-判断是否为SSD并执行专属优化-禁用开机磁盘自动优化
-reg add "HKLM\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction" /v Enable /t REG_SZ /d N /f
+echo 正在检测系统盘介质类型，请稍候...
+set "MediaType="
+for /F "usebackq tokens=*" %%i in (`powershell -NoProfile -Command "(Get-PhysicalDisk | Where-Object { $_.DeviceID -eq (Get-Partition -DriveLetter C).DiskNumber }).MediaType"`) do (set "MediaType=%%i" )
+set "MediaType=!MediaType: =!"
+echo 系统盘介质类型为: !MediaType!
+if /i "!MediaType!"=="SSD" (
+    echo 执行 SSD 专属优化...
+    fsutil behavior set DisableDeleteNotify 0
+    for /f "tokens=2 delims==" %%i in ('wmic ComputerSystem get TotalPhysicalMemory /value ^| find "="') do set mem=%%i
+    set "mem=!mem: =!"
+    if not "!mem!"=="0" if !mem! GEQ 8589934592 (
+        reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v DisablePagingExecutive /t reg_dword /d 1 /f
+    )
+    reg add "HKLM\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction" /v Enable /t REG_SZ /d N /f
+) else if /i "!MediaType!"=="HDD" (
+    echo 检测到 HDD，保留 SuperFetch 并恢复预读...
+    sc config SysMain start= auto
+    net start SysMain
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v EnablePrefetcher /t reg_dword /d 3 /f
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v EnableSuperfetch /t reg_dword /d 3 /f
+	fsutil behavior set disable8dot3 0
+	reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v NtfsDisable8dot3NameCreation /t reg_dword /d 0 /f
+
+) else (
+    echo 无法确定磁盘类型，未进行任何修改。
 )
 
-REM 系统-服务-全局服务超时等待时间从60秒缩短至30秒
+REM 全局服务超时等待时间从60秒缩短至30秒（加快开机/关机速度）
 reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v ServicesPipeTimeout /t REG_DWORD /d 30000 /f
-REM 零售演示服务 (Retail Demo Service)
-sc stop RetailDemo 2>nul
-sc config RetailDemo start= disabled
-REM Windows预览体验计划服务 (Windows Insider Service)
-sc stop wisvc 2>nul
-sc config wisvc start= disabled
-REM 电话服务 (Phone Service)
-sc stop PhoneSvc 2>nul
-sc config PhoneSvc start= disabled
-REM 用户体验与数据收集服务 (Spectrum)
-sc stop Spectrum 2>nul
-sc config Spectrum start= disabled
-REM Windows 混合现实服务 (SharedRealitySvc)
-sc stop SharedRealitySvc 2>nul
-sc config SharedRealitySvc start= disabled
-REM 内置即时通讯消息服务 (MessagingService)
-sc stop MessagingService 2>nul
-sc config MessagingService start= disabled
-REM 地理位置服务 (lfsvc)
-sc stop lfsvc 2>nul
-sc config lfsvc start= disabled
-REM 个人数据索引维护服务 (PimIndexMaintenanceSvc)
-sc stop PimIndexMaintenanceSvc 2>nul
-sc config PimIndexMaintenanceSvc start= disabled
-REM Microsoft Windows SMS 路由器服务
-sc stop SmsRouter 2>nul
-sc config SmsRouter start= disabled
-REM 钱包服务 (Wallet Service)
-sc stop WalletService 2>nul
-sc config WalletService start= disabled
-REM 支付和NFC/SE管理器
-sc stop NfcAppletHostService 2>nul
-sc config NfcAppletHostService start= disabled
-sc stop PaymentManager 2>nul
-sc config PaymentManager start= disabled
-REM Xbox Live 网络服务
-sc stop XboxNetApiSvc 2>nul
-sc config XboxNetApiSvc start= disabled
-REM Xbox Live 身份验证
-sc stop XblAuthManager 2>nul
-sc config XblAuthManager start= disabled
-REM Xbox Live 游戏保存
-sc stop XblGameSave 2>nul
-sc config XblGameSave start= disabled
-REM 诊断跟踪服务 (DiagTrack)
-sc stop DiagTrack 2>nul
-sc config DiagTrack start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\DiagTrack" /v "Start" /t reg_dword /d 4 /f
-REM 诊断服务 (DPS)
-sc stop DPS 2>nul
-sc config DPS start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\DPS" /v "Start" /t reg_dword /d 4 /f
-REM 诊断中心标准收集器服务
-sc stop diagnosticshub.standardcollector.service 2>nul
-sc config diagnosticshub.standardcollector.service start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\diagnosticshub.standardcollector.service" /v "Start" /t reg_dword /d 4 /f
-REM 错误报告服务 (WerSvc)
-sc stop WerSvc 2>nul
-sc config WerSvc start= disabled
-reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v "Disabled" /t reg_dword /d 1 /f
-REM 问题报告和解决方案 (wercplsupport)
-sc stop wercplsupport 2>nul
-sc config wercplsupport start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\wercplsupport" /v Start /t reg_dword /d 4 /f
-REM 疑难解答服务 (WdiServiceHost / WdiSystemHost)
-sc stop WdiServiceHost 2>nul
-sc config WdiServiceHost start= disabled
-sc stop WdiSystemHost 2>nul
-sc config WdiSystemHost start= disabled
-REM 诊断数据收集策略
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "MaxTelemetryAllowed" /t reg_dword /d 0 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack" /v "Enabled" /t reg_dword /d 0 /f
-REM 程序兼容性助手 (PcaSvc)
-sc stop PcaSvc 2>nul
-sc config PcaSvc start= disabled
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /t reg_dword /d 1 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "DisablePCA" /t REG_DWORD /d 1 /f
-REM 禁用Windows Defender实时保护
-PowerShell -Command "Set-MpPreference -DisableRealtimeMonitoring $true" 2>nul
-REM Windows Defender驱动和服务
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\Sense" /v Start /t REG_DWORD /d 4 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdBoot" /v Start /t REG_DWORD /d 4 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdFilter" /v Start /t REG_DWORD /d 4 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdNisDrv" /v Start /t REG_DWORD /d 4 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdNisSvc" /v Start /t REG_DWORD /d 4 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\MDCoreSvc" /v  "start" /t reg_dword /d "4" /f
-reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "SecurityHealth" /f
-sc stop WdNisSvc 2>nul
-sc config WdNisSvc start= disabled
-REM Windows Defender服务 (WinDefend)
-sc stop WinDefend 2>nul
-sc config WinDefend start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\WinDefend" /v Start /t REG_DWORD /d 4 /f
-REM Windows Defender安全中心服务
-sc stop SecurityHealthService 2>nul
-sc config SecurityHealthService start= demand
-REM 禁用Windows Defender组策略
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t reg_dword /d 1 /f
-REM 关闭Windows传递优化服务
-sc stop DoSvc 2>nul
-sc config DoSvc start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\DoSvc" /v "Start" /t reg_dword /d 4 /f
-REM 关闭Windows防火墙
-sc stop MpsSvc
-sc config MpsSvc start= disabled
-netsh advfirewall set allprofiles state off
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess" /v "Start" /t reg_dword /d 4 /f
-REM 禁用远程修改注册表
-sc stop RemoteRegistry 2>nul
-sc config RemoteRegistry start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\RemoteRegistry" /v "Start" /t reg_dword /d 4 /f
-REM 开启IPv6转换服务
-sc stop iphlpsvc 2>nul
-sc config iphlpsvc start= auto
-sc start iphlpsvc
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\iphlpsvc" /v "Start" /t reg_dword /d 2 /f
-REM Windows Media Player 网络共享服务
-sc stop WMPNetworkSvc 2>nul
-sc config WMPNetworkSvc start= disabled
-REM 传真服务
-sc stop Fax 2>nul
-sc config Fax start= disabled
-REM 开启LPD打印服务
-sc stop lpdsvc 2>nul
-sc config lpdsvc start= auto
-sc start lpdsvc
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\lpdsvc" /v "Start" /t reg_dword /d 2 /f
-REM 已下载地图管理器
-sc stop MapsBroker 2>nul
-sc config MapsBroker start= disabled
-REM 家长控制服务
-sc stop WpcMonSvc 2>nul
-sc config WpcMonSvc start= disabled
-REM 3. 文件历史记录服务
-sc stop fhsvc 2>nul
-sc config fhsvc start= disabled
-REM 远程桌面服务用户模式端口重定向器
-sc stop UmRdpService 2>nul
-sc config UmRdpService start= disabled
-REM 关闭超级预读Superfetch
-sc stop SysMain 2>nul
-sc config SysMain start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\SysMain" /v "Start" /t reg_dword /d 4 /f
-REM 关闭Windows Search
-sc stop WSearch 2>nul
-sc config WSearch start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\WSearch" /v "Start" /t reg_dword /d 4 /f
-REM 禁用家庭组
-sc stop HomeGroupProvider 2>nul
-sc config HomeGroupProvider start= disabled
-sc stop HomeGroupListener 2>nul
-sc config HomeGroupListener start= disabled
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\HomeGroup\Services" /v "HomeGroupProvider" /t reg_dword /d 4 /f
-REM 设置NTFS链接跟踪服务为手动
-sc stop TrkWks 2>nul
+REM 零售演示、预览体验、电话服务、体验数据、混合现实、即时通讯
+REM 地理位置、索引维护、短信路由、钱包服务、NFC支付管理
+REM 支付管理器、Xbox网络、Xbox身份、Xbox存档、诊断跟踪
+REM 诊断服务、诊断收集、错误报告、问题报告
+REM 疑难主机、疑难系统、传递优化、远程注册表、媒体共享
+REM 传真、地图管理、家长控制、文件历史、端口重定向、家庭组提供
+REM 家庭组侦听、备份服务、应用准备、WTG服务、DMW用户服务
+REM DMW推送、嵌入模式、自动更新、更新医疗、搜索服务、兼容助手
+for %%s in (
+    RetailDemo wisvc PhoneSvc Spectrum SharedRealitySvc MessagingService 
+    lfsvc PimIndexMaintenanceSvc SmsRouter WalletService NfcAppletHostService 
+    PaymentManager XboxNetApiSvc XblAuthManager XblGameSave DiagTrack 
+    DPS diagnosticshub.standardcollector.service WerSvc wercplsupport 
+    WdiServiceHost WdiSystemHost DoSvc RemoteRegistry WMPNetworkSvc 
+    Fax MapsBroker WpcMonSvc fhsvc UmRdpService HomeGroupProvider 
+    HomeGroupListener SDRSVC AppReadiness WTGService dmwappuserv 
+    dmwappushservice embeddedmode wuauserv WaaSMedicSvc WSearch PcaSvc
+) do (
+    sc stop %%s
+    sc config %%s start= disabled
+)
+
+REM 补充：诊断数据收集与错误报告的注册表安全屏蔽
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "MaxTelemetryAllowed" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack" /v "Enabled" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v "Disabled" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\PushNotifications" /v "NoToastApplicationNotificationOnLockScreen" /t REG_DWORD /d 1 /f
+REM 正在配置并开启 IPv6 转换与 LPD 打印服务...
+for %%s in (iphlpsvc lpdsvc) do (
+    sc config %%s start= auto
+    sc start %%s
+)
+REM 链接跟踪服务：设为手动启动（仅在需要快捷方式解析时触发）
+sc stop TrkWks
 sc config TrkWks start= demand
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\TrkWks" /v "Start" /t reg_dword /d 3 /f
-REM 禁用备份服务
-sc stop SDRSVC 2>nul
-sc config SDRSVC start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\SDRSVC" /v "Start" /t reg_dword /d 4 /f
-REM 禁用AppReadiness
-sc stop AppReadiness 2>nul
-sc config AppReadiness start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\AppReadiness" /v "Start" /t reg_dword /d 4 /f
-REM 禁用Windows To Go
-sc stop WTGService 2>nul
-sc config WTGService start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\WTGService" /v "Start" /t reg_dword /d 4 /f
-REM 禁用DMW应用用户服务
-sc stop dmwappuserv 2>nul
-sc config dmwappuserv start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\dmwappuserv" /v "Start" /t reg_dword /d 4 /f
-REM 数据移动应用程序推送服务
-sc stop dmwappushservice 2>nul
-sc config dmwappushservice start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\dmwappushservice" /v "Start" /t reg_dword /d 4 /f
-REM 禁用锁屏通知推送
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\PushNotifications" /v "NoToastApplicationNotificationOnLockScreen" /t reg_dword /d 1 /f
-REM 嵌入模式服务
-sc stop embeddedmode 2>nul
-sc config embeddedmode start= disabled
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\embeddedmode" /v Start /t reg_dword /d 4 /f
-REM 停止Windows Update服务
-sc stop wuauserv 2>nul
-sc config wuauserv start= disabled
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoUpdate" /t reg_dword /d 1 /f
-REM 禁用Windows更新医疗服务
-sc stop WaaSMedicSvc 2>nul
-sc config WaaSMedicSvc start= disabled
+REM 正在配置系统安全防护选项...
+PowerShell -Command "Set-MpPreference -DisableRealtimeMonitoring $true"
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t REG_DWORD /d 1 /f
+sc stop WinDefend
+sc config WinDefend start= disabled
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "SecurityHealth" /f
+REM Windows 防火墙（正常关闭，同时保留服务项以防依赖它的UWP应用闪退）
+netsh advfirewall set allprofiles state off
+REM 正在配置组策略禁用 Defender 防护...
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v "DisableRealtimeMonitoring" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableBehaviorMonitoring" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableOnAccessProtection" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableScanOnRealtimeEnable" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableRealtimeMonitoring" /t REG_DWORD /d 1 /f
+REM 禁用安全中心通知，防止系统不断右下角弹窗骚扰
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Notifications" /v "DisableNotifications" /t REG_DWORD /d 1 /f
+REM 停止 Defender 运行服务...
+sc stop SecurityHealthService
+sc stop WinDefend
+sc stop WdNisSvc
+sc stop Sense
+REM 禁用 Defender 核心服务自启
+for %%s in (WinDefend WdNisSvc Sense SecurityHealthService) do (
+    sc config %%s start= disabled
+)
+REM 锁定底层驱动与核心服务自启状态，让系统下次开机时不加载 Defender 相关组件
+for %%d in (WinDefend Sense WdBoot WdFilter WdNisDrv WdNisSvc MDCoreSvc SecurityHealthService) do (
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%d" /v "Start" /t REG_DWORD /d 4 /f
+)
+REM 移除安全中心在任务栏的自启图标
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "SecurityHealth" /f
+REM 禁用 Defender 自动扫描和维护计划任务
+for %%t in (
+    "Windows Defender Cache Maintenance"
+    "Windows Defender Cleanup"
+    "Windows Defender Scheduled Scan"
+    "Windows Defender Verification"
+) do (
+    schtasks /change /tn "Microsoft\Windows\Windows Defender\%%~t" /disable
+)
+
 
 REM 禁用更新协调服务
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\UsoSvc" /v "start" /t reg_dword /d 4 /f
@@ -1854,167 +1727,27 @@ reg add "%IE_Domains%\*" /v "https" /t reg_dword /d "2" /f
 goto :eof
 
 :better_llq_kj
-set bl=0
-call :better_llq_kj_set
-goto :eof
-
-:better_llq_kj_set
-if "%bl%"=="5" goto :eof
-rem 老地址：HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\
-set IE_Zones=HKCU\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\%bl%
-echo ZONE%bl%
-REM 安全级别12000=高、11500=中-高、11000＝中、10500＝中低、10000＝低、0=自定义
-reg add "%IE_Zones%" /v "CurrentLevel" /d "0" /t reg_dword /f
-REM 下载已签名的ActiveX控件
-reg add "%IE_Zones%" /v "1001" /d "0" /t reg_dword /f
-REM 下载未签名的ActiveX控件
-reg add "%IE_Zones%" /v "1004" /d "0" /t reg_dword /f
-REM 运行 ActiveX 控件和插件
-reg add "%IE_Zones%" /v "1200" /d "0" /t reg_dword /f
-REM 对没有标记为可安全执行脚本的 ActiveX 控件进行初始化和脚本运行
-reg add "%IE_Zones%" /v "1201" /d "0" /t reg_dword /f
-REM 允许 Microsoft 网页浏览器控件的脚本
-reg add "%IE_Zones%" /v "1206" /d "0" /t reg_dword /f
-REM 允许 Internet Explorer Web 浏览器控件的脚本编写
-reg add "%IE_Zones%" /v "1207" /d "0" /t reg_dword /f
-REM 允许以前未使用的 ActiveX 控件在没有提示的情况下运行
-reg add "%IE_Zones%" /v "1208" /d "0" /t reg_dword /f
-REM 允许脚本小程序
-reg add "%IE_Zones%" /v "1209" /d "0" /t reg_dword /f
-REM 覆盖每站点（基于域）ActiveX 限制
-reg add "%IE_Zones%" /v "120A" /d "0" /t reg_dword /f
-REM 覆盖每站点（基于域）ActiveX 限制
-reg add "%IE_Zones%" /v "120B" /d "3" /t reg_dword /f
-REM 未知
-reg add "%IE_Zones%" /v "120C" /d "0" /t reg_dword /f
-REM 活动脚本编写、弹出窗口
-reg add "%IE_Zones%" /v "1400" /d "0" /t reg_dword /f
-REM Java 小程序脚本编写
-reg add "%IE_Zones%" /v "1402" /d "0" /t reg_dword /f
-REM 对标记为可安全执行脚本的 ActiveX 控件执行脚本
-reg add "%IE_Zones%" /v "1405" /d "0" /t reg_dword /f
-REM 跨域访问数据源
-reg add "%IE_Zones%" /v "1406" /d "0" /t reg_dword /f
-REM 允许编程剪贴板访问
-reg add "%IE_Zones%" /v "1407" /d "0" /t reg_dword /f
-REM 未知
-reg add "%IE_Zones%" /v "1408" /d "0" /t reg_dword /f
-REM 启用 XSS 筛选器
-reg add "%IE_Zones%" /v "1409" /d "3" /t reg_dword /f
-REM 提交未加密的表单数据
-reg add "%IE_Zones%" /v "1601" /d "0" /t reg_dword /f
-REM 字体下载、文件下载
-reg add "%IE_Zones%" /v "1604" /d "0" /t reg_dword /f
-REM 运行 Java
-reg add "%IE_Zones%" /v "1605" /d "0" /t reg_dword /f
-REM 用户数据持久性
-reg add "%IE_Zones%" /v "1606" /d "0" /t reg_dword /f
-REM 跨域浏览子框架
-reg add "%IE_Zones%" /v "1607" /d "0" /t reg_dword /f
-REM 允许 META REFRESH
-reg add "%IE_Zones%" /v "1608" /d "0" /t reg_dword /f
-REM 显示混合内容
-reg add "%IE_Zones%" /v "1609" /d "0" /t reg_dword /f
-REM 在将文件上载到服务器时包括本地目录路径
-reg add "%IE_Zones%" /v "160A" /d "0" /t reg_dword /f
-REM 桌面项目的安装
-reg add "%IE_Zones%" /v "1800" /d "0" /t reg_dword /f
-REM 拖放或复制和粘贴文件
-reg add "%IE_Zones%" /v "1802" /d "0" /t reg_dword /f
-REM 文件下载
-reg add "%IE_Zones%" /v "1803" /d "0" /t reg_dword /f
-REM 在 IFRAME 中启动程序和文件
-reg add "%IE_Zones%" /v "1804" /d "0" /t reg_dword /f
-REM 在 Web 视图中启动程序和文件
-reg add "%IE_Zones%" /v "1805" /d "0" /t reg_dword /f
-REM 启动应用程序和不安全文件
-reg add "%IE_Zones%" /v "1806" /d "0" /t reg_dword /f
-REM 启动应用程序和不安全文件
-reg add "%IE_Zones%" /v "1807" /d "0" /t reg_dword /f
-reg add "%IE_Zones%" /v "1808" /d "0" /t reg_dword /f
-REM 使用弹出窗口阻止程序
-reg add "%IE_Zones%" /v "1809" /d "3" /t reg_dword /f
-reg add "%IE_Zones%" /v "1812" /d "0" /t reg_dword /f
-REM 保留
-reg add "%IE_Zones%" /v "180A" /d "0" /t reg_dword /f
-reg add "%IE_Zones%" /v "180B" /d "0" /t reg_dword /f
-reg add "%IE_Zones%" /v "180C" /d "0" /t reg_dword /f
-reg add "%IE_Zones%" /v "180D" /d "0" /t reg_dword /f
-REM 用户身份验证：登录0=运行自动 10000=65536=提示用户输入
-reg add "%IE_Zones%" /v "1A00" /d "65536" /t reg_dword /f
-REM 允许计算机上存储的持久 cookie
-reg add "%IE_Zones%" /v "1A02" /d "0" /t reg_dword /f
-REM 允许每会话 cookie
-reg add "%IE_Zones%" /v "1A03" /d "0" /t reg_dword /f
-REM 其他：没有证书或只有一个证书时不提示进行客户证书选择
-reg add "%IE_Zones%" /v "1A04" /d "0" /t reg_dword /f
-REM 允许第三方持久 cookie
-reg add "%IE_Zones%" /v "1A05" /d "0" /t reg_dword /f
-REM 允许第三方会话 cookie
-reg add "%IE_Zones%" /v "1A06" /d "0" /t reg_dword /f
-REM 隐私设置
-reg add "%IE_Zones%" /v "1A10" /d "0" /t reg_dword /f
-REM Java 权限30000=7530 196608=低 131072=中 65536=高 0=禁用
-reg add "%IE_Zones%" /v "1C00" /d "196608" /t reg_dword /f
-REM 其他：软件频道权限30000=7530
-reg add "%IE_Zones%" /v "1E05" /d "30000" /t reg_dword /f
-REM ActiveX 控件和插件：二进制和脚本行为
-reg add "%IE_Zones%" /v "2000" /d "0" /t reg_dword /f
-REM 运行已用 Authenticode 签名的组件
-reg add "%IE_Zones%" /v "2001" /d "0" /t reg_dword /f
-REM 运行未用 Authenticode 签名的组件
-reg add "%IE_Zones%" /v "2004" /d "0" /t reg_dword /f
-reg add "%IE_Zones%" /v "2005" /d "0" /t reg_dword /f
-REM 带有清单的权限的组件3＝禁用、10000＝高安全级=65536
-reg add "%IE_Zones%" /v "2007" /d "65536" /t reg_dword /f
-REM 基于内容打开文件，而不是基于文件扩展名
-reg add "%IE_Zones%" /v "2100" /d "0" /t reg_dword /f
-REM 允许 在低特权 Web 内容区域中的网站可以导航到此区域
-reg add "%IE_Zones%" /v "2101" /d "0" /t reg_dword /f
-REM 允许由脚本初始化的窗口，没有大小和位置限制
-reg add "%IE_Zones%" /v "2102" /d "0" /t reg_dword /f
-REM 允许通过脚本更新状态栏
-reg add "%IE_Zones%" /v "2103" /d "0" /t reg_dword /f
-REM 允许网站打开没有地址或状态栏的窗口
-reg add "%IE_Zones%" /v "2104" /d "0" /t reg_dword /f
-REM 脚本：允许网站使用脚本窗口提示信息 ^
-reg add "%IE_Zones%" /v "2105" /d "0" /t reg_dword /f
-reg add "%IE_Zones%" /v "2106" /d "0" /t reg_dword /f
-reg add "%IE_Zones%" /v "2107" /d "0" /t reg_dword /f
-REM 文件下载自动提示
-reg add "%IE_Zones%" /v "2200" /d "0" /t reg_dword /f
-REM ActiveX 控件自动提示
-reg add "%IE_Zones%" /v "2201" /d "0" /t reg_dword /f
-REM 允许通过受限制的协议的活动内容访问我的电脑
-reg add "%IE_Zones%" /v "2300" /d "0" /t reg_dword /f
-REM 其他：使用钓鱼网站筛选器
-reg add "%IE_Zones%" /v "2301" /d "3" /t reg_dword /f
-REM .NET Framework：XAML 浏览器应用程序
-reg add "%IE_Zones%" /v "2400" /d "0" /t reg_dword /f
-REM .NET Framework：XPS 文档
-reg add "%IE_Zones%" /v "2401" /d "0" /t reg_dword /f
-REM .NET Framework：松散 XAML
-reg add "%IE_Zones%" /v "2402" /d "0" /t reg_dword /f
-REM 关闭区域保护模式0x0（开启），0x3（关闭）
-reg add "%IE_Zones%" /v "2500" /d "3" /t reg_dword /f
-REM 启用 .NET Framework 安装程序
-reg add "%IE_Zones%" /v "2600" /d "0" /t reg_dword /f
-REM 启用 .NET Framework 设置
-reg add "%IE_Zones%" /v "2700" /d "3" /t reg_dword /f
-REM 允许ActiveX筛选
-reg add "%IE_Zones%" /v "2702" /d "0" /t reg_dword /f
-REM 启用：第权限WEB内容区域中的网站可以导航到此区域
-reg add "%IE_Zones%" /v "2707" /d "0" /t reg_dword /f
-reg add "%IE_Zones%" /v "2708" /d "0" /t reg_dword /f
-reg add "%IE_Zones%" /v "2709" /d "0" /t reg_dword /f
-REM “在AC控件上运行反恶意软件”-关闭
-reg add "%IE_Zones%" /v "270B" /d "0" /t reg_dword /f
-reg add "%IE_Zones%" /v "270C" /d "3" /t reg_dword /f
-REM 级别
-reg add "%IE_Zones%" /v "MinLevel" /d "10000" /t reg_dword /f
-reg add "%IE_Zones%" /v "RecommendedLevel" /d "10000" /t reg_dword /f
-set /a bl=%bl%+1
-call :better_llq_kj_set
+set "IE_BASE=HKCU\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\Zones"
+set "COMMON=CurrentLevel:0 1001:0 1004:0 1200:0 1201:0 1206:0 1207:0 1208:0 1209:0 120A:0 120B:3 120C:0"
+set "COMMON=!COMMON! 1400:0 1402:0 1405:0 1406:0 1407:0 1408:0 1409:3 1601:0 1604:0 1605:0"
+set "COMMON=!COMMON! 1606:0 1607:0 1608:0 1609:0 160A:0 1800:0 1802:0 1803:0 1804:0"
+set "COMMON=!COMMON! 1805:0 1806:0 1807:0 1808:0 1809:3 1812:0 180A:0 180B:0"
+set "COMMON=!COMMON! 180C:0 180D:0 1A00:65536 1A02:0 1A03:0 1A04:0 1A05:0"
+set "COMMON=!COMMON! 1A06:0 1A10:0 1C00:196608 1E05:30000 2000:0 2001:0"
+set "COMMON=!COMMON! 2004:0 2005:0 2007:65536 2100:0 2101:0 2102:0"
+set "COMMON=!COMMON! 2103:0 2104:0 2105:0 2106:0 2107:0 2200:0"
+set "COMMON=!COMMON! 2201:0 2300:0 2301:3 2400:0 2401:0 2402:0"
+set "COMMON=!COMMON! 2500:3 2600:0 2700:3 2702:0 2707:0 2708:0"
+set "COMMON=!COMMON! 2709:0 270B:0 270C:3 MinLevel:10000 RecommendedLevel:10000"
+for /L %%z in (0,1,4) do (
+    echo 正在配置 ZONE%%z ...
+    set "FULL_KEY=!IE_BASE!\%%z"
+    for %%P in (!COMMON!) do (
+        for /f "tokens=1,2 delims=:" %%A in ("%%P") do (
+            reg add "!FULL_KEY!" /v "%%A" /d "%%B" /t reg_dword /f
+        )
+    )
+)
 goto :eof
 
 :soft_setup
@@ -2477,176 +2210,87 @@ REM 软件-浏览器-IE-hsbank-首页设置
 reg add "HKCU\Software\Microsoft\Internet Explorer\Main" /v "Start Page" /t REG_SZ /d "http://38.40.12.180" /f >nul
 REM 软件-浏览器-IE-hsbank-兼容性视图中添加网站
 reg add "HKCU\Software\Microsoft\Internet Explorer\BrowserEmulation\ClearableListData" /v "UserFilter" /d "411f00005308adba1c00000066040000010000001c0000000c00000004f493222487d601010000000c00330039002e00310039002e00310031002e003100370037000c000000fd9c074d2487d601010000000a0068007300620061006e006b002e0063006f006d000c0000000054236e2487d601010000000c00330038002e00310039002e00310031002e003100370036000c00000072f633952487d601010000000c00330038002e00310039002e00310039002e003100310034000c000000f3fb70bc2487d601010000000c00330038002e00310039002e00310039002e003200340030000c00000089614bc92487d6010100000003002a002e002a000c0000005b847eabfcbed601010000000c00330038002e00310039002e00310039002e003100350037000c0000008cfd718833ced601010000000b00330038002e00310039002e00310037002e00380030000c00000070381f9433ced601010000000b00330038002e00310039002e00310033002e00370030000c000000b8e4df9c33ced601010000000b00330038002e00310039002e00360034002e00330035000c00000050ba78a333ced601010000000c00330038002e00340030002e00310035002e003100300031000c000000960235af33ced6010100000007006800730062002e00620069007a000c0000001366e42c34ced601010000000b00330038002e00310039002e00370039002e00350035000c000000917dab825729d701010000000b00330038002e00310039002e00370039002e00340035000c0000001197e8875729d701010000000c00330038002e00310039002e00310039002e003100370032000c0000003998c8720d4dd701010000000c00330038002e00310039002e00310033002e003200340031000c00000097a5e72f6154d701010000000c00330038002e00310039002e00310039002e003200340033000c000000459afabc195cd701010000000b00330038002e00310039002e00310039002e00370038000c00000091ee0d178f5ed701010000000c00330038002e00310039002e00370037002e003100300034000c000000ce2a8ae6b7b2d70101000000090068007300620061006e006b002e00630063000c000000b6b5c1eeb7b2d701010000000b00330038002e00310030002e00360038002e00330032000c00000085dc69f3b7b2d701010000000b00330038002e00310030002e00360038002e00330038000c000000d223a28509a3d801010000000b00330038002e00310039002e00310039002e00350032000c0000005a097aa609a3d801010000000b00330038002e00310039002e00310039002e00380037000c0000009129ce0a46a5d801010000000b00330038002e00310039002e00310036002e00330033000c0000008a48ee2846a5d801010000000c00330038002e00310039002e00310031002e003100370037000c000000d1f89b9446a5d801010000000b00330038002e00310039002e00370038002e00350039000c000000f1d6b2b69416dc01010000000c00330038002e00310039002e00370038002e00310033003000" /t reg_binary /f
-REM 软件-浏览器-IE-hsbank-添加网址至信任站点
-reg add "%IE_Domains%\hsbank.com.cn\*" /v "http" /t reg_dword /d "2" /f
-reg add "%IE_Domains%\hsbank.com.cn\*" /v "https" /t reg_dword /d "2" /f
-reg add "%IE_Domains%\hsbank.cn\*" /v "http" /t reg_dword /d "2" /f
-reg add "%IE_Domains%\hsbank.cn\*" /v "https" /t reg_dword /d "2" /f
-reg add "%IE_Domains%\hsbank.cc\*" /v "http" /t reg_dword /d "2" /f
-reg add "%IE_Domains%\hsbank.cc\*" /v "https" /t reg_dword /d "2" /f
-reg add "%IE_Domains%\hsbank.com\*" /v "http" /t reg_dword /d "2" /f
-reg add "%IE_Domains%\hsbank.com\*" /v "https" /t reg_dword /d "2" /f
-REM 软件-浏览器-IE-hsbank-增加IP到信任站点
-reg add "%IE_Ranges%\Range99" /v ":Range" /d "*" /t reg_sz /f
-reg add "%IE_Ranges%\Range100" /v ":Range" /d "38.*" /t reg_sz /f
-reg add "%IE_Ranges%\Range100" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range100" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range101" /v ":Range" /d "38.*.*.*" /t reg_sz /f
-reg add "%IE_Ranges%\Range101" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range101" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range102" /v ":Range" /d "38.10.68.32" /t reg_sz /f
-reg add "%IE_Ranges%\Range102" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range102" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range103" /v ":Range" /d "38.10.68.38" /t reg_sz /f
-reg add "%IE_Ranges%\Range103" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range103" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range104" /v ":Range" /d "38.19.11.176" /t reg_sz /f
-reg add "%IE_Ranges%\Range104" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range104" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range105" /v ":Range" /d "38.19.11.177" /t reg_sz /f
-reg add "%IE_Ranges%\Range105" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range105" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range106" /v ":Range" /d "38.19.13.70" /t reg_sz /f
-reg add "%IE_Ranges%\Range106" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range106" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range107" /v ":Range" /d "38.19.13.241" /t reg_sz /f
-reg add "%IE_Ranges%\Range107" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range107" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range108" /v ":Range" /d "38.19.17.80" /t reg_sz /f
-reg add "%IE_Ranges%\Range108" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range108" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range109" /v ":Range" /d "38.19.19.114" /t reg_sz /f
-reg add "%IE_Ranges%\Range109" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range109" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range110" /v ":Range" /d "38.19.19.157" /t reg_sz /f
-reg add "%IE_Ranges%\Range110" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range110" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range111" /v ":Range" /d "38.19.19.172" /t reg_sz /f
-reg add "%IE_Ranges%\Range111" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range111" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range112" /v ":Range" /d "38.19.19.240" /t reg_sz /f
-reg add "%IE_Ranges%\Range112" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range112" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range113" /v ":Range" /d "38.19.19.243" /t reg_sz /f
-reg add "%IE_Ranges%\Range113" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range113" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range114" /v ":Range" /d "38.19.19.78" /t reg_sz /f
-reg add "%IE_Ranges%\Range114" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range114" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range115" /v ":Range" /d "38.19.64.35" /t reg_sz /f
-reg add "%IE_Ranges%\Range115" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range115" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range116" /v ":Range" /d "38.19.77.104" /t reg_sz /f
-reg add "%IE_Ranges%\Range116" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range116" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range117" /v ":Range" /d "38.19.79.45" /t reg_sz /f
-reg add "%IE_Ranges%\Range117" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range117" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range118" /v ":Range" /d "38.19.79.55" /t reg_sz /f
-reg add "%IE_Ranges%\Range118" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range118" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range119" /v ":Range" /d "38.40.15.101" /t reg_sz /f
-reg add "%IE_Ranges%\Range119" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range119" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range120" /v ":Range" /d "38.19.19.52" /t reg_sz /f
-reg add "%IE_Ranges%\Range120" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range120" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range121" /v ":Range" /d "38.19.19.87" /t reg_sz /f
-reg add "%IE_Ranges%\Range121" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range121" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range122" /v ":Range" /d "38.19.16.33" /t reg_sz /f
-reg add "%IE_Ranges%\Range122" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range122" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range123" /v ":Range" /d "38.19.78.59" /t reg_sz /f
-reg add "%IE_Ranges%\Range123" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range123" /v "https" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range124" /v ":Range" /d "38.19.78.130" /t reg_sz /f
-reg add "%IE_Ranges%\Range124" /v "http" /d "2" /t reg_dword /f
-reg add "%IE_Ranges%\Range124" /v "https" /d "2" /t reg_dword /f
+REM 软件-浏览器-IE-hsbank-添加域名至信任站点
+for %%d in (
+hsbank.com.cn
+hsbank.cn
+hsbank.cc
+hsbank.com
+) do (
+reg add "%IE_Domains%\%%d\*" /v "http" /t REG_DWORD /d 2 /f
+reg add "%IE_Domains%\%%d\*" /v "https" /t REG_DWORD /d 2 /f
+)
+REM 软件-浏览器-IE-hsbank-添加IP到信任站点
+set /a rangeNum=99
+
+for %%i in (
+STAR
+38.STAR
+38.STAR.STAR.STAR
+38.10.68.32
+38.10.68.38
+38.19.11.176
+38.19.11.177
+38.19.13.70
+38.19.13.241
+38.19.17.80
+38.19.19.114
+38.19.19.157
+38.19.19.172
+38.19.19.240
+38.19.19.243
+38.19.19.78
+38.19.64.35
+38.19.77.104
+38.19.79.45
+38.19.79.55
+38.40.15.101
+38.19.19.52
+38.19.19.87
+38.19.16.33
+38.19.78.59
+38.19.78.130
+) do (
+set "val=%%i"
+set "val=!val:STAR=*!"
+reg add "%IE_Ranges%\Range!rangeNum!" /v ":Range" /d "!val!" /t REG_SZ /f
+reg add "%IE_Ranges%\Range!rangeNum!" /v "http" /d 2 /t REG_DWORD /f
+reg add "%IE_Ranges%\Range!rangeNum!" /v "https" /d 2 /t REG_DWORD /f
+set /a rangeNum+=1
+)
+@echo off
+attrib -h "C:\hsbankweb.xml"
 REM 软件-浏览器-Edge-创建IE模式站点列表XML文件
 (
 echo ^<?xml version="1.0" encoding="UTF-8"?^>
 echo ^<site-list version="1"^>
-echo     ^<site url="38.10.68.32"^>
+for %%i in (
+38.10.68.32
+38.10.68.38
+38.19.11.176
+38.19.11.177
+38.19.13.241
+38.19.13.70
+38.19.19.114
+38.19.19.157
+38.19.19.172
+38.19.19.240
+38.19.19.52
+38.19.19.78
+38.19.19.87
+38.19.64.35
+38.19.77.104
+38.19.78.59
+38.19.78.130
+38.19.79.45
+38.19.79.55
+38.40.15.101
+) do (
+echo     ^<site url="%%i"^>
 echo         ^<compat-mode^>Default^</compat-mode^>
 echo         ^<open-in^>IE11^</open-in^>
 echo     ^</site^>
-echo     ^<site url="38.10.68.38"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.11.176"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.11.177"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.13.241"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.13.70"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.19.114"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.19.157"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.19.172"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.19.240"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.19.52"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.19.78"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.19.87"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.64.35"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.77.104"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.78.59"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.78.130"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.79.45"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.19.79.55"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
-echo     ^<site url="38.40.15.101"^>
-echo         ^<compat-mode^>Default^</compat-mode^>
-echo         ^<open-in^>IE11^</open-in^>
-echo     ^</site^>
+)
 echo ^</site-list^>
 ) > C:\hsbankweb.xml
 attrib +h "C:\hsbankweb.xml"
@@ -2768,6 +2412,8 @@ reg add "HKLM\SOFTWARE\WOW6432Node\Kingsoft\Office\6.0\Common" /v DisplayName /t
 reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Kingsoft Office" /v DisplayName /t REG_SZ /d "WPS Office 2019 (11.8.2.12316)" /f
 reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Kingsoft Office" /v StartMenuDir /t REG_SZ /d "WPS Office" /f
 if exist "%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe" start "" mshta VBScript:Execute("Set a=CreateObject(""WScript.Shell""):Set b=a.CreateShortcut(a.SpecialFolders(""Desktop"") & ""\Microsoft Edge.lnk""):b.TargetPath=""%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe"":b.WorkingDirectory=""%ProgramFiles(x86)%\Microsoft\Edge\Application"":b.Save:close") 2>nul
+
+powershell -NoProfile -Command "$s=(New-Object -COM WScript.Shell).CreateShortcut('%USERPROFILE%\Desktop\Microsoft Edge.lnk');$s.TargetPath='%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe';$s.Save()"
 REM 转换系统版本为LTSC ENT
 REM cscript %windir%\system32\slmgr.vbs /ipk PG7H6-7RNT3-R4MGR-HMJK2-J462D
 goto :eof
