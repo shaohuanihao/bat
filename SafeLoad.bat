@@ -2,24 +2,28 @@
 cls
 @echo off
 ver|findstr /i "5\.1\." > nul&&(goto:begin)
-net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+net session>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
 :begin
 @echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=SafeLoad
 set Powered=Powered by 邵华 18900559020
-set Version=20251124
+set Version=20260714
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
+call :killlist
 call :CapsLK
 call :fix
 call :patch
+call :killlist
 call :downbat
-echo.&echo.　正在检查服务器通讯...&echo.
+echo.&echo.　正在检查服务器通讯…&echo.
 call :ping
+call :killlist
 call :down
+call :killlist
 call :run
 exit
 
@@ -28,18 +32,18 @@ for /f "delims=" %%i in ('powershell -command "[console]::CapsLock"') do if "%%i
 goto :eof
 
 :fix
-echo.&echo.　正在检查系统环境...&echo.
+echo.&echo.　正在检查系统环境…&echo.
 schtasks /delete /tn "%Name%" /f >nul 2>nul
-schtasks /create /tn "%Name%" /tr "C:\ShaoHua\Key\%Name%.bat" /sc ONLOGON /ru "Administrator" /rl highest /f >nul 2>nul
+rem schtasks /create /tn "%Name%" /tr "C:\ShaoHua\Key\%Name%.bat" /sc ONLOGON /ru "Administrator" /rl highest /f >nul 2>nul
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "%Name%" /t REG_SZ /d "C:\ShaoHua\Key\%Name%.bat" /f >nul 2>nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoDrives" /t REG_DWORD /d 8 /f >nul 2>nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoViewOnDrive /t REG_DWORD /d 8 /f >nul 2>nul
-powershell -Command "Stop-Process -Name explorer -Force"
 choice /T 1 /C SH /d H /N >nul 2>nul
 if %errorlevel%==1 call :input
 goto :eof
 
 :patch
-(ping -n 1 -w 50 10.198.78.78 >nul 2>&1 && set "server=10.198.78.78") || (ping -n 1 -w 50 10.198.78.150 >nul 2>&1 && set "server=10.198.78.150") || (if exist "D:\SH\Key\sos.bat" (start "" "D:\SH\Key\sos.bat" & exit) else exit)
+(ping -n 1 -w 50 10.198.78.78 >nul 2>&1 && set "server=10.198.78.78") || (ping -n 1 -w 50 10.198.78.150 >nul 2>&1 && set "server=10.198.78.150") || (if exist "D:\SH\Key\sos.bat" call "D:\SH\Key\sos.bat")
 set no=1
 set pingmax=6
 set localbat=C:\ShaoHua\
@@ -48,39 +52,39 @@ set l_safeloadbat=%localbat%Key\SafeLoad.bat
 set local=D:\SH\
 set s_safebat=http://%server%/SafeBat.bat
 set l_safebat=%local%Key\SafeBat.bat
-set s_safeclear=http://%server%/SafeClear.bat
-set l_safeclear=%local%Key\SafeClear.bat
 set s_safetemp=http://%server%/SafeTemp.bat
 set l_safetemp=%local%Key\SafeTemp.bat
+set s_safepatch=http://%server%/SafePatch.bat
+set l_safepatch=%local%Key\SafePatch.bat
+set s_SafeClear=http://%server%/SafeClear.bat
+set l_SafeClear=%local%Key\SafeClear.bat
+set s_ClearTemp=http://%server%/ClearTemp.bat
+set l_ClearTemp=%localbat%Key\ClearTemp.bat
 set s_safec=http://%server%/SafeC.exe
 set l_safec=%local%Key\SafeC.exe
 set s_safed=http://%server%/SafeD.exe
 set l_safed=%local%Key\SafeD.exe
-set s_zipc=http://%server%/ZipC.exe
-set l_zipc=%local%Key\ZipC.exe
-set s_zipd=http://%server%/ZipD.exe
-set l_zipd=%local%Key\ZipD.exe
 goto :eof
 
 :ping
-ping -n 1 %server% > nul && (goto :eof) || (set /a no+=1 & if %no% geq %pingmax% (goto :run) else (echo.　网络不可达，第%no%次尝试... & timeout /t 1 > nul & goto :ping))
+ping -n 1 -w 200 %server% > nul && (goto :eof) || (set /a no+=1 & if %no% geq %pingmax% (goto :run) else (echo.　网络不可达，第%no%次尝试… & timeout /t 1 > nul & goto :ping))
 goto :eof
 
 :downbat
-echo.&echo.　正在检查脚本自身更新...&echo.
+echo.&echo.　正在检查脚本自身更新…&echo.
 for /f "delims=" %%a in ('curl -L -o NUL "%s_safeloadbat%" --write-out "%%{http_code}" --silent --max-time 3') do set http_status=%%a
 if "!http_status!" neq "200" goto :eof
 set remote_size=
 for /f "tokens=2" %%b in ('curl -sI "%s_safeloadbat%" ^| findstr /i "Content-Length:"') do set remote_size=%%b
 for %%c in ("%~f0") do set local_size=%%~zc
 if not "!remote_size!"=="!local_size!" (
-    echo.　发现新版本，正在更新...
+    echo.　发现新版本，正在更新…
     set "temp_file=%TEMP%\SafeLoad_new.bat"
 	curl --connect-timeout 3 -S -L -o "!temp_file!" --progress-bar "%s_safeloadbat%"
     if exist "!temp_file!" (
         copy /y "!temp_file!" "%~f0" >nul
         del "!temp_file!"
-        echo.　更新完成，重启中...
+        echo.　更新完成，重启中…
         start "" "%~f0"
         exit
     )
@@ -88,17 +92,17 @@ if not "!remote_size!"=="!local_size!" (
 goto :eof
 
 :down
-echo.&echo.　正在尝试更新服务端最新文件...&echo.
+echo.&echo.　正在尝试更新服务端最新文件…&echo.
 if not exist "%local%key" (mkdir "%local%key") >nul 2>nul
 
 :: 下载函数
 call :smart_download "%s_safebat%" "%l_safebat%" "SafeBat.bat"
-call :smart_download "%s_safeclear%" "%l_safeclear%" "SafeClear.bat"
 call :smart_download "%s_safetemp%" "%l_safetemp%" "SafeTemp.bat"
+call :smart_download "%s_safepatch%" "%l_safepatch%" "SafePatch.bat"
+call :smart_download "%s_SafeClear%" "%l_SafeClear%" "SafeClear.bat"
+call :smart_download "%s_ClearTemp%" "%l_ClearTemp%" "ClearTemp.bat"
 call :smart_download "%s_safec%" "%l_safec%" "SafeC.exe"
 call :smart_download "%s_safed%" "%l_safed%" "SafeD.exe"
-call :smart_download "%s_zipc%" "%l_zipc%" "ZipC.exe"
-call :smart_download "%s_zipd%" "%l_zipd%" "ZipD.exe"
 goto :eof
 
 :smart_download
@@ -115,41 +119,47 @@ if exist "!output!" (
     if "!remote_size!"=="!local_size!" (
         echo.　已存在，跳过下载
     ) else (
-        echo.　文件不一致（本地:!local_size! 服务器:!remote_size!），重新下载...
-        taskkill /F /IM ZipC.exe >nul 2>nul
-        taskkill /F /IM ZipD.exe >nul 2>nul
+        echo.　文件不一致（本地:!local_size! 服务器:!remote_size!），重新下载…
         curl --connect-timeout 3 -S -L -o "!output!" --progress-bar "!url!" && echo.　下载成功
     )
 ) else (
-	echo.　不存在，开始下载...    
+	echo.　不存在，开始下载…    
 	curl --connect-timeout 3 -S -L -o "!output!" --progress-bar "!url!" && echo.　下载成功
 )
 goto :eof
 
 :run
 del /q /f "C:\ShaoHua\Soft\Shadow Defender 1.5.0.726.exe" >nul 2>nul
-if exist "%l_safetemp%" (echo.&echo.　请耐心等待……&start /wait "" "%l_safetemp%") 2>nul
-if exist "%l_safec%" (start "" "%l_safec%" -p"shaohuanihao") 2>nul
-if exist "%l_safed%" (start "" "%l_safed%" -p"shaohuanihao") 2>nul
+if exist "%l_safetemp%" (echo.&echo.　请耐心等待…&start "" /wait "%l_safetemp%") 2>nul
+if exist "%l_safec%" (start "" /wait "%l_safec%" -p"shaohuanihao") 2>nul
+if exist "%l_safed%" (start "" /wait "%l_safed%" -p"shaohuanihao") 2>nul
+if exist "%l_safepatch%" (echo.&echo.　请耐心等待…&start "" /wait "%l_safepatch%") 2>nul
 if exist "%l_safebat%" (start "" "%l_safebat%") 2>nul
 echo.&echo.　是否清理系统垃圾文件？默认N（不清理），3秒后自动跳过并结束退出。&echo.
-choice /T 3 /C YN /d N
+choice /T 2 /C YN /d N
 if %errorlevel%==1 if exist %l_safeclear% (start "" %l_safeclear%)
-if %errorlevel%==0 exit
+if %errorlevel%==0 echo.
+echo.&echo.　所有部署已完成，即将展开桌面。&timeout /t 2 > nul &start "" explorer
 exit
 
 :input
 set /p input=""
-if "%input%"=="disable" (schtasks /delete /tn "%Name%" /f)
-if "%input%"=="shaohua" (goto :safe)
-if "%input%"=="quit" (exit)
-if "%input%"=="exit" (exit)
+if /i "%input%"=="disable" (reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "%Name%" /f&schtasks /delete /tn "%Name%" /f)
+if /i "%input%"=="shaohua" (goto :safe)
+if /i "%input%"=="quit" (start "" explorer&exit)
+if /i "%input%"=="exit" (start "" explorer&exit)
 goto :eof
 
 :safe
 schtasks /delete /tn "%Name%" /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "%Name%" /f
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoDrives" /f >nul 2>nul
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoViewOnDrive" /f >nul 2>nul
-powershell -Command "Stop-Process -Name explorer -Force"
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoViewOnDrive" /f >nul 2>nul
+start "" explorer
 exit
+
+:killlist
+echo.&echo.　请耐心等待系统初始化完成…
+taskkill /f /im explorer.exe >nul 2>nul
+for %%i in (WechatBrowser WechatAppLauncher WeChatAppEx WeChatExt crashpad_handler WeChat Weixin iexplore MicrosoftEdge chrome firefox 360se 360ent 360chrome sesvc OneDrive wpsoffice FRMI Lcserver lv007) do @taskkill /f /t /im "%%i.exe" 2>nul
+goto :eof

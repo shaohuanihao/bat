@@ -2,14 +2,14 @@
 cls
 @echo off
 ver|findstr /i "5\.1\." > nul&&(goto:begin)
-net sess>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
+net session>nul 2>&1||(cls&powershell saps '%0'-Verb RunAs&exit)
 :begin
 @echo off
 cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=InitialSetup脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20260427
+set Version=20260721
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -86,11 +86,88 @@ REM 软件-输入法-默认语言 0 中文，1 英文，肯定正确！
 reg add "HKCU\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
 reg add "HKLM\Software\Microsoft\InputMethod\Settings\CHS" /v "Default Mode" /t reg_dword /d 1 /f
 REM 删除所有计划任务
-schtasks /delete /tn * /F
+REM 禁用全部任务禁用，会导致计划任务不停报错
+REM schtasks /delete /tn * /F
+REM 客户体验改进计划 + 遥测上报（全覆盖）
+schtasks /change /disable /tn "\Microsoft\Windows\Customer Experience Improvement Program\Consolidator" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Application Experience\ProgramDataUpdater" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Application Experience\AitAgent" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Device Inventory\DeviceInventoryTask" >nul 2>&1
+REM 系统诊断、磁盘诊断全系列
+schtasks /change /disable /tn "\Microsoft\Windows\Diagnostics\Scheduled" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Diagnostics\DiskDiagnosticDataCollector" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\DiskDiagnostic\DiskDiagnosticResolver" >nul 2>&1
+REM 广告、推送、应用数据同步全系列
+schtasks /change /disable /tn "\Microsoft\Windows\AdvertisingInfo\Schedule" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\ApplicationData\DsSvcCleanup" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\PushNotifications\WpnTask4" >nul 2>&1
+REM Xbox 全套任务
+schtasks /change /disable /tn "\Microsoft\Windows\XboxGameSave\XboxGameSaveTask" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Xbox\XboxLiveGameInstaller" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Xbox\XboxLiveTask" >nul 2>&1
+REM 磁盘碎片整理 SSD专用关闭
+schtasks /change /disable /tn "\Microsoft\Windows\Defrag\ScheduledDefrag" >nul 2>&1
+REM 系统自动维护双任务
+schtasks /change /disable /tn "\Microsoft\Windows\TaskScheduler\Regular Maintenance" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\TaskScheduler\Maintenance Configurator" >nul 2>&1
+REM 反馈中心、错误日志上传全套
+schtasks /change /disable /tn "\Microsoft\Windows\Feedback\Siuf\DmClient" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload" >nul 2>&1
+REM 地图、位置更新任务
+schtasks /change /disable /tn "\Microsoft\Windows\Maps\MapsUpdateTask" >nul 2>&1
+REM 语音识别、手写错误上报
+schtasks /change /disable /tn "\Microsoft\Windows\Speech\SpeechModelDownloadTask" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Speech\SpeechTelemetryTask" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\HandwritingErrorReports\HandwritingErrorReportTask" >nul 2>&1
+REM MediaCenter 多媒体全套后台任务
+schtasks /change /disable /tn "\Microsoft\Windows\MediaCenter\MediaCenterRecoveryTask" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\MediaCenter\ObjectStoreRecoveryTask" >nul 2>&1
+REM 打印诊断收集
+schtasks /change /disable /tn "\Microsoft\Windows\PrintDiagnostics\PrintDiagnosticTask" >nul 2>&1
+REM 锁屏/壁纸自动同步任务
+schtasks /change /disable /tn "\Microsoft\Windows\Wallpaper\WallpaperTask" >nul 2>&1
+REM OneDrive 同步任务（不用OneDrive可禁用）
+schtasks /change /disable /tn "\Microsoft\Windows\SkyDrive\RoutineCleanupTask" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\SkyDrive\Idle Sync Maintenance Task" >nul 2>&1
+REM 家庭组（已废弃功能）
+schtasks /change /disable /tn "\Microsoft\Windows\HomeGroup\HomeGroupTask" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\HomeGroup\HomeGroupListener" >nul 2>&1
+REM 商店应用临时状态清理
+schtasks /change /disable /tn "\Microsoft\Windows\ApplicationData\CleanupTemporaryState" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\AppxDeploymentClient\Pre-staged app cleanup" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\AppxDeploymentClient\InstallPreapprovedApps" >nul 2>&1
+REM 字体缓存服务（若不改字体可禁用）
+schtasks /change /disable /tn "\Microsoft\Windows\FontCache\FontCacheTask" >nul 2>&1
+REM 存储感知自动清理
+schtasks /change /disable /tn "\Microsoft\Windows\DiskFootprint\StorageSense" >nul 2>&1
+REM 用户资料上传（隐私相关）
+schtasks /change /disable /tn "\Microsoft\Windows\User Profile Service\HiveUploadTask" >nul 2>&1
+REM 辅助功能遥测（不用放大镜/讲述人可关）
+schtasks /change /disable /tn "\Microsoft\Windows\Accessibility\AccessibilityDiagnostics" >nul 2>&1
+REM Windows 更新自动维护（不影响手动更新）
+schtasks /change /disable /tn "\Microsoft\Windows\WindowsUpdate\Automatic App Update" >nul 2>&1
+REM 磁盘配额管理（个人用户可禁用）
+schtasks /change /disable /tn "\Microsoft\Windows\DiskQuota\DiskQuota" >nul 2>&1
+REM 空间管理任务（存储空间优化）
+schtasks /change /disable /tn "\Microsoft\Windows\SpacePort\SpaceAgentTask" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\SpacePort\SpaceManagerTask" >nul 2>&1
+REM WebThreatDefense（Windows Defender部分功能，装了第三方杀软可关）
+schtasks /change /disable /tn "\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenance" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Windows Defender\Windows Defender Cleanup" >nul 2>&1
+schtasks /change /disable /tn "\Microsoft\Windows\Windows Defender\Windows Defender Verification" >nul 2>&1
+REM 远程协助日志上传（单机离线用户关闭）
+schtasks /change /disable /tn "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask" >nul 2>&1
+REM wps升级
+schtasks /change /disable /tn "WpsUpdateTask_Administrator" >nul 2>&1
+REM 360zip升级
+schtasks /change /disable /tn "360ZipUpdater" >nul 2>&1
 REM 删除用户和系统启动项中的所有项
-@reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /va /f
-@reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /va /f
-@reg delete "HKLM\Software\Microsoft\Shared Tools\MSConfig\startupreg" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /va /f
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /va /f
+reg delete "HKLM\Software\Microsoft\Shared Tools\MSConfig\startupreg" /f
 REM 删除启动文件夹中的所有程序
 del /q /f "C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*"
 del /q /f "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*"
@@ -127,7 +204,7 @@ reg delete "HKCU\SOFTWARE\360ent6" /f >nul 2>&1
 reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\360pingbao" /f >nul 2>&1
 del /q /f /s "C:\Users\Administrator\AppData\Local\Temp\" >nul 2>&1
 REM 添加 ctfmon.exe 到用户启动项
-@reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "ctfmon" /t REG_SZ /d "C:\Windows\System32\ctfmon.exe" /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "ctfmon" /t REG_SZ /d "C:\Windows\System32\ctfmon.exe" /f
 REM 检查并启动 ctfmon.exe 如果它未运行
 tasklist /FI "IMAGENAME eq ctfmon.exe" | find /I "ctfmon.exe" >nul || start "" "C:\WINDOWS\system32\ctfmon.exe"
 goto :eof

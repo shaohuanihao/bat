@@ -9,7 +9,7 @@ cls
 disableX >nul 2>nul&mode con cols=110 lines=20&color 1F&setlocal enabledelayedexpansion
 set Name=综合脚本
 set Powered=Powered by 邵华 18900559020
-set Version=20260705
+set Version=20260722
 set Comment=运行完毕后脚本会自动关闭，请勿手动关闭！
 title %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 :start
@@ -20,7 +20,6 @@ if not defined Pc set Pc=Unknown
 title %Pc% ★ %Name% ★ %Powered% ★ Ver%Version% ★ %Comment%
 cls
 call :cmd_admin
-call :pctime
 call :closesoft
 call :better_yj
 call :better_xt
@@ -124,41 +123,6 @@ REM 64位 PowerShell 默认管理员
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
 REM 32位 PowerShell 默认管理员
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%windir%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" /t reg_sz /d RUNASADMIN /f
-REM 强制更新组策略
-gpupdate /force
-REM 重启资源管理器生效全部UI&权限
-taskkill /f /im explorer.exe
-start explorer.exe
-goto :eof
-
-:pctime
-REM 指定NTP服务器
-call :pctime%hs%
-REM 开启“自动设置时间”
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" /v Type /d NTP /f
-REM 开启“自动设置时区”
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\tzautoupdate" /v Start /t reg_dword /d 3 /f
-w32tm /config /update
-sc config w32time start= auto
-net stop w32time
-net start w32time
-w32tm /resync /rediscover /nowait
-goto :eof
-:pctime_hsl
-reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\DateTime\Servers" /v 3 /t reg_sz /d 38.40.254.250 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" /v NtpServer /t reg_sz /d 38.40.254.250 /f
-w32tm /config /manualpeerlist:"38.40.254.250" /syncfromflags:manual /reliable:yes /update
-goto :eof
-:pctime_hsw
-reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\DateTime\Servers" /v 3 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" /v NtpServer /t reg_sz /d "time.windows.com,0x9" /f
-w32tm /config /manualpeerlist:"time.windows.com" /syncfromflags:manual /reliable:yes /update
-goto :eof
-:pctime_hso
-call :pctime_hsw
-goto :eof
-:pctime_hsf
-call :pctime_hsw
 goto :eof
 
 :closesoft
@@ -305,15 +269,8 @@ REM 硬件-驱动-禁用数据执行保护（DEP）
 bcdedit /set nx AlwaysOff
 REM 硬件-驱动-禁用启动时的完整性检查
 bcdedit /set loadoptions DISABLE_INTEGRITY_CHECKS
-REM 硬件-驱动-关闭MPO
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Dwm" /v "MPO" /t reg_dword /d 0 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\Dwm" /v "OverlayTestMode" /t reg_dword /d 5 /f
 REM 硬件-驱动-启用 APPX 开发人员模式
 powershell -Command "Set-ExecutionPolicy RemoteSigned -Scope CurrentUser"
-REM 禁用动态时钟调整功能
-bcdedit /set disabledynamictick yes
-REM 启用平台定时器功能
-bcdedit /set useplatformtick yes
 REM 关闭驱动签名验证（勿开，否则右下角会提示测试模式，除非bcdedit /set nointegritychecks on关闭提示）
 ::bcdedit /set testsigning on
 REM 开启调试功能
@@ -424,8 +381,15 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Ena
 REM 系统-广告-禁用硬件清单收集
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisableInventory" /t REG_DWORD /d 1 /f
 REM 系统-广告-禁用是0，基本是1，遥测。实测1更好，atelas，20260410改成0
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t reg_dword /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowDeviceNameInTelemetry" /t reg_dword /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t reg_dword /d 1 /f
+REM 系统-广告-允许遥测携带本机计算机名，用于微软登录风控校验
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowDeviceNameInTelemetry" /t reg_dword /d 1 /f
+REM 系统-广告-同步遥测策略
+reg add "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t reg_dword /d 1 /f
+REM 系统-广告-关闭增强诊断数据分析上传
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t reg_dword /d 1 /f
+REM 系统-广告-禁用系统预装推广应用、广告、推荐内容；若要放行微软账户云登录需改为0
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "LimitEnhancedDiagnosticDataWindowsAnalytics" /t reg_dword /d 0 /f
 REM 系统-广告-清空商业 ID
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "CommercialId" /t REG_SZ /d "" /f
 REM 系统-广告-关闭应用程序影响遥测
@@ -444,10 +408,6 @@ REM 系统-广告-禁用发送手写错误报告
 reg add "HKLM\Software\Policies\Microsoft\Windows\HandwritingErrorReports" /v "PreventHandwritingErrorReports" /t REG_DWORD /d 1 /f
 REM 系统-广告-禁用发送笔迹数据
 reg add "HKLM\Software\Policies\Microsoft\Windows\TabletPC" /v "PreventHandwritingDataSharing" /t REG_DWORD /d 1 /f
-REM 系统-广告-关闭数据收集中的遥测
-reg add "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t reg_dword /d 0 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t reg_dword /d 0 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "LimitEnhancedDiagnosticDataWindowsAnalytics" /t reg_dword /d 0 /f
 REM 系统-广告-禁用传递优化内容，设置下载模式为99（完全禁用传递优化P2P功能）
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v "DODownloadMode" /t REG_DWORD /d 99 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DODownloadMode /t reg_dword /d 0 /f
@@ -494,7 +454,8 @@ REM 系统-广告-关闭向导和推荐相关的内容
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "DisableSoftLanding" /t reg_dword /d 1 /f
 REM 系统-广告-启用Windows聚光灯功能，1是禁用，0是启用
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "DisableWindowsSpotlightFeatures" /t reg_dword /d 1 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "DisableWindowsConsumerFeatures" /t reg_dword /d 1 /f
+REM 系统-广告-放开系统消费者云功能，关闭则无法登录账号,1是禁用，0是启用
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "DisableWindowsConsumerFeatures" /t reg_dword /d 0 /f
 REM 系统-广告-禁用内容交付管理器的功能管理
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "FeatureManagementEnabled" /t reg_dword /d 0 /f
 REM 系统-广告-启用 Content Delivery Manager（内容交付管理器）以允许 Windows 聚焦功能
@@ -671,6 +632,10 @@ REM 系统-设置-禁用系统还原功能
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v DisableSR /t REG_DWORD /d 1 /f
 REM 系统-设置-Windows 登录界面生效小键盘：打开（NumLock 开机启动时开启）
 reg add "HKU\.DEFAULT\Control Panel\Keyboard" /v InitialKeyboardIndicators /t REG_SZ /d 2 /f
+REM 系统-设置-禁用系统崩溃/重启后自动恢复未关闭的应用
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\SessionRestore" /v "SessionRestoreDisabled" /t REG_DWORD /d 1 /f
+REM 系统-设置-关闭"重启后使用我的登录信息自动恢复应用"
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "EnableRestartApps" /t REG_DWORD /d 0 /f
 
 REM 系统-性能-GPU硬件加速开启
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t reg_dword /d 1 /f
@@ -744,6 +709,7 @@ set "MediaType="
 for /F "usebackq tokens=*" %%i in (`powershell -NoProfile -Command "(Get-PhysicalDisk | Where-Object { $_.DeviceID -eq (Get-Partition -DriveLetter C).DiskNumber }).MediaType"`) do (set "MediaType=%%i" )
 set "MediaType=!MediaType: =!"
 echo 系统盘介质类型为: !MediaType!
+timeout /t 2 >nul
 if /i "!MediaType!"=="SSD" (
     echo 执行 SSD 专属优化...
     fsutil behavior set DisableDeleteNotify 0
@@ -774,7 +740,7 @@ REM 支付管理器、Xbox网络、Xbox身份、Xbox存档、诊断跟踪
 REM 诊断服务、诊断收集、错误报告、问题报告
 REM 疑难主机、疑难系统、传递优化、远程注册表、媒体共享
 REM 传真、地图管理、家长控制、文件历史、端口重定向、家庭组提供
-REM 家庭组侦听、备份服务、应用准备、WTG服务、DMW用户服务
+REM 家庭组侦听、备份服务、WTG服务、DMW用户服务
 REM DMW推送、嵌入模式、自动更新、更新医疗、搜索服务、兼容助手
 for %%s in (
     RetailDemo wisvc PhoneSvc Spectrum SharedRealitySvc MessagingService 
@@ -783,7 +749,7 @@ for %%s in (
     DPS diagnosticshub.standardcollector.service WerSvc wercplsupport 
     WdiServiceHost WdiSystemHost DoSvc RemoteRegistry WMPNetworkSvc 
     Fax MapsBroker WpcMonSvc fhsvc UmRdpService HomeGroupProvider 
-    HomeGroupListener SDRSVC AppReadiness WTGService dmwappuserv 
+    HomeGroupListener SDRSVC WTGService dmwappuserv 
     dmwappushservice embeddedmode wuauserv WaaSMedicSvc WSearch PcaSvc
 ) do (
     sc stop %%s
@@ -845,7 +811,6 @@ for %%t in (
     schtasks /change /tn "Microsoft\Windows\Windows Defender\%%~t" /disable
 )
 
-
 REM 禁用更新协调服务
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\UsoSvc" /v "start" /t reg_dword /d 4 /f
 REM 禁用Windows更新访问
@@ -897,12 +862,11 @@ REM 系统-系统更新-自动安装无需重启的更新
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "AutoInstallMinorUpdates" /t reg_dword /d 1 /f
 REM 系统-系统更新-更新挂起时如果有用户登录不自动重启计算机
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoRebootWithLoggedOnUsers" /t reg_dword /d 1 /f
-REM 系统-系统更新-win10禁止更新大于1809版本
+REM 系统-系统更新-win10禁止更新大于21H2版本
 reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "TargetReleaseVersion" /t reg_dword /d 1 /f
-reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "TargetReleaseVersionInfo" /t reg_sz /d 1809 /f
+reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "TargetReleaseVersionInfo" /t reg_sz /d 21H2 /f
 REM 系统-系统更新-禁止 Windows 更新提示
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v DisableOSUpgrade /t reg_dword /d 1 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v DisableWindowsUpdateAccess /t reg_dword /d 1 /f
 REM 系统-系统更新-Windows 7 不再提示升级到 Windows 10
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\OSUpgrade" /v ReservationsAllowed /t reg_dword /d 0 /f
 REM 系统-系统更新-删除 Windows 10 更新相关的计划任务
@@ -967,10 +931,10 @@ REM 系统-安全设置-在本地计算机上设置允许不安全的访客身份验证（64位系统）
 reg add "HKLM\Software\Policies\Microsoft\Windows\LanmanWorkstation" /v "AllowInsecureGuestAuth" /d 1 /t reg_dword /f
 REM 系统-安全设置-在本地计算机上设置允许不安全的访客身份验证（32位系统）
 reg add "HKLM\Software\WOW6432Node\Policies\Microsoft\Windows\LanmanWorkstation" /v "AllowInsecureGuestAuth" /d 1 /t reg_dword /f
-REM 系统-安全设置-禁止文件属性访问限制或安全警告
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "SaveZoneInformation" /t reg_dword /d 0 /f
-reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "SaveZoneInformation" /t reg_dword /d 0 /f
-REM 系统-安全设置-完全放行所有文件
+REM 系统-安全设置-关闭附件安全标记，不保存区域来源信息
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "SaveZoneInformation" /t reg_dword /d 1 /f
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "SaveZoneInformation" /t reg_dword /d 1 /f
+REM 系统-安全设置-所有后缀直接下载、直接打开
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "BlockLevel" /t reg_dword /d 0 /f
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "BlockLevel" /t reg_dword /d 0 /f
 REM 系统-安全设置-禁止运行计算机自动维护计划
@@ -990,8 +954,16 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\Firewall
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\DomainProfile" /v "EnableFirewall" /t reg_dword /d 0 /f
 REM 系统-安全设置-禁用 BitLocker 自动设备加密
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\BitLocker" /v "AutoUnlockDisabled" /t reg_dword /d 1 /f
-REM 系统-安全设置-禁用windows安装时候 BitLocker 自动磁盘加密
+REM 系统-安全设置-BitLocker 禁用登录微软账号自动全盘设备加密
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\BitLocker" /v "PreventDeviceEncryption" /t reg_dword /d 1 /f
+REM 系统-安全设置-BitLocker 创建FVE策略项
+reg add "HKLM\SOFTWARE\Policies\Microsoft\FVE" /f
+REM 系统-安全设置-BitLocker 禁止部署系统时自动加密
+reg add "HKLM\SOFTWARE\Policies\Microsoft\FVE" /v EnableEncryptionDuringOsDeploy /t REG_DWORD /d 0 /f
+REM 系统-安全设置-BitLocker 禁止固定数据盘自动开启BitLocker
+reg add "HKLM\SOFTWARE\Policies\Microsoft\FVE" /v NoAutoTurnOnEncryptedFixedDisks /t REG_DWORD /d 1 /f
+REM 系统-安全设置-BitLocker 禁止外接U盘弹出“必须加密才能写入”弹窗
+reg add "HKLM\SOFTWARE\Policies\Microsoft\FVE" /v DisableExternalDriveTurnOn /t REG_DWORD /d 1 /f
 goto :eof
 
 :better_jm
@@ -1173,17 +1145,21 @@ REM 界面-主题与背景-设置视觉效果设置为极速模式0启用一些特效1最佳外观2最佳性能3
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /d 3 /t reg_dword /f
 REM 界面-主题与背景-禁用系统视觉动画
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "TurnOffSPIAnimations" /d 1 /t reg_dword /f
+REM 界面-主题与背景-关闭平滑滚动列表框
+reg add "HKCU\Control Panel\Desktop" /v "SmoothScroll" /t REG_DWORD /d 0 /f
 
-REM 界面-资源管理器-配置当前用户桌面用户首选项掩码为 上次是 9030078010000000（不能独立输入法） 再上次是 9032078010000000（系统默认是9012038010000000）
-reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9030078090000000" /t reg_binary /f
+REM 界面-资源管理器-配置当前用户桌面用户首选项掩码为 0706是9030078090000000上次是 9030078010000000（不能独立输入法） 再上次是 9032078010000000（系统默认是9012038010000000）
+reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /d "9012078010000000" /t reg_binary /f
 REM 界面-资源管理器-设置当前用户的资源管理器用户首选项掩码为 上次是 9032078010000000（系统默认是 9012038010000000）
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9030078090000000" /t reg_binary /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "UserPreferencesMask" /d "9012078010000000" /t reg_binary /f
 REM 界面-资源管理器-“此电脑”默认展开
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v NavPaneExpandToThisPC /t reg_dword /d 1 /f
 REM 界面-资源管理器-将启动延迟时间设置为 0 毫秒，以加快 Windows Explorer 的启动速度
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v StartupDelayInMSec /t reg_dword /d 0 /f
 REM 界面-资源管理器-将等待空闲状态设置为 0，以在启动 Windows Explorer 时不等待空闲状态
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v WaitforIdleState /t reg_dword /d 0 /f
+REM 界面-资源管理器-文件自动排序
+reg add "HKLM\SYSTEM\CurrentControlSet\Update" /v UpdateMode /t REG_DWORD /d 0 /f
 REM 界面-资源管理器-鼠标恢复加速
 reg add "HKCU\Control Panel\Mouse" /v MouseSpeed /t reg_sz /d 1 /f
 reg add "HKCU\Control Panel\Mouse" /v MouseThreshold1 /t reg_dword /d 6 /f
@@ -1221,8 +1197,6 @@ REM 界面-资源管理器-禁用在Windows资源管理器中显示常用项目
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowFrequent" /t reg_dword /d 0 /f
 REM 界面-资源管理器-禁用在Windows资源管理器中显示最近使用的项目
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowRecent" /t reg_dword /d 0 /f
-REM 界面-资源管理器-网络位置是否在"快速访问"中显示
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoSimpleNetIDList /t REG_DWORD /d 1 /f
 REM 界面-资源管理器-收起资源管理器功能区
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Ribbon" /v "MinimizedStateTabletModeOff" /t reg_dword /d 1 /f
 REM 界面-资源管理器-关闭显示所有文件扩展名
@@ -1839,60 +1813,45 @@ REM 软件-输入法-彻底关闭输入法表情、GIF、符号面板
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "EnableEmojiPanel" /t REG_DWORD /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "DisableEmojiPanel" /t REG_DWORD /d 1 /f
 
-
 REM 软件-记事本-自动换行
 reg add "HKCU\Software\Microsoft\Notepad" /v "fWrap" /t reg_dword /d 1 /f
 REM 软件-记事本-始终显示状态栏
 reg add "HKCU\Software\Microsoft\Notepad" /v "StatusBar" /t reg_dword /d 1 /f
 
-REM 软件-Windows 照片查看器-设置 默认打开方式
-if exist "C:\Program Files\JPEGView\JPEGView.exe" (
-    echo. [INFO] 检测到 JPEGView，设置为默认图片查看器…
-    set "ViewerPath=C:\Program Files\JPEGView\JPEGView.exe"
-    set "ProgID=JPEGView.Document"
-    set "AppName=JPEGView"
-    set "Desc=快速、小巧的图片查看器"
-) else (
-    echo. [INFO] 未检测到 JPEGView，使用 Windows 图片查看器…
-    set "ViewerPath=C:\Program Files\Windows Photo Viewer\PhotoViewer.dll"
-    set "ProgID=PhotoViewer.FileAssoc.Tiff"
-    set "AppName=Windows Photo Viewer"
-    set "Desc=Windows 图片查看器"
-)
-REM 软件-Windows 照片查看器-JPEGView系统设置注册
-if "%ProgID%"=="JPEGView.Document" (
-    reg add "HKLM\SOFTWARE\%AppName%\Capabilities" /v "ApplicationDescription" /t REG_SZ /d "%Desc%" /f >nul 2>&1
-    reg add "HKLM\SOFTWARE\%AppName%\Capabilities\FileAssociations" /f >nul 2>&1
+REM 软件-Windows 照片查看器-设置默认打开方式
+if exist "C:\Program Files\Imagine\Imagine64.exe" (
+    echo.检测到 Imagine，设置为默认图片查看器...
+    start "" "C:\Program Files\Imagine\Imagine64.exe" /assocext
+    timeout /t 2 /nobreak >nul
     for %%e in (jpg jpeg png bmp gif tif tiff ico webp) do (
-        reg add "HKLM\SOFTWARE\%AppName%\Capabilities\FileAssociations" /v ".%%e" /t REG_SZ /d "%ProgID%" /f >nul 2>&1
+        assoc .%%e=Imagine.Image
     )
-    reg add "HKLM\SOFTWARE\RegisteredApplications" /v "%AppName%" /t REG_SZ /d "SOFTWARE\%AppName%\Capabilities" /f >nul 2>&1
-)
-REM 软件-Windows 照片查看器-JPEGView注册右键打开方式 
-if "%ProgID%"=="JPEGView.Document" (
-    reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe" /f >nul 2>&1
-    reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe\shell\open\command" /ve /t REG_SZ /d "\"%ViewerPath%\" \"%%1\"" /f >nul 2>&1
-    reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe\SupportedTypes" /f >nul 2>&1
+    ftype Imagine.Image="C:\Program Files\Imagine\Imagine64.exe" "%%1"
+) else if exist "C:\ShaoHua\Tools\SetUserFTA.exe" (
+    echo.使用 SetUserFTA 设置 Windows 照片查看器...
     for %%e in (jpg jpeg png bmp gif tif tiff ico webp) do (
-        reg add "HKLM\SOFTWARE\Classes\Applications\JPEGView.exe\SupportedTypes" /v ".%%e" /t REG_SZ /d "" /f >nul 2>&1
+        reg add "HKCU\SOFTWARE\Kolbicz IT\SetUserFTA" /v "RunCount" /t REG_DWORD /d 1 /f >nul 2>&1
+        "C:\ShaoHua\Tools\SetUserFTA.exe" .%%e PhotoViewer.FileAssoc.Tiff >nul 2>&1
     )
-)
-REM 软件-Windows 照片查看器-设置文档类型基础
-if "%ProgID%"=="JPEGView.Document" (
-    reg add "HKLM\SOFTWARE\Classes\%ProgID%\shell\open\command" /ve /t REG_SZ /d "\"%ViewerPath%\" \"%%1\"" /f >nul 2>&1
-)
-REM 软件-Windows 照片查看器-SetUserFTA关联
-set "SetUserFTA=C:\ShaoHua\Tools\SetUserFTA.exe"
-if exist "%SetUserFTA%" (
-    for %%e in (jpg jpeg png bmp gif tif tiff ico webp) do (
-        reg add "HKCU\SOFTWARE\Kolbicz IT\SetUserFTA" /v "RunCount" /t reg_dword /d 1 /f >nul 2>&1
-        "%SetUserFTA%" .%%e %ProgID% >nul 2>&1
+    for %%e in (.jpg .jpeg .png .bmp .gif .tif .tiff .ico .webp) do (
+        reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v "%%e" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f >nul 2>&1
     )
 ) else (
-    echo. [WARNING] 未找到 SetUserFTA.exe，使用传统方法…
-    for %%e in (jpg jpeg png bmp gif tif tiff) do (
-        reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.%%e\UserChoice" /v "Progid" /t REG_SZ /d "%ProgID%" /f >nul 2>&1
+    echo.使用传统方法设置 Windows 照片查看器...
+    for %%e in (.jpg .jpeg .png .bmp .gif .tif .tiff .ico .webp) do (
+        reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v "%%e" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f >nul 2>&1
+        reg add "HKCU\Software\Classes\%%e" /ve /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f >nul 2>&1
     )
+    assoc .jpg=PhotoViewer.FileAssoc.Tiff
+    assoc .jpeg=PhotoViewer.FileAssoc.Tiff
+    assoc .png=PhotoViewer.FileAssoc.Tiff
+    assoc .bmp=PhotoViewer.FileAssoc.Tiff
+    assoc .gif=PhotoViewer.FileAssoc.Tiff
+    assoc .tif=PhotoViewer.FileAssoc.Tiff
+    assoc .tiff=PhotoViewer.FileAssoc.Tiff
+    assoc .ico=PhotoViewer.FileAssoc.Tiff
+    assoc .webp=PhotoViewer.FileAssoc.Tiff
+    ftype PhotoViewer.FileAssoc.Tiff="%SystemRoot%\System32\rundll32.exe" "%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll", ImageView_Fullscreen %%1
 )
 
 REM 软件-Windows Media Player-不显示首次使用对话框
@@ -2030,42 +1989,29 @@ reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "Default
 REM 软件-福昕阅读器-设置福昕阅读器的图标大小为中等
 reg add "HKCU\Software\Foxit Software\Foxit Reader 11.0\Preferences" /v "ToolbarIconSize" /t reg_dword /d 1 /f
 
-REM 软件-服务-Asus-关闭Asus的自动更新服务
-sc stop AsusUpdateCheck
-sc config AsusUpdateCheck start=disabled
-sc stop edgeupdatem
-sc config edgeupdatem start=disabled
-REM 软件-服务-福昕阅读器-关闭福昕阅读器的自动更新服务
-sc stop FoxitReaderUpdateService
-sc config FoxitReaderUpdateService start=disabled
-REM 软件-服务-WPS-关闭WPS Office的自动更新服务
-sc stop WPSUpdateService
-sc config WPSUpdateService start= disabled
-net stop wpscloudsvr
-sc config wpscloudsvr start=disabled
-REM 软件-服务-禁用并停止PDF服务
-net stop FoxitPhantomPDFUpdateService
-sc config FoxitPhantomPDFUpdateService start=disabled
-REM 软件-服务-Edge-关闭Edge的自动更新服务
-net stop MicrosoftEdgeElevationService
-sc config MicrosoftEdgeElevationService start=disabled
-net stop edgeupdate
-sc config edgeupdate start=disabled
-sc delete edgeupdate
-net stop edgeupdatem
-sc config edgeupdatem start=disabled
-net stop MicrosoftEdgeElevationService
-sc config MicrosoftEdgeElevationService start=disabled
-REM 软件-服务-停止并禁用旧版Google更新服务（Chrome 78-122左右使用的服务名）
-sc stop gupdate
-sc config gupdate start= disabled
-sc stop gupdatem
-sc config gupdatem start= disabled
-REM 2. 停止并禁用新版Google更新服务（Chrome 123及以上版本引入的新服务名）
-sc stop GoogleUpdater InternalService
-sc config "GoogleUpdater InternalService" start= disabled
-sc stop "GoogleUpdater Service"
-sc config "GoogleUpdater Service" start= disabled
+REM 软件-启动项-禁用
+for /f "tokens=1" %%i in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" ^| findstr /i "GoogleUpdaterTaskUser GoogleChromeAutoLaunch GoogleUpdate GoogleUpdater MicrosoftEdgeAutoLaunch LaunchOnLogin 360se 360browser 360SafeBrowser 360ent Opera Liebao UCBrowser"') do (reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "%%i" /f)
+for /f "tokens=1" %%i in ('reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" ^| findstr /i "GoogleUpdaterTaskUser GoogleChromeAutoLaunch GoogleUpdate GoogleUpdater MicrosoftEdgeAutoLaunch LaunchOnLogin 360se 360browser 360SafeBrowser 360ent Opera Liebao UCBrowser"') do (reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "%%i" /f)
+
+REM 软件-服务-Asus-EDGE-福昕阅读器-WPS-chrome
+(for %%s in (
+AsusUpdateCheck
+edgeupdatem
+FoxitReaderUpdateService
+WPSUpdateService
+wpscloudsvr
+FoxitPhantomPDFUpdateService
+MicrosoftEdgeElevationService
+edgeupdate
+gupdate
+gupdatem
+GoogleUpdater InternalService
+GoogleUpdater Service
+Microsoft OneDrive
+) do (
+sc stop "%%s"
+sc config "%%s" start= disabled
+))
 
 REM 软件-软件启动项-禁用 OneDrive 同步客户端
 reg add "HKLM\Software\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSyncNGSC" /t reg_dword /d 1 /f
@@ -2075,10 +2021,10 @@ REM 软件-软件启动项-禁用OneDrive的系统服务
 sc config OneSyncSvc start= disabled
 
 REM 软件-计划任务-通配符删除
-powershell "$t=Get-ScheduledTask|?{$_.TaskName -match 'update|edge|google|office|firefox|fox|wps'};$t|ft TaskName,State -AutoSize;$t|Unregister-ScheduledTask -Confirm:$false"
+powershell "$t=Get-ScheduledTask|?{$_.TaskName -match 'update|edge|chrome|google|RunPlatformExperienceHelper|office|firefox|fox|pdf|wps|360Zip'};$t|ft TaskName,State -AutoSize;$t|Unregister-ScheduledTask -Confirm:$false"
 
-REM 软件-服务-通配符删除
-powershell "$s=Get-Service|?{$_.Name -match 'update|google|fox|edge|pdf|wps' -and $_.Name -ne 'tzautoupdate'};$s|ft DisplayName,Status,StartType -AutoSize;$s|Stop-Service -Force;$s|Set-Service -StartupType Disabled"
+REM 软件-服务-通配符禁用
+powershell "$s=Get-Service|?{$_.Name -match 'update|edge|chrome|google|RunPlatformExperienceHelper|office|firefox|fox|pdf|wps|360Zip' -and $_.Name -ne 'tzautoupdate'};$s|ft DisplayName,Status,StartType -AutoSize;$s|Stop-Service -Force;$s|Set-Service -StartupType Disabled"
 goto :eof
 
 :better_wl
@@ -2349,6 +2295,7 @@ REM 界面-锁屏界面-屏幕保护程序启动超时时间
 reg add "HKCU\Control Panel\Desktop" /v "ScreenSaveTimeOut" /t reg_sz /d "180" /f
 call :finish_hso
 call :360ent
+reg add "HKCU\SOFTWARE\Kolbicz IT\SetUserFTA" /v "RunCount" /t REG_DWORD /d 1 /f >nul 2>&1
 if exist "C:\ShaoHua\Tools\SetUserFTA.exe" "C:\ShaoHua\Tools\SetUserFTA.exe" http ChromeHTML
 if exist "C:\ShaoHua\Tools\SetUserFTA.exe" "C:\ShaoHua\Tools\SetUserFTA.exe" https ChromeHTML
 call :upan
@@ -2385,6 +2332,7 @@ rd /q /s "C:\ShaoHua\Drv\Scan" 2>nul
 rd /q /s "C:\ShaoHua\Drv\Glenfly" 2>nul
 rd /q /s "C:\ShaoHua\Drv\KeyBoard" 2>nul
 if "%hs%"=="_hsw" goto :eof
+reg add "HKCU\SOFTWARE\Kolbicz IT\SetUserFTA" /v "RunCount" /t REG_DWORD /d 1 /f >nul 2>&1
 if exist "C:\ShaoHua\Tools\SetUserFTA.exe" "C:\ShaoHua\Tools\SetUserFTA.exe" http MSEdgeHTM
 if exist "C:\ShaoHua\Tools\SetUserFTA.exe" "C:\ShaoHua\Tools\SetUserFTA.exe" https MSEdgeHTM
 del /q /f "C:\ShaoHua\Key\SafeLoad.bat" 2>nul
@@ -2474,6 +2422,7 @@ reg add "HKCR\360HTML" /ve /d "360 Enterprise HTML Document" /f >nul 2>&1
 reg add "HKCR\360HTML\DefaultIcon" /ve /d "%ent_path%,0" /f >nul 2>&1
 reg add "HKCR\360HTML\shell\open\command" /ve /d "\"%ent_path%\" \"%%1\"" /f >nul 2>&1
 goto :eof
+
 :upan
 REM 安全U盘_v1_V2_V3_DEL
 del /q /f "%userprofile%\Desktop\安全U盘.lnk" 2>nul
@@ -2489,6 +2438,7 @@ del /q /f "%userprofile%\Desktop\安全U盘_V3.lnk" 2>nul
 if "%hs%"=="_hsf" goto :eof
 if exist "C:\ShaoHua\Soft\FugueExplorer_v3.exe" call :upanadd
 goto :eof
+
 :upanadd
 REM 安全U盘_V3_ADD
 if not exist "C:\ShaoHua\Soft\FugueExplorer_v3.exe" goto :eof
