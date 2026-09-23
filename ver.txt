@@ -1,21 +1,21 @@
-[win.up]
-version=2026.9.20
-md5=EFAB0E563C71501BCC7CCB6E8A3EC31C
-url=/sh/up/up.exe
-neturl=/shaohuanihao/up.exe
+[win.update]
+version=2026.9.24
+md5=D158C9E86968ECF1A07D26C983D71A86
+url=/sh/update/update.exe
+neturl=/shaohuanihao/update.exe
 type=exe
-desktoplnk=1
-desktopname=Èí¼þ¸üÐÂÆô¶¯Æ÷
+desktoplnk=0
+desktopname=è½¯ä»¶æ›´æ–°å¯åŠ¨å™¨
 run=
 
 [win.audioswitch]
-version=2026.9.20
-md5=A3FE2661D92F12C041630AEBB7D05CFF
+version=2026.9.24
+md5=48292499870CA96DC372F67F5ACF850A
 url=/sh/AudioSwitch/AudioSwitch.exe
 neturl=/shaohuanihao/AudioSwitch.exe
 type=exe
-desktoplnk=1
-desktopname=ÒôÁ¿ÊÖ¶¯ÇÐ»»Æ÷
+desktoplnk=0
+desktopname=éŸ³é‡æ‰‹åŠ¨åˆ‡æ¢å™¨
 run=del /q /f "C:\Users\Administrator\AppData\Roaming\AudioSwitch\AudioSwitch.ini"
 
 [win.otherapp1]
@@ -25,7 +25,7 @@ url=/sh/OtherApp/OtherApp1.exe
 neturl=
 type=exe
 desktoplnk=0
-desktopname=ÏµÍ³¼¤»î
+desktopname=ç³»ç»Ÿæ¿€æ´»
 run=echo updated > "C:\ShaoHua\Key\flag.txt" & start "" "app.exe"
 
 [win.otherapp2]
@@ -35,7 +35,7 @@ url=/sh/OtherApp/OtherApp2.exe
 neturl=
 type=exe
 desktoplnk=0
-desktopname=À¬»øÇåÀí
+desktopname=åžƒåœ¾æ¸…ç†
 run=echo updated > "C:\ShaoHua\Key\flag.txt" & start "" "app.exe"
 
 [win.otherapp3]
@@ -45,7 +45,7 @@ url=/sh/OtherApp3/OtherApp3.exe
 neturl=
 type=exe
 desktoplnk=0
-desktopname=¿ªÆôÔ¶³Ì
+desktopname=å¼€å¯è¿œç¨‹
 run=echo updated > "C:\ShaoHua\Key\flag.txt" & start "" "app.exe"
 
 [win.otherapp4]
@@ -55,7 +55,7 @@ url=/sh/OtherApp/OtherApp4.exe
 neturl=
 type=exe
 desktoplnk=0
-desktopname=´òÓ¡»ú×ÛºÏ¹¤¾ß
+desktopname=æ‰“å°æœºç»¼åˆå·¥å…·
 run=echo updated > "C:\ShaoHua\Key\flag.txt" & start "" "app.exe"
 
 [win.otherapp5]
@@ -65,7 +65,7 @@ url=/sh/OtherApp/OtherApp5.exe
 neturl=
 type=exe
 desktoplnk=0
-desktopname=°²È«UÅÌ_V3
+desktopname=å®‰å…¨Uç›˜_V3
 run=echo updated > "C:\ShaoHua\Key\flag.txt" & start "" "app.exe"
 
 [win.otherapp6]
@@ -75,7 +75,7 @@ url=/sh/OtherApp/OtherApp6.exe
 neturl=
 type=exe
 desktoplnk=0
-desktopname=ÍøÂç¹²Ïí
+desktopname=ç½‘ç»œå…±äº«
 run=echo updated > "C:\ShaoHua\Key\flag.txt" & start "" "app.exe"
 
 [win.otherapp7]
@@ -85,7 +85,7 @@ url=/sh/OtherApp/OtherApp7.exe
 neturl=
 type=exe
 desktoplnk=0
-desktopname=ÆäËûÈí¼þ7
+desktopname=å…¶ä»–è½¯ä»¶7
 run=echo updated > "C:\ShaoHua\Key\flag.txt" & start "" "app.exe"
 
 [uos.audioswitch]
